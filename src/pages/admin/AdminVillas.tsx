@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getDirectImageUrl } from '@/utils/imageUtils';
 import {
   Dialog,
   DialogContent,
@@ -72,71 +73,18 @@ const AdminVillas = () => {
     setShowForm(true);
   };
 
-  const compressImage = (file: File, quality = 0.8, maxWidth = 1200): Promise<Blob> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-          if (width > maxWidth) {
-            height *= maxWidth / width;
-            width = maxWidth;
-          }
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-          canvas.toBlob((blob) => resolve(blob || file), 'image/jpeg', quality);
-        };
-      };
-    });
+  const handleAddGalleryUrl = () => {
+    setForm(prev => ({ ...prev, gallery: [...prev.gallery, ''] }));
   };
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const compressedBlob = await compressImage(file);
-      const fileName = `main-${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-      const { data, error } = await supabase.storage.from('media').upload(fileName, compressedBlob);
-      if (error) throw error;
-      const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(data.path);
-      setForm(prev => ({ ...prev, image: publicUrl }));
-      toast.success('Imagen subida');
-    } catch (error: any) {
-      toast.error('Fallo al subir: Revisa políticas de Storage');
-    } finally {
-      setUploading(false);
-    }
+  const handleUpdateGalleryUrl = (index: number, url: string) => {
+    const newGallery = [...form.gallery];
+    newGallery[index] = url;
+    setForm(prev => ({ ...prev, gallery: newGallery }));
   };
 
-  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files?.length) return;
-    setGalleryUploading(true);
-    try {
-      const newGalleryItems: string[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const compressedBlob = await compressImage(files[i], 0.7, 1000);
-        const fileName = `gallery-${Date.now()}-${i}`;
-        const { data, error } = await supabase.storage.from('media').upload(fileName, compressedBlob);
-        if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(data.path);
-        newGalleryItems.push(publicUrl);
-      }
-      setForm(prev => ({ ...prev, gallery: [...prev.gallery, ...newGalleryItems] }));
-      toast.success(`${newGalleryItems.length} fotos añadidas`);
-    } catch (error: any) {
-      toast.error('Error galería');
-    } finally {
-      setGalleryUploading(false);
-    }
+  const handleRemoveGalleryUrl = (index: number) => {
+    setForm(prev => ({ ...prev, gallery: form.gallery.filter((_, i) => i !== index) }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -217,16 +165,23 @@ const AdminVillas = () => {
             {villas?.map((villa: any) => (
               <div key={villa.id} className="bg-white rounded-[2rem] border border-neutral-200 overflow-hidden hover:shadow-xl transition-all">
                 <div className="relative aspect-[4/3]">
-                  <img src={villa.image} className="w-full h-full object-cover" />
+                  <img src={getDirectImageUrl(villa.image) || ''} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                     <button onClick={() => handleEdit(villa)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center"><Edit2 size={16} /></button>
-                     <button onClick={() => handleDelete(villa.id)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-destructive"><Trash2 size={16} /></button>
+                     <button onClick={() => handleEdit(villa)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center transition-transform hover:scale-110"><Edit2 size={16} /></button>
+                     <button onClick={() => handleDelete(villa.id)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose-500 transition-transform hover:scale-110"><Trash2 size={16} /></button>
                   </div>
                 </div>
                 <div className="p-6">
                    <h2 className="text-xl font-display font-medium text-[#111827]">{villa.name}</h2>
                    <p className="text-neutral-500 text-sm mt-1">Huéspedes: {villa.capacity}</p>
-                   <p className="text-lg font-bold text-[#111827] mt-4">RD${villa.price.toLocaleString()}</p>
+                   <div className="flex items-center justify-between mt-4">
+                      <p className="text-lg font-black text-primary">RD${villa.price.toLocaleString()}</p>
+                      <div className="flex -space-x-2">
+                         {villa.gallery?.slice(0, 3).map((img: string, i: number) => (
+                            <img key={i} src={getDirectImageUrl(img) || ''} className="w-6 h-6 rounded-full border-2 border-white object-cover shadow-sm" />
+                         ))}
+                      </div>
+                   </div>
                 </div>
               </div>
             ))}
@@ -275,29 +230,72 @@ const AdminVillas = () => {
               </div>
 
               {/* Visual Section */}
-              <div className="lg:col-span-5 space-y-10">
+              <div className="lg:col-span-5 space-y-8">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[10px] font-black uppercase text-neutral-400">Imagen Principal</label>
-                    {uploading && <Loader2 className="animate-spin text-primary" size={16} />}
+                  <label className="text-[10px] font-black uppercase text-neutral-400">Imagen Principal (URL)</label>
+                  <div className="relative">
+                    <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
+                    <input 
+                      value={form.image} 
+                      onChange={e => setForm({...form, image: e.target.value})} 
+                      className="w-full bg-neutral-50 border border-neutral-200 rounded-xl pl-12 pr-4 py-3 outline-none focus:border-black transition-all text-sm font-medium"
+                      placeholder="https://drive.google.com/..."
+                    />
                   </div>
-                  <label className="block aspect-[3/4] rounded-3xl overflow-hidden bg-neutral-50 border-2 border-dashed border-neutral-200 cursor-pointer">
-                    {form.image ? <img src={form.image} className="w-full h-full object-cover" /> : <div className="h-full flex items-center justify-center text-neutral-300"><ImageIcon size={40} /></div>}
-                    <input type="file" className="hidden" onChange={handleUpload} />
-                  </label>
+                  <div className="aspect-video rounded-3xl overflow-hidden bg-neutral-50 border border-neutral-100 shadow-inner group relative">
+                    {form.image ? (
+                      <img src={getDirectImageUrl(form.image) || ''} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-neutral-200"><ImageIcon size={40} /></div>
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur-sm p-2 opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
+                       <span className="text-white text-[9px] font-black uppercase tracking-widest">Vista Previa Real</span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
                    <div className="flex justify-between items-center">
-                      <label className="text-[10px] font-black uppercase text-neutral-400">Galería</label>
-                      <label className="text-[10px] font-bold text-primary cursor-pointer">Añadir Fotos<input type="file" multiple className="hidden" onChange={handleGalleryUpload}/></label>
+                      <label className="text-[10px] font-black uppercase text-neutral-400">Galería de Fotos (URLs)</label>
+                      <button 
+                        type="button"
+                        onClick={handleAddGalleryUrl}
+                        className="text-[10px] font-black uppercase text-primary bg-primary/10 px-3 py-1.5 rounded-full hover:bg-primary/20 transition-colors"
+                      >
+                        Añadir URL
+                      </button>
                    </div>
-                   <div className="grid grid-cols-2 gap-3">
+                   <div className="space-y-3">
                       {form.gallery.map((img, idx) => (
-                         <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-neutral-100">
-                            <img src={img} className="w-full h-full object-cover" />
+                         <div key={idx} className="flex gap-2 items-start group">
+                            <div className="flex-1 space-y-2">
+                               <input 
+                                 value={img} 
+                                 onChange={e => handleUpdateGalleryUrl(idx, e.target.value)} 
+                                 placeholder="Enlace de la foto..."
+                                 className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black text-xs font-medium"
+                               />
+                               {img && (
+                                 <div className="h-20 rounded-xl overflow-hidden border border-neutral-100 shadow-sm relative w-32 ml-1">
+                                    <img src={getDirectImageUrl(img) || ''} className="w-full h-full object-cover" />
+                                    <button 
+                                      type="button"
+                                      onClick={() => handleRemoveGalleryUrl(idx)}
+                                      className="absolute top-1 right-1 bg-white/80 p-1.5 rounded-full hover:bg-red-500 hover:text-white transition-colors"
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
+                                 </div>
+                               )}
+                            </div>
                          </div>
                       ))}
+                      {form.gallery.length === 0 && (
+                        <div className="py-8 border-2 border-dashed border-neutral-100 rounded-3xl flex flex-col items-center justify-center text-neutral-300">
+                           <ImageIcon size={32} />
+                           <p className="text-[9px] font-black uppercase tracking-widest mt-2">Sin fotos en galería</p>
+                        </div>
+                      )}
                    </div>
                 </div>
               </div>
