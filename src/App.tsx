@@ -28,6 +28,7 @@ import AdminPromotions from "./pages/admin/AdminPromotions";
 import AdminCalendar from "./pages/admin/AdminCalendar";
 import AdminSettings from "./pages/admin/AdminSettings";
 import ClientAuthPage from "./pages/ClientAuthPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import MyReservationsPage from "./pages/MyReservationsPage";
 import NotFound from "./pages/NotFound";
 
@@ -57,6 +58,7 @@ const App = () => {
               <Route path="/pago" element={<PaymentPage />} />
               <Route path="/factura" element={<InvoicePage />} />
               <Route path="/auth" element={<ClientAuthPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/mis-reservas" element={<MyReservationsPage />} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
               <Route path="/admin" element={<AdminDashboard />} />

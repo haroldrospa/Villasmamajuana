@@ -138,11 +138,39 @@ const ClientAuthPage = () => {
               value={password}
               onChange={(e) => { setPassword(e.target.value); setError(''); }}
               className="bg-background border border-border rounded-lg pl-10 pr-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground w-full"
-              required
+              required={!loading}
               minLength={6}
               disabled={loading}
             />
           </div>
+
+          {isLogin && (
+            <button
+              type="button"
+              onClick={async () => {
+                if (!email) {
+                  setError('Por favor ingresa tu correo electrónico primero');
+                  return;
+                }
+                setLoading(true);
+                try {
+                  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/reset-password`,
+                  });
+                  if (error) throw error;
+                  toast.success('Correo de recuperación enviado exitosamente');
+                } catch (err: any) {
+                  setError(err.message || 'Error al enviar correo de recuperación');
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              className="text-[11px] text-muted-foreground hover:text-primary self-end font-semibold transition-colors"
+              disabled={loading}
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          )}
 
           {error && (
             <div className={`p-3 rounded-lg text-xs flex flex-col gap-1 ${
