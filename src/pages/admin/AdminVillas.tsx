@@ -91,39 +91,58 @@ const AdminVillas = () => {
     e.preventDefault();
     setSubmitting(true);
     const villaData: any = {
-      name: form.name,
-      price: parseFloat(form.price) || 0,
-      image: form.image,
-      capacity: parseInt(form.capacity) || 0,
-      description: form.description,
-      video_url: form.video_url || null,
-      amenities: typeof form.amenities === 'string' ? form.amenities.split(',').map(s => s.trim()).filter(s => s !== '') : form.amenities,
-      gallery: form.gallery,
-      location: form.location
+      name: form.name.trim(),
+      price: Number(form.price) || 0,
+      image: form.image.trim(),
+      capacity: Number(form.capacity) || 0,
+      description: form.description.trim(),
+      video_url: form.video_url?.trim() || null,
+      amenities: Array.isArray(form.amenities) ? form.amenities : form.amenities.split(',').map(s => s.trim()).filter(Boolean),
+      gallery: form.gallery.filter(Boolean),
+      location: typeof form.location === 'object' ? form.location : { address: form.location }
     };
+
+    console.log('Intentando guardar villa con datos:', villaData);
 
     try {
       if (editingVilla) {
-        const { error } = await supabase.from('villas').update(villaData).eq('id', editingVilla.id);
+        console.log('Actualizando villa existente ID:', editingVilla.id);
+        const { data, error } = await supabase
+          .from('villas')
+          .update(villaData)
+          .eq('id', editingVilla.id)
+          .select();
+
         if (error) {
-          console.error('Supabase Update Error:', error);
+          console.error('Error de Actualización:', error);
           throw error;
         }
+        console.log('Resultado de actualización:', data);
         toast.success('Villa actualizada correctamente');
       } else {
-        const id = form.name.toLowerCase().replace(/\s+/g, '-');
-        const { error } = await supabase.from('villas').insert([{ ...villaData, id }]);
+        const id = form.name.toLowerCase().trim().replace(/\s+/g, '-');
+        console.log('Insertando nueva villa con slug ID:', id);
+        const { data, error } = await supabase
+          .from('villas')
+          .insert([{ ...villaData, id }])
+          .select();
+
         if (error) {
-          console.error('Supabase Insert Error:', error);
+          console.error('Error de Inserción:', error);
           throw error;
         }
+        console.log('Resultado de inserción:', data);
         toast.success('Nueva villa publicada correctamente');
       }
       setShowForm(false);
       refetch();
     } catch (error: any) {
-      console.error('Submission Error:', error);
-      toast.error(`No se pudo guardar: ${error.message || 'Error desconocido'}`);
+      console.error('DATABASE ERROR:', error);
+      const errorMessage = error.message || 'Error desconocido de la base de datos';
+      const errorDetails = error.details || '';
+      toast.error(`ERROR AL GUARDAR: ${errorMessage} ${errorDetails}`, {
+        duration: 5000,
+      });
     } finally {
       setSubmitting(false);
     }
