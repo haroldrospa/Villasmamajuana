@@ -149,7 +149,6 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
         {/* HEADER SECTION */}
         <div className="flex justify-between items-start border-b-2 border-slate-900 pb-10">
           <div className="flex flex-col md:flex-row gap-6 md:items-center">
-            <img src="/logo.png" alt="Logo Villas Mamajuana" className="w-20 h-20 object-contain print:w-24 print:h-24 transition-all" />
             <div className="space-y-1">
               <h1 className="text-3xl font-display font-black tracking-tighter text-slate-900 uppercase">
                 {business.business_name}
