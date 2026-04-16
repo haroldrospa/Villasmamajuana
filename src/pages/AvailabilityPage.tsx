@@ -4,6 +4,7 @@ import ClientLayout from '@/components/ClientLayout';
 import { useReservations } from '@/hooks/useFinances';
 import { useVillas } from '@/hooks/useVillas';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { getDirectImageUrl } from '@/utils/imageUtils';
 
 const daysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
 const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -81,9 +82,9 @@ const AvailabilityPage = () => {
                   onClick={() => setSelectedVilla(v.id)}
                   className="group relative h-40 bg-card rounded-[2rem] overflow-hidden border border-border shadow-soft transition-all hover:scale-[1.02] active:scale-98"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-transparent z-10" />
                   <img 
-                    src={v.image_url || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'} 
+                    src={getDirectImageUrl(v.image_url) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'} 
                     alt={v.name} 
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
