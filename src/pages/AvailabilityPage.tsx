@@ -17,6 +17,8 @@ const AvailabilityPage = () => {
   const [year, setYear] = useState(today.getFullYear());
   const [selectedVilla, setSelectedVilla] = useState<string | null>(null);
 
+  const isLoading = isLoadingReservations || isLoadingVillas;
+
   const occupancyData = useMemo(() => {
     const map = new Map<string, string[]>(); // date -> villa_ids
     if (!reservations) return map;
