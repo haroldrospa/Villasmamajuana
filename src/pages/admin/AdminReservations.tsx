@@ -163,8 +163,15 @@ const AdminReservations = () => {
       await updateStatus(reservation.id, 'pago_parcial', true);
       await handleRegisterIncome(reservation, amount, 'Reserva (50%)');
       
+      const shortId = reservation.id.substring(0, 8).toUpperCase();
       const message = encodeURIComponent(
-        `¡Hola ${reservation.client_name}! 👋 Hemos recibido tu primer pago del 50% para la reserva *#${reservation.id}*. Tu estancia en *${reservation.villa_name}* para el día *${reservation.check_in}* está ahora *PRE-CONFIRMADA*. El saldo restante se paga al llegar. ¡Te esperamos! 🏡`
+        `¡Hola *${reservation.client_name}*! ✨🌿\n\n` +
+        `Hemos recibido exitosamente el pago del 50% de tu reserva *#${shortId}*.\n\n` +
+        `🏡 *Villa:* ${reservation.villa_name}\n` +
+        `📅 *Fecha:* ${reservation.check_in}\n` +
+        `✅ *Estado:* ¡CONFIRMADA!\n\n` +
+        `📢 *Importante:* Recuerda que el 50% restante debe ser liquidado al momento de realizar el *check-in*.\n\n` +
+        `¡Estamos ansiosos por recibirte en *Villas Mamajuana*! 🍃🦜`
       );
       const whatsappUrl = `https://wa.me/${reservation.client_phone?.replace(/\D/g, '') || whatsappNumber.replace(/\D/g, '')}?text=${message}`;
       
@@ -187,8 +194,14 @@ const AdminReservations = () => {
       await updateStatus(reservation.id, 'confirmada', true);
       await handleRegisterIncome(reservation, amount, 'Pago restante');
       
+      const shortId = reservation.id.substring(0, 8).toUpperCase();
       const message = encodeURIComponent(
-        `¡Hola ${reservation.client_name}! 👋 Te confirmamos que hemos recibido el pago total de tu reserva *#${reservation.id}*. ¡Todo listo para tu estancia en *${reservation.villa_name}*! 🏡✨`
+        `¡Hola *${reservation.client_name}*! ✨🌿\n\n` +
+        `¡Buenas noticias! Hemos recibido el pago total de tu reserva *#${shortId}*.\n\n` +
+        `🏡 *Villa:* ${reservation.villa_name}\n` +
+        `📅 *Fecha:* ${reservation.check_in}\n` +
+        `💰 *Estado:* TOTALMENTE PAGADA\n\n` +
+        `¡Todo listo para tu estancia! Nos vemos pronto en *Villas Mamajuana*. 🍃🦜`
       );
       const whatsappUrl = `https://wa.me/${reservation.client_phone?.replace(/\D/g, '') || whatsappNumber.replace(/\D/g, '')}?text=${message}`;
       
