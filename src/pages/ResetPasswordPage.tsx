@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
-import { Lock, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Lock, Loader2, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -11,6 +11,8 @@ const ResetPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,29 +88,45 @@ const ResetPasswordPage = () => {
             <div className="relative">
               <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Nueva contraseña"
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                className="bg-background border border-border rounded-xl pl-12 pr-4 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground w-full focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                className="bg-background border border-border rounded-xl pl-12 pr-12 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground w-full focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                 required
                 minLength={6}
                 disabled={loading}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                disabled={loading}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
             
             <div className="relative">
               <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
-                type="password"
+                type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Confirmar contraseña"
                 value={confirmPassword}
                 onChange={(e) => { setConfirmPassword(e.target.value); setError(''); }}
-                className="bg-background border border-border rounded-xl pl-12 pr-4 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground w-full focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                className="bg-background border border-border rounded-xl pl-12 pr-12 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground w-full focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                 required
                 minLength={6}
                 disabled={loading}
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                disabled={loading}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 

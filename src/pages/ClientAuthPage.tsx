@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
-import { User, Mail, Lock, Phone, Loader2, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, Phone, Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -15,6 +15,7 @@ const ClientAuthPage = () => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { signIn, signUp, resendConfirmationEmail } = useAuth();
 
@@ -133,15 +134,23 @@ const ClientAuthPage = () => {
           <div className="relative">
             <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="Contraseña"
               value={password}
               onChange={(e) => { setPassword(e.target.value); setError(''); }}
-              className="bg-background border border-border rounded-lg pl-10 pr-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground w-full"
+              className="bg-background border border-border rounded-lg pl-10 pr-10 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground w-full"
               required={!loading}
               minLength={6}
               disabled={loading}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              disabled={loading}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
           </div>
 
           {isLogin && (
