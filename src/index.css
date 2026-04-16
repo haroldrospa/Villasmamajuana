@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 39 33% 94%;
+    --foreground: 153 43% 21%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 153 43% 21%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 153 43% 21%;
+
+    --primary: 153 43% 21%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 153 38% 30%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 35 30% 90%;
+    --muted-foreground: 153 20% 35%;
+
+    --accent: 37 42% 61%;
+    --accent-foreground: 153 43% 21%;
+
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 35 25% 85%;
+    --input: 35 25% 85%;
+    --ring: 153 43% 21%;
+
+    --radius: 1rem;
+
+    --sage: 143 14% 50%;
+    --sage-foreground: 0 0% 100%;
+    --stone: 33 22% 85%;
+    --stone-foreground: 153 20% 35%;
+    --gold: 37 42% 61%;
+    --gold-foreground: 153 43% 21%;
+    --beige-soft: 33 30% 91%;
+
+    --font-display: 'Montserrat', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    --shadow-soft: 0 4px 20px -4px hsl(153 43% 21% / 0.08);
+    --shadow-card: 0 2px 12px -2px hsl(153 43% 21% / 0.06);
+    --shadow-elevated: 0 8px 30px -6px hsl(153 43% 21% / 0.12);
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 153 43% 21%;
+    --sidebar-primary: 153 43% 21%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 39 33% 94%;
+    --sidebar-accent-foreground: 153 43% 21%;
+    --sidebar-border: 35 25% 85%;
+    --sidebar-ring: 153 43% 21%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .gold-line {
+    border-top: 1px solid hsl(var(--gold));
+  }
+  .text-display {
+    font-family: var(--font-display);
+  }
+  .text-body {
+    font-family: var(--font-body);
+  }
+}
+
+@media print {
+  body {
+    background-color: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .print-hidden {
+    display: none !important;
+  }
+}
