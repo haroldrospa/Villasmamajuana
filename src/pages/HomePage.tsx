@@ -73,9 +73,15 @@ const HomePage = () => {
       </div>
 
       {/* Hero */}
-      <div className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] min-h-[400px] overflow-hidden">
-        <img src={heroUrl || heroImg} alt="Villas Mamajuana" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-foreground/40 via-foreground/20 to-background" />
+      <div className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] min-h-[450px] overflow-hidden bg-neutral-900">
+        <img 
+          src={heroUrl || heroImg} 
+          alt="Villas Mamajuana" 
+          className="absolute inset-0 w-full h-full object-cover will-change-transform scale-[1.01] transition-transform duration-700 hover:scale-105" 
+          loading="eager"
+          decoding="async"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-background" />
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
           <img src={logo} alt="Logo" className="w-16 h-16 mb-4" />
           <h1 className="font-display font-extrabold text-3xl md:text-5xl text-primary-foreground leading-tight">
