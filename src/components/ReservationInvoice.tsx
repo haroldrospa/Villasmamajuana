@@ -157,26 +157,6 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
               <p className="text-xs font-bold text-slate-500 tracking-wider">ECO-TOURISM & LUXURY VILLAS</p>
             </div>
           </div>
-            
-            <div className="space-y-1 text-sm font-medium text-slate-600">
-              <div className="flex items-center gap-2">
-                <Hash size={14} className="text-slate-400" />
-                <span>RNC: {business.rnc}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin size={14} className="text-slate-400" />
-                <span>{business.address}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone size={14} className="text-slate-400" />
-                <span>{business.phone}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail size={14} className="text-slate-400" />
-                <span>{business.email}</span>
-              </div>
-            </div>
-          </div>
 
           <div className="text-right space-y-2">
             <div className="bg-slate-900 text-white px-6 py-3 inline-block">
