@@ -71,6 +71,17 @@ const AdminSettings = () => {
     }
   };
 
+  const getDirectImageUrl = (url: string | null) => {
+    if (!url) return null;
+    if (url.includes('drive.google.com')) {
+      const idMatch = url.match(/\/d\/(.+?)\/?(?:\/|$|\?)/) || url.match(/id=(.+?)(?:&|$)/);
+      if (idMatch && idMatch[1]) {
+        return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+      }
+    }
+    return url;
+  };
+
   return (
     <AdminLayout>
       <PageTransition className="px-6 py-10 md:px-12 bg-[#F9FAFB] min-h-screen">
@@ -122,14 +133,14 @@ const AdminSettings = () => {
                     </div>
                   </div>
 
-                  {settings.hero_image_url && (
-                    <div className="relative aspect-[21/9] w-full rounded-3xl overflow-hidden border border-neutral-100 shadow-lg animate-in fade-in zoom-in-95 duration-500">
-                      <img 
-                        src={settings.hero_image_url} 
-                        alt="Vista previa" 
-                        className="w-full h-full object-cover"
-                        onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80' }}
-                      />
+                    {settings.hero_image_url && (
+                      <div className="relative aspect-[21/9] w-full rounded-3xl overflow-hidden border border-neutral-100 shadow-lg animate-in fade-in zoom-in-95 duration-500">
+                        <img 
+                          src={getDirectImageUrl(settings.hero_image_url) || ''} 
+                          alt="Vista previa" 
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80' }}
+                        />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
                         <span className="text-white text-[10px] font-black uppercase tracking-[0.2em] bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
                           Vista Previa de Inicio

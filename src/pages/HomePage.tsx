@@ -25,6 +25,17 @@ const HomePage = () => {
     fetchHero();
   }, []);
 
+  const getDirectImageUrl = (url: string | null) => {
+    if (!url) return null;
+    if (url.includes('drive.google.com')) {
+      const idMatch = url.match(/\/d\/(.+?)\/?(?:\/|$|\?)/) || url.match(/id=(.+?)(?:&|$)/);
+      if (idMatch && idMatch[1]) {
+        return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+      }
+    }
+    return url;
+  };
+
   return (
   <ClientLayout>
     <PageTransition>
@@ -75,7 +86,7 @@ const HomePage = () => {
       {/* Hero */}
       <div className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] min-h-[450px] overflow-hidden bg-neutral-900">
         <img 
-          src={heroUrl || heroImg} 
+          src={getDirectImageUrl(heroUrl) || heroImg} 
           alt="Villas Mamajuana" 
           className="absolute inset-0 w-full h-full object-cover will-change-transform scale-[1.01] transition-transform duration-700 hover:scale-105" 
           loading="eager"
