@@ -164,8 +164,13 @@ const AdminVillas = () => {
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {villas?.map((villa: any) => (
               <div key={villa.id} className="bg-white rounded-[2rem] border border-neutral-200 overflow-hidden hover:shadow-xl transition-all">
-                <div className="relative aspect-[4/3]">
-                  <img src={getDirectImageUrl(villa.image) || ''} className="w-full h-full object-cover" />
+                <div className="relative aspect-[4/3] bg-neutral-100">
+                  <img 
+                    src={getDirectImageUrl(villa.image) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'} 
+                    alt={villa.name}
+                    className="w-full h-full object-cover transition-opacity duration-300"
+                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80' }}
+                  />
                   <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                      <button onClick={() => handleEdit(villa)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center transition-transform hover:scale-110"><Edit2 size={16} /></button>
                      <button onClick={() => handleDelete(villa.id)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose-500 transition-transform hover:scale-110"><Trash2 size={16} /></button>
