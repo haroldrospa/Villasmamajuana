@@ -30,7 +30,7 @@ const HomePage = () => {
     if (url.includes('drive.google.com')) {
       const idMatch = url.match(/\/d\/(.+?)\/?(?:\/|$|\?)/) || url.match(/id=(.+?)(?:&|$)/);
       if (idMatch && idMatch[1]) {
-        return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+        return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
       }
     }
     return url;
