@@ -9,6 +9,7 @@ const AdminUsers = () => {
   const { admins, currentAdmin, activityLogs, isLoading, toggleAdminRole } = useAdminAuth();
   const [showLogs, setShowLogs] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [roleFilter, setRoleFilter] = useState<'all' | 'admin'>('admin');
 
   const handleToggleRole = async (userId: string, currentRole: 'admin' | 'client') => {
     if (userId === currentAdmin?.id) {
@@ -25,6 +26,10 @@ const AdminUsers = () => {
     }
     setProcessingId(null);
   };
+
+  const filteredUsers = roleFilter === 'admin' 
+    ? admins.filter(u => u.role === 'admin') 
+    : admins;
 
   return (
     <AdminLayout>
@@ -46,16 +51,40 @@ const AdminUsers = () => {
           </div>
         </div>
 
-        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6 flex gap-3 items-start">
-          <Info className="text-primary shrink-0 mt-0.5" size={18} />
-          <div>
-            <p className="text-xs text-foreground font-semibold">Nota Importante</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Para añadir un nuevo administrador, la persona debe registrarse primero en el sitio web principal. 
-              Una vez registrada, aparecerá en esta lista y podrás promoverla a Administrador.
-            </p>
-          </div>
+        <div className="flex bg-muted/30 p-1 rounded-xl w-fit mb-6 border border-border/50">
+          <button
+            onClick={() => setRoleFilter('admin')}
+            className={`px-6 py-2 rounded-lg text-xs font-display font-bold transition-all ${
+              roleFilter === 'admin' 
+                ? 'bg-white shadow-sm text-[#111827]' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Administradores
+          </button>
+          <button
+            onClick={() => setRoleFilter('all')}
+            className={`px-6 py-2 rounded-lg text-xs font-display font-bold transition-all ${
+              roleFilter === 'all' 
+                ? 'bg-white shadow-sm text-[#111827]' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Todos los Usuarios
+          </button>
         </div>
+
+        {roleFilter === 'all' && (
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6 flex gap-3 items-start animate-in fade-in slide-in-from-top-1 duration-300">
+            <Info className="text-primary shrink-0 mt-0.5" size={18} />
+            <div>
+              <p className="text-xs text-foreground font-semibold">Nota Importante</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Para añadir un nuevo administrador, busca al usuario en esta lista y promotedlo con el botón "Hacer Admin".
+              </p>
+            </div>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 bg-card rounded-lg border border-border border-dashed">
@@ -64,7 +93,7 @@ const AdminUsers = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {admins.map((user) => (
+            {filteredUsers.map((user) => (
               <div key={user.id} className="bg-card rounded-lg shadow-card p-4 gold-line transition-all hover:shadow-md">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
