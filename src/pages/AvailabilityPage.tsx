@@ -15,9 +15,7 @@ const AvailabilityPage = () => {
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
-  const [selectedVilla, setSelectedVilla] = useState<string>('all');
-
-  const isLoading = isLoadingReservations || isLoadingVillas;
+  const [selectedVilla, setSelectedVilla] = useState<string | null>(null);
 
   const occupancyData = useMemo(() => {
     const map = new Map<string, string[]>(); // date -> villa_ids
@@ -29,9 +27,6 @@ const AvailabilityPage = () => {
       const start = new Date(r.check_in);
       const end = new Date(r.check_out);
       
-      // We iterate through dates. Note: for simplicity in this logic, 
-      // check-out day is usually half-day, but here we count it as occupied 
-      // if the business logic expects whole days.
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split('T')[0];
         const current = map.get(dateStr) || [];
@@ -55,119 +50,142 @@ const AvailabilityPage = () => {
     else setMonth(m => m + 1);
   };
 
-  const totalVillasCount = villas?.length || 0;
+  const selectedVillaData = villas?.find(v => v.id === selectedVilla);
 
   return (
     <ClientLayout>
       <PageTransition>
-        <div className="px-6 pt-8 pb-6 max-w-lg mx-auto">
-          <h1 className="font-display font-extrabold text-2xl text-foreground">Disponibilidad</h1>
-          <p className="text-muted-foreground text-sm mt-1 mb-4">Consulta fechas disponibles</p>
+        <div className="px-6 pt-8 pb-10 max-w-lg mx-auto min-h-[80vh]">
+          <header className="mb-6">
+            <h1 className="font-display font-black text-3xl text-foreground tracking-tight">Disponibilidad</h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              {!selectedVilla 
+                ? "Selecciona una de nuestras villas para continuar" 
+                : `Viendo disponibilidad para: ${selectedVillaData?.name}`}
+            </p>
+          </header>
 
           {isLoading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="animate-spin text-primary h-8 w-8" />
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <Loader2 className="animate-spin text-primary h-10 w-10" />
+              <p className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest">Cargando...</p>
+            </div>
+          ) : !selectedVilla ? (
+            /* VILLA SELECTION SCREEN */
+            <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {(villas || []).map((v) => (
+                <button
+                  key={v.id}
+                  onClick={() => setSelectedVilla(v.id)}
+                  className="group relative h-40 bg-card rounded-[2rem] overflow-hidden border border-border shadow-soft transition-all hover:scale-[1.02] active:scale-98"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
+                  <img 
+                    src={v.image_url || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'} 
+                    alt={v.name} 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="relative z-20 h-full flex flex-col justify-center px-8 text-left">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1">Villa Exclusiva</span>
+                    <h3 className="text-2xl font-display font-black text-white leading-none">{v.name}</h3>
+                    <p className="text-xs text-white/70 mt-2 font-medium">Pulsa para ver disponibilidad</p>
+                  </div>
+                </button>
+              ))}
+              
+              <button
+                onClick={() => setSelectedVilla('all')}
+                className="bg-muted/30 border border-dashed border-border py-6 rounded-[2rem] text-muted-foreground font-display font-bold text-sm transition-colors hover:bg-muted/50"
+              >
+                Ver todas las villas (Vista General)
+              </button>
             </div>
           ) : (
-            <>
-              {/* Villa filter */}
-              <select
-                value={selectedVilla}
-                onChange={(e) => setSelectedVilla(e.target.value)}
-                className="w-full bg-card border border-border rounded-lg px-4 py-3 text-sm mb-5 font-body text-foreground"
-              >
-                <option value="all">Todas las villas</option>
-                {(villas || []).map(v => (
-                  <option key={v.id} value={v.id}>{v.name}</option>
-                ))}
-              </select>
-            </>
-          )}
+            /* CALENDAR VIEW */
+            <div className="animate-in fade-in zoom-in-95 duration-500">
+              <div className="flex items-center justify-between mb-4">
+                <button 
+                  onClick={() => setSelectedVilla(null)}
+                  className="text-xs font-display font-bold text-primary flex items-center gap-1.5 bg-primary/10 px-4 py-2 rounded-full hover:bg-primary/20 transition-colors"
+                >
+                  <ChevronLeft size={14} /> Cambiar Villa
+                </button>
+              </div>
 
-          {/* Calendar */}
-          <div className="bg-card rounded-lg shadow-card p-4">
-            <div className="flex items-center justify-between mb-4">
-              <button onClick={prev} className="p-2 rounded-lg hover:bg-muted transition-colors">
-                <ChevronLeft size={18} className="text-foreground" />
-              </button>
-              <span className="font-display font-bold text-foreground">
-                {monthNames[month]} {year}
-              </span>
-              <button onClick={next} className="p-2 rounded-lg hover:bg-muted transition-colors">
-                <ChevronRight size={18} className="text-foreground" />
-              </button>
-            </div>
+              <div className="bg-white rounded-[2.5rem] shadow-xl border border-neutral-100 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <button onClick={prev} className="p-3 rounded-2xl bg-neutral-50 hover:bg-neutral-100 transition-colors border border-neutral-100">
+                    <ChevronLeft size={20} className="text-neutral-900" />
+                  </button>
+                  <span className="font-display font-black text-xl text-neutral-900 tracking-tight">
+                    {monthNames[month]} {year}
+                  </span>
+                  <button onClick={next} className="p-3 rounded-2xl bg-neutral-50 hover:bg-neutral-100 transition-colors border border-neutral-100">
+                    <ChevronRight size={20} className="text-neutral-900" />
+                  </button>
+                </div>
 
-            <div className="grid grid-cols-7 gap-1 text-center">
-              {dayNames.map(d => (
-                <span key={d} className="text-[10px] font-display font-semibold text-muted-foreground pb-1">{d}</span>
-              ))}
-              {Array.from({ length: firstDayOfWeek }).map((_, i) => <span key={`e-${i}`} />)}
-              {Array.from({ length: totalDays }).map((_, i) => {
-                const day = i + 1;
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const occupiedVillaIds = occupancyData.get(dateStr) || [];
-                const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                <div className="grid grid-cols-7 gap-2 text-center">
+                  {dayNames.map(d => (
+                    <span key={d} className="text-[10px] font-black uppercase tracking-widest text-neutral-400 pb-3">{d}</span>
+                  ))}
+                  {Array.from({ length: firstDayOfWeek }).map((_, i) => <span key={`e-${i}`} />)}
+                  {Array.from({ length: totalDays }).map((_, i) => {
+                    const day = i + 1;
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const occupiedVillaIds = occupancyData.get(dateStr) || [];
+                    const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
 
-                let cellClass = "";
-                let cellStyle = {};
+                    let cellClass = "";
+                    let cellStyle = {};
+                    const isAll = selectedVilla === 'all';
+                    const counts = occupiedVillaIds.length;
+                    const totalVillasCount = villas?.length || 0;
 
-                if (selectedVilla === 'all') {
-                  const count = occupiedVillaIds.length;
-                  if (count === 0) {
-                    cellClass = "bg-sage/20 text-foreground";
-                  } else if (count >= totalVillasCount) {
-                    cellClass = "bg-[#D1C7BD] text-stone-foreground"; // Ocupado total
-                  } else {
-                    // Parcialmente ocupado - Diagonal split
-                    cellStyle = {
-                      background: "linear-gradient(135deg, #D1C7BD 50%, #E8F0E8 50%)"
-                    };
-                    cellClass = "text-foreground font-bold shadow-sm border border-white/20";
-                  }
-                } else {
-                  const isSpecificOccupied = occupiedVillaIds.includes(selectedVilla);
-                  cellClass = isSpecificOccupied ? "bg-[#D1C7BD] text-stone-foreground" : "bg-sage/20 text-foreground";
-                }
+                    if (isAll) {
+                      if (counts === 0) {
+                        cellClass = "bg-emerald-50 text-emerald-900 border-emerald-100";
+                      } else if (counts >= totalVillasCount) {
+                        cellClass = "bg-rose-50 text-rose-900 border-rose-100";
+                      } else {
+                        cellStyle = { background: "linear-gradient(135deg, #F9FAFB 50%, #FEF2F2 50%)" };
+                        cellClass = "text-neutral-900 border-neutral-100";
+                      }
+                    } else {
+                      const isSpecificOccupied = occupiedVillaIds.includes(selectedVilla);
+                      cellClass = isSpecificOccupied 
+                        ? "bg-rose-50 text-rose-900 border-rose-100" 
+                        : "bg-emerald-50 text-emerald-900 border-emerald-100";
+                    }
 
-                return (
-                  <div
-                    key={day}
-                    style={cellStyle}
-                    title={occupiedVillaIds.length > 0 ? `Ocupadas: ${occupiedVillaIds.map(id => villas?.find(v => v.id === id)?.name).join(', ')}` : 'Disponible'}
-                    className={`aspect-square flex flex-col items-center justify-center rounded-md text-[11px] font-medium transition-colors relative group overflow-hidden ${cellClass} ${isToday ? 'ring-2 ring-primary z-10' : ''}`}
-                  >
-                    <span>{day}</span>
-                    {selectedVilla === 'all' && occupiedVillaIds.length > 0 && occupiedVillaIds.length < totalVillasCount && (
-                      <span className="absolute bottom-0.5 right-0.5 text-[7px] leading-tight font-black bg-white/40 text-background px-1 rounded-sm uppercase tracking-tighter">1/2</span>
-                    )}
+                    return (
+                      <div
+                        key={day}
+                        style={cellStyle}
+                        className={`aspect-square flex flex-col items-center justify-center rounded-2xl text-xs font-black border transition-all ${cellClass} ${isToday ? 'ring-2 ring-primary ring-offset-2 scale-105 z-10' : ''}`}
+                      >
+                        {day}
+                        {isAll && counts > 0 && counts < totalVillasCount && (
+                          <span className="text-[7px] mt-0.5 opacity-60">1/2</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-neutral-50 grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2.5 bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100/50">
+                    <div className="w-4 h-4 rounded-md bg-emerald-500 shadow-sm" />
+                    <span className="text-[10px] font-black uppercase text-emerald-900 tracking-tight">Disponible</span>
                   </div>
-                );
-              })}
-            </div>
-
-            <div className="grid grid-cols-1 gap-2 mt-6 pt-4 border-t border-border">
-              <div className="flex items-center justify-between text-[11px]">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-sm bg-sage/20 border border-border" />
-                  <span className="text-muted-foreground font-medium">Disponible (Ambas)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-sm" style={{ background: "linear-gradient(135deg, #D1C7BD 50%, #E8F0E8 50%)" }} />
-                  <span className="text-muted-foreground font-medium">Parcial (1 Ocupada)</span>
+                  <div className="flex items-center gap-2.5 bg-rose-50/50 p-2.5 rounded-xl border border-rose-100/50">
+                    <div className="w-4 h-4 rounded-md bg-rose-500 shadow-sm" />
+                    <span className="text-[10px] font-black uppercase text-rose-900 tracking-tight">Ocupada</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-[11px]">
-                <div className="w-4 h-4 rounded-sm bg-[#D1C7BD]" />
-                <span className="text-muted-foreground font-medium">Total (Ocupado completo)</span>
-              </div>
-              {selectedVilla === 'all' && (
-                <p className="text-[10px] text-primary font-body bg-primary/5 p-2 rounded-lg mt-1 italic">
-                  💡 Pasa el dedo o el mouse sobre los días con dos colores para ver cuál villa está ocupada.
-                </p>
-              )}
             </div>
-          </div>
+          )}
         </div>
       </PageTransition>
     </ClientLayout>
