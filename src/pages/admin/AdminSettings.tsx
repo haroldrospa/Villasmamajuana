@@ -172,18 +172,38 @@ const AdminSettings = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">URL Imagen de Portada (Hero)</label>
-                    <div className="relative">
-                      <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
-                      <input 
-                        value={(settings as any).hero_image_url || ''}
-                        onChange={e => setSettings({...settings, hero_image_url: e.target.value})}
-                        className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl pl-12 pr-6 py-4 outline-none focus:border-black transition-all text-sm font-medium"
-                        placeholder="https://images.unsplash.com/..."
-                      />
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">URL Imagen de Portada (Hero)</label>
+                      <div className="relative">
+                        <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
+                        <input 
+                          value={(settings as any).hero_image_url || ''}
+                          onChange={e => setSettings({...settings, hero_image_url: e.target.value})}
+                          className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl pl-12 pr-6 py-4 outline-none focus:border-black transition-all text-sm font-medium"
+                          placeholder="Pega el enlace de la imagen aquí..."
+                        />
+                      </div>
                     </div>
-                    <p className="text-[10px] text-neutral-400 ml-1 mt-1 font-medium italic">Pega aquí el enlace de una imagen (Unsplash, etc.) para cambiar la foto de inicio.</p>
+
+                    {((settings as any).hero_image_url) && (
+                      <div className="relative aspect-video w-full max-w-sm rounded-[2rem] overflow-hidden border border-neutral-100 shadow-inner group animate-in fade-in zoom-in-95 duration-500">
+                        <img 
+                          src={(settings as any).hero_image_url} 
+                          alt="Vista previa portada" 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80';
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <span className="text-white text-[10px] font-black uppercase tracking-widest">Vista Previa Actual</span>
+                        </div>
+                      </div>
+                    )}
+                    <p className="text-[10px] text-neutral-400 ml-1 font-medium italic">
+                      Puedes usar enlaces de Unsplash (ej: https://images.unsplash.com/...) o cualquier imagen pública en internet.
+                    </p>
                   </div>
                 </div>
 
