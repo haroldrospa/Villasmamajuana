@@ -248,12 +248,6 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
         {/* SUMMARY SECTION */}
         <div className="mt-10 border-t-2 border-slate-900 pt-8 flex justify-between">
           <div className="max-w-[300px] space-y-6">
-            <div className="bg-slate-50 p-4 border border-slate-200 rounded-lg">
-              <h4 className="text-[10px] font-black text-slate-400 uppercase mb-2">Información de Pago</h4>
-              <p className="text-xs text-slate-600 font-bold leading-relaxed italic">
-                {business.bank_info}
-              </p>
-            </div>
             <div className="pt-10">
               <div className="w-48 border-t border-slate-300 pt-2 text-center">
                 <p className="text-[10px] font-black text-slate-400 uppercase">Firma Autorizada</p>
