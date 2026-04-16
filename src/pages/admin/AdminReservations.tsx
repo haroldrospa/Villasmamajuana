@@ -132,22 +132,73 @@ const AdminReservations = () => {
     }
   };
 
-  const handleApprove = (reservation: any) => {
-    const confirmApprove = confirm(`¿Aprobar reserva de ${reservation.client_name}?`);
+  const handleRegisterIncome = async (reservation: any, amount: number, type: 'Reserva (50%)' | 'Pago restante') => {
+    try {
+      const { error } = await supabase
+        .from('incomes')
+        .insert([{
+          date: new Date().toISOString().split('T')[0],
+          concept: `${type} - ${reservation.client_name} (${reservation.villa_name})`,
+          amount: amount,
+          payment_method: 'Transferencia',
+          client: reservation.client_name,
+          villa_id: reservation.villa_id,
+          income_type: type,
+        }]);
+      if (error) throw error;
+      return true;
+    } catch (e) {
+      console.error('Error registering income:', e);
+      return false;
+    }
+  };
+
+  const handleApprove = async (reservation: any) => {
+    const amount = (reservation.total_amount || 0) / 2;
+    const confirmApprove = confirm(`¿Aprobar reserva de ${reservation.client_name} con el primer pago de RD$${amount.toLocaleString()} (50%)?`);
     if (!confirmApprove) return;
 
-    updateStatus(reservation.id, 'confirmada', true);
-    
-    // Open WhatsApp with approval message
-    const message = encodeURIComponent(
-      `¡Hola ${reservation.client_name}! 👋 Te confirmamos que tu reserva *#${reservation.id}* para *${reservation.villa_name}* (${reservation.check_in}) ha sido *APROBADA*. ¡Te esperamos! 🏡`
-    );
-    const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}?text=${message}`;
-    
-    toast.success('Reserva aprobada. Notificando por WhatsApp...');
-    setTimeout(() => {
-      window.open(whatsappUrl, '_blank');
-    }, 1500);
+    setIsSubmitting(true);
+    try {
+      await updateStatus(reservation.id, 'pago_parcial', true);
+      await handleRegisterIncome(reservation, amount, 'Reserva (50%)');
+      
+      const message = encodeURIComponent(
+        `¡Hola ${reservation.client_name}! 👋 Hemos recibido tu primer pago del 50% para la reserva *#${reservation.id}*. Tu estancia en *${reservation.villa_name}* para el día *${reservation.check_in}* está ahora *PRE-CONFIRMADA*. El saldo restante se paga al llegar. ¡Te esperamos! 🏡`
+      );
+      const whatsappUrl = `https://wa.me/${reservation.client_phone?.replace(/\D/g, '') || whatsappNumber.replace(/\D/g, '')}?text=${message}`;
+      
+      toast.success('Pago parcial registrado y reserva aprobada.');
+      setTimeout(() => {
+        window.open(whatsappUrl, '_blank');
+      }, 1000);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCompletePayment = async (reservation: any) => {
+    const amount = (reservation.total_amount || 0) / 2;
+    const confirmApprove = confirm(`¿Registrar PAGO TOTAL restante de RD$${amount.toLocaleString()} para ${reservation.client_name}?`);
+    if (!confirmApprove) return;
+
+    setIsSubmitting(true);
+    try {
+      await updateStatus(reservation.id, 'confirmada', true);
+      await handleRegisterIncome(reservation, amount, 'Pago restante');
+      
+      const message = encodeURIComponent(
+        `¡Hola ${reservation.client_name}! 👋 Te confirmamos que hemos recibido el pago total de tu reserva *#${reservation.id}*. ¡Todo listo para tu estancia en *${reservation.villa_name}*! 🏡✨`
+      );
+      const whatsappUrl = `https://wa.me/${reservation.client_phone?.replace(/\D/g, '') || whatsappNumber.replace(/\D/g, '')}?text=${message}`;
+      
+      toast.success('Pago total completado y reserva confirmada.');
+      setTimeout(() => {
+        window.open(whatsappUrl, '_blank');
+      }, 1000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const deleteReservation = async (id: string) => {
@@ -332,19 +383,22 @@ const AdminReservations = () => {
                        <button onClick={() => handleGenerateInvoice(r)} title="Generar Factura" className="bg-primary/5 text-primary p-3 rounded-xl hover:bg-primary hover:text-white transition-all">
                           <FileText size={18} />
                        </button>
-                      {r.status === 'pendiente_pago' && (
-                         <button onClick={() => updateStatus(r.id, 'pago_parcial')} className="bg-blue-50 text-blue-600 p-3 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><Check size={18} /></button>
-                      )}
-                       {r.status === 'pago_parcial' && (
-                          <button onClick={() => updateStatus(r.id, 'confirmada')} title="Marcar como pagada" className="bg-emerald-50 text-emerald-600 p-3 rounded-xl hover:bg-emerald-600 hover:text-white transition-all"><Plus size={18} /></button>
-                       )}
-                       {(r.status === 'pendiente_pago' || r.status === 'pago_parcial') && (
+                       {r.status === 'pendiente_pago' && (
                           <button 
                             onClick={() => handleApprove(r)} 
-                            title="Aprobar y Notificar"
-                            className="bg-emerald-600 text-white px-4 rounded-xl hover:bg-black hover:shadow-lg transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
+                            title="Aprobar (50%)"
+                            className="bg-emerald-600 text-white px-5 rounded-xl hover:bg-emerald-700 hover:shadow-lg transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
                           >
                             <Check size={14} /> Aprobar
+                          </button>
+                       )}
+                       {r.status === 'pago_parcial' && (
+                          <button 
+                            onClick={() => handleCompletePayment(r)} 
+                            title="Completar Pago Total"
+                            className="bg-[#111827] text-white px-5 rounded-xl hover:bg-black hover:shadow-lg transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
+                          >
+                            <DollarSign size={14} /> Pago Total
                           </button>
                        )}
                       {r.receipt_image && (
