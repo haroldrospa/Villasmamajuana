@@ -8,7 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Trash2, Eye, X, Loader2, Plus, Home, Check, Phone, User, DollarSign, Pencil, Clock, Sun, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { differenceInDays, parseISO } from 'date-fns';
+import { differenceInDays, parseISO, format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { mapReservationToInvoice } from '@/utils/reservationMapper';
 import {
   Dialog,
@@ -355,72 +356,92 @@ const AdminReservations = () => {
             <Loader2 className="animate-spin text-neutral-300" size={40} />
           </div>
         ) : (
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filtered.map((r) => (
-              <motion.div layout key={r.id} className="bg-white rounded-[2.5rem] border border-neutral-100 p-8 shadow-sm group">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-display font-medium text-[#111827] truncate max-w-[200px]">{r.client_name}</h3>
-                    <div className="flex items-center gap-2 text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                       <Home size={12} /> {r.villa_name} 
-                       {r.stay_type === '10h' && (
-                         <span className="ml-2 bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded text-[8px] font-bold">PASA DÍA 10H</span>
-                       )}
-                    </div>
-                  </div>
-                  <span className={`text-[9px] font-black px-4 py-1.5 rounded-full border tracking-widest uppercase ${statusStyles[r.status]}`}>
-                    {statusLabels[r.status]}
-                  </span>
+          <div className="max-w-7xl mx-auto space-y-12">
+            {Object.entries(
+              [...filtered]
+                .sort((a, b) => parseISO(a.check_in).getTime() - parseISO(b.check_in).getTime())
+                .reduce((acc: any, res: any) => {
+                  const month = format(parseISO(res.check_in), 'MMMM yyyy', { locale: es });
+                  const capitalizedMonth = month.charAt(0) ? month.charAt(0).toUpperCase() + month.slice(1) : month;
+                  if (!acc[capitalizedMonth]) acc[capitalizedMonth] = [];
+                  acc[capitalizedMonth].push(res);
+                  return acc;
+                }, {})
+            ).map(([month, monthReservations]: [string, any]) => (
+              <div key={month} className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h2 className="text-sm font-black uppercase tracking-[0.3em] text-neutral-400 whitespace-nowrap">{month}</h2>
+                  <div className="h-[1px] w-full bg-neutral-200/60"></div>
                 </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {monthReservations.map((r: any) => (
+                    <motion.div layout key={r.id} className="bg-white rounded-[2.5rem] border border-neutral-100 p-8 shadow-sm group">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="space-y-1">
+                          <h3 className="text-xl font-display font-medium text-[#111827] truncate max-w-[200px]">{r.client_name}</h3>
+                          <div className="flex items-center gap-2 text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                             <Home size={12} /> {r.villa_name} 
+                             {r.stay_type === '10h' && (
+                               <span className="ml-2 bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded text-[8px] font-bold">PASA DÍA 10H</span>
+                             )}
+                          </div>
+                        </div>
+                        <span className={`text-[9px] font-black px-4 py-1.5 rounded-full border tracking-widest uppercase ${statusStyles[r.status]}`}>
+                          {statusLabels[r.status]}
+                        </span>
+                      </div>
 
-                <div className="grid grid-cols-2 gap-8 py-5 border-y border-neutral-50 mb-6">
-                   <div>
-                      <p className="text-[10px] text-neutral-300 font-black uppercase">Ingreso</p>
-                      <p className="text-sm font-semibold text-neutral-600 italic">{r.check_in}</p>
-                   </div>
-                   <div>
-                      <p className="text-[10px] text-neutral-300 font-black uppercase">Salida</p>
-                      <p className="text-sm font-semibold text-neutral-600 italic">{r.stay_type === '10h' ? 'Mismo día' : r.check_out}</p>
-                   </div>
-                </div>
+                      <div className="grid grid-cols-2 gap-8 py-5 border-y border-neutral-50 mb-6">
+                         <div>
+                            <p className="text-[10px] text-neutral-300 font-black uppercase">Ingreso</p>
+                            <p className="text-sm font-semibold text-neutral-600 italic">{r.check_in}</p>
+                         </div>
+                         <div>
+                            <p className="text-[10px] text-neutral-300 font-black uppercase">Salida</p>
+                            <p className="text-sm font-semibold text-neutral-600 italic">{r.stay_type === '10h' ? 'Mismo día' : r.check_out}</p>
+                         </div>
+                      </div>
 
-                <div className="flex justify-between items-end">
-                   <div className="space-y-1">
-                      <p className="text-[10px] text-neutral-300 font-black uppercase">Total Facturado</p>
-                      <p className="text-2xl font-display font-black text-[#111827]">RD${r.total_amount?.toLocaleString()}</p>
-                   </div>
-                   <div className="flex gap-2">
-                       <button onClick={() => openEditModal(r)} className="bg-neutral-50 text-neutral-400 p-3 rounded-xl hover:bg-neutral-200 hover:text-black transition-all">
-                          <Pencil size={18} />
-                       </button>
-                       <button onClick={() => handleGenerateInvoice(r)} title="Generar Factura" className="bg-primary/5 text-primary p-3 rounded-xl hover:bg-primary hover:text-white transition-all">
-                          <FileText size={18} />
-                       </button>
-                       {r.status === 'pendiente_pago' && (
-                          <button 
-                            onClick={() => handleApprove(r)} 
-                            title="Aprobar (50%)"
-                            className="bg-emerald-600 text-white px-5 rounded-xl hover:bg-emerald-700 hover:shadow-lg transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
-                          >
-                            <Check size={14} /> Aprobar
-                          </button>
-                       )}
-                       {r.status === 'pago_parcial' && (
-                          <button 
-                            onClick={() => handleCompletePayment(r)} 
-                            title="Completar Pago Total"
-                            className="bg-[#111827] text-white px-5 rounded-xl hover:bg-black hover:shadow-lg transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
-                          >
-                            <DollarSign size={14} /> Pago Total
-                          </button>
-                       )}
-                      {r.receipt_image && (
-                         <button onClick={() => setViewingReceipt(r.receipt_image!)} className="bg-neutral-50 text-neutral-400 p-3 rounded-xl hover:bg-[#111827] hover:text-white transition-all"><Eye size={18} /></button>
-                      )}
-                      <button onClick={() => deleteReservation(r.id)} className="bg-rose-50 text-rose-400 p-3 rounded-xl hover:bg-rose-600 hover:text-white transition-all"><Trash2 size={18} /></button>
-                   </div>
+                      <div className="flex justify-between items-end">
+                         <div className="space-y-1">
+                            <p className="text-[10px] text-neutral-300 font-black uppercase">Total Facturado</p>
+                            <p className="text-2xl font-display font-black text-[#111827]">RD${r.total_amount?.toLocaleString()}</p>
+                         </div>
+                         <div className="flex gap-2">
+                             <button onClick={() => openEditModal(r)} className="bg-neutral-50 text-neutral-400 p-3 rounded-xl hover:bg-neutral-200 hover:text-black transition-all">
+                                <Pencil size={18} />
+                             </button>
+                             <button onClick={() => handleGenerateInvoice(r)} title="Generar Factura" className="bg-primary/5 text-primary p-3 rounded-xl hover:bg-primary hover:text-white transition-all">
+                                <FileText size={18} />
+                             </button>
+                             {r.status === 'pendiente_pago' && (
+                                <button 
+                                  onClick={() => handleApprove(r)} 
+                                  title="Aprobar (50%)"
+                                  className="bg-emerald-600 text-white px-5 rounded-xl hover:bg-emerald-700 hover:shadow-lg transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
+                                >
+                                  <Check size={14} /> Aprobar
+                                </button>
+                             )}
+                             {r.status === 'pago_parcial' && (
+                                <button 
+                                  onClick={() => handleCompletePayment(r)} 
+                                  title="Completar Pago Total"
+                                  className="bg-[#111827] text-white px-5 rounded-xl hover:bg-black hover:shadow-lg transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
+                                >
+                                  <DollarSign size={14} /> Pago Total
+                                </button>
+                             )}
+                            {r.receipt_image && (
+                               <button onClick={() => setViewingReceipt(r.receipt_image!)} className="bg-neutral-50 text-neutral-400 p-3 rounded-xl hover:bg-[#111827] hover:text-white transition-all"><Eye size={18} /></button>
+                            )}
+                            <button onClick={() => deleteReservation(r.id)} className="bg-rose-50 text-rose-400 p-3 rounded-xl hover:bg-rose-600 hover:text-white transition-all"><Trash2 size={18} /></button>
+                         </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}
