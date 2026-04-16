@@ -90,33 +90,40 @@ const AdminVillas = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const villaData = {
+    const villaData: any = {
       name: form.name,
-      price: parseFloat(form.price),
+      price: parseFloat(form.price) || 0,
       image: form.image,
-      capacity: parseInt(form.capacity),
+      capacity: parseInt(form.capacity) || 0,
       description: form.description,
       video_url: form.video_url || null,
-      amenities: form.amenities.split(',').map(s => s.trim()).filter(s => s !== ''),
+      amenities: typeof form.amenities === 'string' ? form.amenities.split(',').map(s => s.trim()).filter(s => s !== '') : form.amenities,
       gallery: form.gallery,
-      location: form.location,
-      updated_at: new Date().toISOString()
+      location: form.location
     };
+
     try {
       if (editingVilla) {
         const { error } = await supabase.from('villas').update(villaData).eq('id', editingVilla.id);
-        if (error) throw error;
-        toast.success('Villa actualizada');
+        if (error) {
+          console.error('Supabase Update Error:', error);
+          throw error;
+        }
+        toast.success('Villa actualizada correctamente');
       } else {
         const id = form.name.toLowerCase().replace(/\s+/g, '-');
         const { error } = await supabase.from('villas').insert([{ ...villaData, id }]);
-        if (error) throw error;
-        toast.success('Nueva villa publicada');
+        if (error) {
+          console.error('Supabase Insert Error:', error);
+          throw error;
+        }
+        toast.success('Nueva villa publicada correctamente');
       }
       setShowForm(false);
       refetch();
     } catch (error: any) {
-      toast.error('Error: ' + error.message);
+      console.error('Submission Error:', error);
+      toast.error(`No se pudo guardar: ${error.message || 'Error desconocido'}`);
     } finally {
       setSubmitting(false);
     }
