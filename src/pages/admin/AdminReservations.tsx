@@ -194,22 +194,7 @@ const AdminReservations = () => {
     try {
       await updateStatus(reservation.id, 'confirmada', true);
       await handleRegisterIncome(reservation, amount, 'Pago restante');
-      
-      const shortId = reservation.id.substring(0, 8).toUpperCase();
-      const message = encodeURIComponent(
-        `¡Hola *${reservation.client_name}*! ✨🌿\n\n` +
-        `¡Buenas noticias! Hemos recibido el pago total de tu reserva *#${shortId}*.\n\n` +
-        `🏡 *Villa:* ${reservation.villa_name}\n` +
-        `📅 *Fecha:* ${reservation.check_in}\n` +
-        `💰 *Estado:* TOTALMENTE PAGADA\n\n` +
-        `¡Todo listo para tu estancia! Nos vemos pronto en *Villas Mamajuana*. 🍃🦜`
-      );
-      const whatsappUrl = `https://wa.me/${reservation.client_phone?.replace(/\D/g, '') || whatsappNumber.replace(/\D/g, '')}?text=${message}`;
-      
       toast.success('Pago total completado y reserva confirmada.');
-      setTimeout(() => {
-        window.open(whatsappUrl, '_blank');
-      }, 1000);
     } finally {
       setIsSubmitting(false);
     }
