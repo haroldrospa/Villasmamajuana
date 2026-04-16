@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
 import { Link } from 'react-router-dom';
@@ -6,9 +7,23 @@ import logo from '@/assets/logo.png';
 import PromotionsBanner from '@/components/PromotionsBanner';
 import { useAuth } from '@/hooks/useAuth';
 import { LogIn, UserPlus, LogOut, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const HomePage = () => {
   const { user, profile, signOut, isLoading, isAdmin } = useAuth();
+  const [heroUrl, setHeroUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHero = async () => {
+      try {
+        const { data } = await supabase.from('business_settings').select('hero_image_url').single();
+        if (data?.hero_image_url) setHeroUrl(data.hero_image_url);
+      } catch (e) {
+        console.error('Error loading hero settings');
+      }
+    };
+    fetchHero();
+  }, []);
 
   return (
   <ClientLayout>
@@ -58,8 +73,8 @@ const HomePage = () => {
       </div>
 
       {/* Hero */}
-      <div className="relative h-[70vh] min-h-[420px] overflow-hidden">
-        <img src={heroImg} alt="Villas Mamajuana" className="absolute inset-0 w-full h-full object-cover" />
+      <div className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] min-h-[400px] overflow-hidden">
+        <img src={heroUrl || heroImg} alt="Villas Mamajuana" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-foreground/40 via-foreground/20 to-background" />
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
           <img src={logo} alt="Logo" className="w-16 h-16 mb-4" />
@@ -73,7 +88,7 @@ const HomePage = () => {
       </div>
 
       {/* CTA Buttons */}
-      <div className="px-6 -mt-8 relative z-20 flex flex-col gap-3 max-w-md mx-auto">
+      <div className="px-6 -mt-10 relative z-20 flex flex-col gap-3 max-w-md mx-auto">
         <Link to="/villas" className="bg-primary text-primary-foreground rounded-lg py-4 text-center font-display font-bold text-base shadow-soft transition-all hover:bg-secondary">
           Ver Villas
         </Link>

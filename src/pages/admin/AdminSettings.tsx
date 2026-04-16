@@ -17,7 +17,8 @@ const AdminSettings = () => {
     email: '',
     terms: '',
     bank_info: 'Banreservas\nHarold Rosado Cuenta de ahorro\n9601938364\n\nBanreservas\nArianny Marte Cuenta de ahorro\n9608356286',
-    whatsapp_number: '8299735049'
+    whatsapp_number: '8299735049',
+    hero_image_url: ''
   });
 
   useEffect(() => {
@@ -157,17 +158,32 @@ const AdminSettings = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Email de Contacto</label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
-                    <input 
-                      type="email"
-                      value={settings.email}
-                      onChange={e => setSettings({...settings, email: e.target.value})}
-                      className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl pl-12 pr-6 py-4 outline-none focus:border-black transition-all text-sm font-medium"
-                      placeholder="contacto@empresa.com"
-                    />
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Email de Contacto</label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
+                      <input 
+                        type="email"
+                        value={settings.email}
+                        onChange={e => setSettings({...settings, email: e.target.value})}
+                        className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl pl-12 pr-6 py-4 outline-none focus:border-black transition-all text-sm font-medium"
+                        placeholder="contacto@empresa.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">URL Imagen de Portada (Hero)</label>
+                    <div className="relative">
+                      <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
+                      <input 
+                        value={(settings as any).hero_image_url || ''}
+                        onChange={e => setSettings({...settings, hero_image_url: e.target.value})}
+                        className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl pl-12 pr-6 py-4 outline-none focus:border-black transition-all text-sm font-medium"
+                        placeholder="https://images.unsplash.com/..."
+                      />
+                    </div>
+                    <p className="text-[10px] text-neutral-400 ml-1 mt-1 font-medium italic">Pega aquí el enlace de una imagen (Unsplash, etc.) para cambiar la foto de inicio.</p>
                   </div>
                 </div>
 
