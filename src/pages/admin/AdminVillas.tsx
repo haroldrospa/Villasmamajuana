@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
 import { useVillas } from '@/hooks/useVillas';
@@ -24,6 +25,7 @@ import {
 
 const AdminVillas = () => {
   const { data: villas, isLoading, refetch } = useVillas();
+  const queryClient = useQueryClient();
   const [editingVilla, setEditingVilla] = useState<any>(null);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -135,7 +137,8 @@ const AdminVillas = () => {
         toast.success('Nueva villa publicada correctamente');
       }
       setShowForm(false);
-      refetch();
+      await queryClient.invalidateQueries({ queryKey: ['villas'] });
+      await refetch();
     } catch (error: any) {
       console.error('DATABASE ERROR:', error);
       const errorMessage = error.message || 'Error desconocido de la base de datos';
