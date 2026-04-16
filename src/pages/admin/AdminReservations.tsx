@@ -356,7 +356,6 @@ const AdminReservations = () => {
             <Loader2 className="animate-spin text-neutral-300" size={40} />
           </div>
         ) : (
-        ) : (
           <div className="max-w-7xl mx-auto space-y-16">
             {Object.entries(
               [...filtered]
