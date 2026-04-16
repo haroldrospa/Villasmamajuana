@@ -84,7 +84,7 @@ const AvailabilityPage = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-transparent z-10" />
                   <img 
-                    src={getDirectImageUrl(v.image_url) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'} 
+                    src={getDirectImageUrl(v.image) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'} 
                     alt={v.name} 
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
