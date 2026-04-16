@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Download, MessageCircle, FileText, MapPin, Phone, Hash, Globe, Mail } from 'lucide-react';
+import { Download, MessageCircle, FileText, MapPin, Phone, Hash, Globe, Mail, Share2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export interface InvoiceData {
   reservationId: string;
@@ -40,6 +43,7 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
 }) => {
   const [settings, setSettings] = useState<BusinessSettings | null>(null);
   const invoiceRef = useRef<HTMLDivElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -55,6 +59,74 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
     } catch (e) {
       console.error('Error fetching settings for invoice');
     }
+  };
+
+  const getPDFBlob = async (): Promise<{ blob: Blob; fileName: string } | null> => {
+    if (!invoiceRef.current) return null;
+    try {
+      const canvas = await html2canvas(invoiceRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      const shortId = invoice.reservationId.substring(0, 8).toUpperCase();
+      const fileName = `Factura-${shortId}-${invoice.clientName.replace(/\s+/g, '_')}.pdf`;
+      return { blob: pdf.output('blob'), fileName };
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      return null;
+    }
+  };
+
+  const handleDownload = async () => {
+    setIsGenerating(true);
+    const result = await getPDFBlob();
+    if (result) {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(result.blob);
+      link.download = result.fileName;
+      link.click();
+      toast.success('PDF descargado correctamente');
+    } else {
+      toast.error('No se pudo generar el PDF');
+    }
+    setIsGenerating(false);
+  };
+
+  const handleShare = async () => {
+    setIsGenerating(true);
+    const result = await getPDFBlob();
+    if (result && navigator.share) {
+      try {
+        const file = new File([result.blob], result.fileName, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: result.fileName,
+            text: `🧾 Factura de Reserva: ${invoice.clientName} (#${invoice.reservationId.substring(0,8)})`
+          });
+          toast.success('Archivo listo para enviar');
+        } else {
+          if (onShareWhatsApp) onShareWhatsApp();
+          toast.info('Navegador incompatible para enviar archivos. Abriendo WhatsApp con link de texto...');
+        }
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          toast.error('Error al compartir');
+          if (onShareWhatsApp) onShareWhatsApp();
+        }
+      }
+    } else {
+      if (onShareWhatsApp) onShareWhatsApp();
+    }
+    setIsGenerating(false);
   };
 
   const business = settings || {
@@ -113,7 +185,7 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
             </div>
             <div className="pt-4">
               <p className="text-[10px] font-black text-slate-400 uppercase">Número de Control</p>
-              <p className="text-xl font-display font-black text-slate-900">#{invoice.reservationId}</p>
+              <p className="text-xl font-display font-black text-slate-900">#{invoice.reservationId.substring(0,8).toUpperCase()}</p>
             </div>
             <div>
               <p className="text-[10px] font-black text-slate-400 uppercase">Fecha de Emisión</p>
@@ -251,18 +323,20 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
       {/* ACTION BUTTONS (Hidden in Print) */}
       <div className="flex gap-4 mt-8 print:hidden max-w-[210mm] mx-auto">
         <button
-          onClick={onDownloadPDF}
-          className="flex-1 flex items-center justify-center gap-3 bg-slate-900 text-white rounded-2xl py-5 font-display font-black text-sm shadow-2xl transition-all hover:bg-black hover:scale-[1.02] active:scale-95"
+          onClick={handleDownload}
+          disabled={isGenerating}
+          className="flex-1 flex items-center justify-center gap-3 bg-slate-900 text-white rounded-2xl py-5 font-display font-black text-sm shadow-2xl transition-all hover:bg-black hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Download size={20} />
-          Descargar PDF Oficial
+          {isGenerating ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
+          {isGenerating ? 'Generando...' : 'Descargar PDF Oficial'}
         </button>
         <button
-          onClick={onShareWhatsApp}
-          className="flex-1 flex items-center justify-center gap-3 bg-emerald-500 text-white rounded-2xl py-5 font-display font-black text-sm shadow-2xl transition-all hover:bg-emerald-600 hover:scale-[1.02] active:scale-95"
+          onClick={handleShare}
+          disabled={isGenerating}
+          className="flex-1 flex items-center justify-center gap-3 bg-emerald-500 text-white rounded-2xl py-5 font-display font-black text-sm shadow-2xl transition-all hover:bg-emerald-600 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <MessageCircle size={20} />
-          Enviar por WhatsApp
+          {isGenerating ? <Loader2 size={20} className="animate-spin" /> : <MessageCircle size={20} />}
+          {isGenerating ? 'Generando...' : 'Compartir PDF'}
         </button>
       </div>
     </div>
