@@ -271,7 +271,7 @@ const BookingPage = () => {
                >
                  <option value="">Seleccionar villa</option>
                  {villas?.map(v => (
-                   <option key={v.id} value={v.id}>{v.name} — US${form.stayType === '24h' ? v.price : (v.price_10h || (v.price * 0.6))}/{form.stayType === '24h' ? 'noche' : 'día'}</option>
+                   <option key={v.id} value={v.id}>{v.name} — RD${form.stayType === '24h' ? v.price : (v.price_10h || (v.price * 0.6))}/{form.stayType === '24h' ? 'noche' : 'día'}</option>
                  ))}
                </select>
              )}
@@ -348,7 +348,7 @@ const BookingPage = () => {
                     <span className="text-muted-foreground">
                       {form.stayType === '10h' ? 'Pasa Día (10 horas)' : `${pricing.nights} noche${pricing.nights > 1 ? 's' : ''}`}
                     </span>
-                    <span className="font-display font-bold text-foreground">US${pricing.subtotal.toLocaleString()}</span>
+                    <span className="font-display font-bold text-foreground">RD${pricing.subtotal.toLocaleString()}</span>
                   </div>
 
                   {pricing.promoDiscount > 0 && (
@@ -357,7 +357,7 @@ const BookingPage = () => {
                         <Tag size={12} className="text-accent" />
                         {pricing.promoName}
                       </span>
-                      <span className="font-display font-bold">-US${pricing.promoDiscount.toLocaleString()}</span>
+                      <span className="font-display font-bold">-RD${pricing.promoDiscount.toLocaleString()}</span>
                     </div>
                   )}
 
@@ -367,23 +367,23 @@ const BookingPage = () => {
                         <Tag size={12} />
                         Cupón {appliedCoupon?.code}
                       </span>
-                      <span className="font-display font-bold">-US${pricing.couponDiscount.toLocaleString()}</span>
+                      <span className="font-display font-bold">-RD${pricing.couponDiscount.toLocaleString()}</span>
                     </div>
                   )}
 
                   <div className="flex justify-between border-t border-border pt-2 mt-1">
                     <span className="font-display font-bold text-foreground">Total</span>
-                    <span className="font-display font-extrabold text-lg text-primary">US${pricing.total.toLocaleString()}</span>
+                    <span className="font-display font-extrabold text-lg text-primary">RD${pricing.total.toLocaleString()}</span>
                   </div>
 
                   <div className="border-t border-border pt-2 mt-1">
                     <div className="flex justify-between text-primary font-display font-bold">
                       <span>Depósito (50%)</span>
-                      <span>US${pricing.deposit.toLocaleString()}</span>
+                      <span>RD${pricing.deposit.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-muted-foreground text-xs mt-1">
                       <span>Restante al llegar</span>
-                      <span>US${pricing.remaining.toLocaleString()}</span>
+                      <span>RD${pricing.remaining.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>

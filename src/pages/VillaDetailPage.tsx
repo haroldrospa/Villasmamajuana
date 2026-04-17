@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
@@ -169,22 +169,28 @@ const VillaDetailPage = () => {
             {/* Price */}
             <div className="flex items-baseline gap-2 mt-3">
               {discountedPrice ? (
-                <>
-                  <span className="font-display font-extrabold text-2xl text-primary">
-                    US${discountedPrice}
-                  </span>
-                  <span className="font-display text-base text-muted-foreground line-through">
-                    US${villa.price}
-                  </span>
-                  <span className="text-xs text-muted-foreground">/noche</span>
-                </>
+                <div className="flex flex-col">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-display font-extrabold text-2xl text-primary">
+                      RD${discountedPrice.toLocaleString()}
+                    </span>
+                    <span className="font-display text-base text-muted-foreground line-through">
+                      RD${villa.price.toLocaleString()}
+                    </span>
+                    <span className="text-xs text-muted-foreground">/noche</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground font-bold">Aprox. US${Math.round(discountedPrice / 59).toLocaleString()}</span>
+                </div>
               ) : (
-                <>
-                  <span className="font-display font-extrabold text-2xl text-primary">
-                    US${villa.price}
-                  </span>
-                  <span className="text-xs text-muted-foreground">/noche</span>
-                </>
+                <div className="flex flex-col">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-display font-extrabold text-2xl text-primary">
+                      RD${villa.price.toLocaleString()}
+                    </span>
+                    <span className="text-xs text-muted-foreground">/noche</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground font-bold">Aprox. US${Math.round(villa.price / 59).toLocaleString()}</span>
+                </div>
               )}
             </div>
 

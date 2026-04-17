@@ -89,11 +89,11 @@ const AdminReservations = () => {
 
     if (form.stayType === '10h') {
       subtotal = villa.price_10h || (villa.price * 0.6);
-      details = `Pasa Día: US$${subtotal.toLocaleString()}`;
+      details = `Pasa Día: RD$${subtotal.toLocaleString()}`;
     } else if (form.checkOut) {
       const days = Math.max(1, differenceInDays(parseISO(form.checkOut), parseISO(form.checkIn)));
       subtotal = villa.price * days;
-      details = `${days} noche(s) x US$${villa.price.toLocaleString()} = US$${subtotal.toLocaleString()}`;
+      details = `${days} noche(s) x RD$${villa.price.toLocaleString()} = RD$${subtotal.toLocaleString()}`;
     }
 
     if (subtotal > 0) {
@@ -103,10 +103,10 @@ const AdminReservations = () => {
       if (form.discountType === 'percent' && form.discountValue) {
         const disc = subtotal * (Number(form.discountValue) / 100);
         finalTotal -= disc;
-        discountLabel = ` - ${form.discountValue}% (US$${disc.toLocaleString()})`;
+        discountLabel = ` - ${form.discountValue}% (RD$${disc.toLocaleString()})`;
       } else if (form.discountType === 'amount' && form.discountValue) {
         finalTotal -= Number(form.discountValue);
-        discountLabel = ` - US$${Number(form.discountValue).toLocaleString()} (fijo)`;
+        discountLabel = ` - RD$${Number(form.discountValue).toLocaleString()} (fijo)`;
       }
 
       setForm(prev => ({ ...prev, totalAmount: Math.max(0, finalTotal).toString() }));
@@ -156,7 +156,7 @@ const AdminReservations = () => {
 
   const handleApprove = async (reservation: any) => {
     const amount = (reservation.total_amount || 0) / 2;
-    const confirmApprove = confirm(`¿Aprobar reserva de ${reservation.client_name} con el primer pago de US$${amount.toLocaleString()} (50%)?`);
+    const confirmApprove = confirm(`¿Aprobar reserva de ${reservation.client_name} con el primer pago de RD$${amount.toLocaleString()} (50%)?`);
     if (!confirmApprove) return;
 
     setIsSubmitting(true);
@@ -187,7 +187,7 @@ const AdminReservations = () => {
 
   const handleCompletePayment = async (reservation: any) => {
     const amount = (reservation.total_amount || 0) / 2;
-    const confirmApprove = confirm(`¿Registrar PAGO TOTAL restante de US$${amount.toLocaleString()} para ${reservation.client_name}?`);
+    const confirmApprove = confirm(`¿Registrar PAGO TOTAL restante de RD$${amount.toLocaleString()} para ${reservation.client_name}?`);
     if (!confirmApprove) return;
 
     setIsSubmitting(true);
@@ -403,7 +403,7 @@ const AdminReservations = () => {
                           <div className="flex justify-between items-end">
                              <div className="space-y-1">
                                 <p className="text-[10px] text-neutral-300 font-black uppercase">Total Facturado</p>
-                                <p className="text-2xl font-display font-black text-[#111827]">US${r.total_amount?.toLocaleString()}</p>
+                                <p className="text-2xl font-display font-black text-[#111827]">RD${r.total_amount?.toLocaleString()}</p>
                              </div>
                              <div className="flex gap-2">
                                  <button onClick={() => openEditModal(r)} title="Editar" className="bg-neutral-50 text-neutral-400 p-3 rounded-xl hover:bg-neutral-200 hover:text-black transition-all">
@@ -501,7 +501,7 @@ const AdminReservations = () => {
                        <option value="">Elegir propiedad...</option>
                        {villas?.map(v => (
                          <option key={v.id} value={v.id}>
-                           {v.name} (US${form.stayType === '24h' ? v.price : (v.price_10h || (v.price * 0.6))})
+                           {v.name} (RD${form.stayType === '24h' ? v.price : (v.price_10h || (v.price * 0.6))})
                          </option>
                        ))}
                     </select>
@@ -546,7 +546,7 @@ const AdminReservations = () => {
                           {form.discountType !== 'none' && (
                             <input 
                               type="number" 
-                              placeholder={form.discountType === 'percent' ? '%' : 'US$'} 
+                              placeholder={form.discountType === 'percent' ? '%' : 'RD$'} 
                               value={form.discountValue}
                               onChange={e => setForm({...form, discountValue: e.target.value})}
                               className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-black"
@@ -567,7 +567,7 @@ const AdminReservations = () => {
                  </div>
 
                  <div className="space-y-2 pt-2">
-                    <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Monto Acuerdo (US$)</label>
+                    <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Monto Acuerdo (RD$)</label>
                     <div className="relative">
                        <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
                        <input required type="number" placeholder="Importe total" value={form.totalAmount} onChange={e => setForm({...form, totalAmount: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl pl-12 pr-6 py-5 outline-none focus:border-black transition-all text-lg font-black" />

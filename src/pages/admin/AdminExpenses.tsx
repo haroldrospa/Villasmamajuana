@@ -105,7 +105,7 @@ const AdminExpenses = () => {
                   <p className="text-xs text-muted-foreground mt-0.5">{exp.date} • {exp.category}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <p className="font-display font-bold text-foreground">US${Number(exp.amount).toLocaleString()}</p>
+                  <p className="font-display font-bold text-foreground">RD${Number(exp.amount).toLocaleString()}</p>
                   <button onClick={() => deleteExpense(exp.id)} className="text-destructive">
                     <Trash2 size={14} />
                   </button>

@@ -1,4 +1,4 @@
-﻿import { usePromotions } from '@/hooks/usePromotions';
+import { usePromotions } from '@/hooks/usePromotions';
 import { Link } from 'react-router-dom';
 import { Tag, Users, ShieldCheck, Waves } from 'lucide-react';
 import DriveImage from '@/components/DriveImage';
@@ -72,12 +72,18 @@ const VillaCard = ({ villa }: { villa: any }) => {
               <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.15em] mb-1">Precio / Noche</span>
               <div className="flex items-baseline gap-2">
                 {discountedPrice ? (
-                  <>
-                    <span className="font-display font-black text-3xl text-primary leading-none">US${discountedPrice}</span>
-                    <span className="text-sm text-neutral-300 line-through font-bold">US${villa.price}</span>
-                  </>
+                  <div className="flex flex-col">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display font-black text-3xl text-primary leading-none">RD${discountedPrice.toLocaleString()}</span>
+                      <span className="text-sm text-neutral-300 line-through font-bold">RD${villa.price.toLocaleString()}</span>
+                    </div>
+                    <span className="text-xs text-neutral-400 font-bold mt-1">Aprox. US${Math.round(discountedPrice / 59).toLocaleString()}</span>
+                  </div>
                 ) : (
-                  <span className="font-display font-black text-3xl text-primary leading-none">US${villa.price}</span>
+                  <div className="flex flex-col">
+                    <span className="font-display font-black text-3xl text-primary leading-none">RD${villa.price.toLocaleString()}</span>
+                    <span className="text-xs text-neutral-400 font-bold mt-1">Aprox. US${Math.round(villa.price / 59).toLocaleString()}</span>
+                  </div>
                 )}
               </div>
             </div>

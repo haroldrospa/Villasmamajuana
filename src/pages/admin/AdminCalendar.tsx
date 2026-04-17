@@ -224,7 +224,7 @@ const AdminCalendar = () => {
                    <div className="flex flex-col sm:flex-row justify-between items-center bg-neutral-50 p-6 rounded-3xl gap-4">
                       <div className="space-y-1 text-center sm:text-left">
                          <p className="text-[10px] text-neutral-400 font-black uppercase tracking-tighter">Total Pago</p>
-                         <p className="text-xl md:text-2xl font-display font-black text-[#111827]">US${activeReservation.total_amount?.toLocaleString()}</p>
+                         <p className="text-xl md:text-2xl font-display font-black text-[#111827]">RD${activeReservation.total_amount?.toLocaleString()}</p>
                       </div>
                       <Link 
                         to="/admin/reservas" 

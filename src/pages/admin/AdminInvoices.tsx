@@ -147,7 +147,7 @@ const AdminInvoices = () => {
                     <p className="text-muted-foreground text-xs mt-0.5">{inv.villaName} • {inv.checkIn} → {inv.checkOut}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-display font-bold text-foreground">US${inv.totalAmount.toLocaleString()}</p>
+                    <p className="font-display font-bold text-foreground">RD${inv.totalAmount.toLocaleString()}</p>
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full inline-block mt-1 ${statusStyles[inv.status]}`}>
                       {statusLabels[inv.status]}
                     </span>
@@ -155,8 +155,8 @@ const AdminInvoices = () => {
                 </div>
 
                 <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                  <span>Pagado: <span className="font-bold text-primary">US${inv.depositAmount.toLocaleString()}</span></span>
-                  <span>Pendiente: <span className="font-bold text-foreground">US${inv.remainingAmount.toLocaleString()}</span></span>
+                  <span>Pagado: <span className="font-bold text-primary">RD${inv.depositAmount.toLocaleString()}</span></span>
+                  <span>Pendiente: <span className="font-bold text-foreground">RD${inv.remainingAmount.toLocaleString()}</span></span>
                 </div>
 
                 <div className="flex gap-2 mt-3 pt-3 border-t border-border">
@@ -232,8 +232,8 @@ const AdminInvoices = () => {
                         <span className="text-foreground">{viewingInvoice.checkOut}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">{viewingInvoice.nights} noches × US${viewingInvoice.pricePerNight.toLocaleString()}</span>
-                        <span className="font-display font-bold text-foreground">US${viewingInvoice.totalAmount.toLocaleString()}</span>
+                        <span className="text-muted-foreground">{viewingInvoice.nights} noches × RD${viewingInvoice.pricePerNight.toLocaleString()}</span>
+                        <span className="font-display font-bold text-foreground">RD${viewingInvoice.totalAmount.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
@@ -243,15 +243,15 @@ const AdminInvoices = () => {
                     <div className="bg-muted/50 rounded-lg p-3 flex flex-col gap-2 text-sm">
                       <div className="flex justify-between font-display font-bold">
                         <span className="text-foreground">Total</span>
-                        <span className="text-foreground">US${viewingInvoice.totalAmount.toLocaleString()}</span>
+                        <span className="text-foreground">RD${viewingInvoice.totalAmount.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-primary font-display font-semibold">
                         <span>Pagado (50%)</span>
-                        <span>US${viewingInvoice.depositAmount.toLocaleString()}</span>
+                        <span>RD${viewingInvoice.depositAmount.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-muted-foreground">
                         <span>Pendiente</span>
-                        <span className="font-display font-bold">US${viewingInvoice.remainingAmount.toLocaleString()}</span>
+                        <span className="font-display font-bold">RD${viewingInvoice.remainingAmount.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>

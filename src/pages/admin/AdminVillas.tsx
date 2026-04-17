@@ -317,7 +317,10 @@ const AdminVillas = () => {
                   <h2 className="text-xl font-display font-medium text-[#111827]">{villa.name}</h2>
                   <p className="text-neutral-500 text-sm mt-1">Huéspedes: {villa.capacity}</p>
                   <div className="flex items-center justify-between mt-4">
-                    <p className="text-lg font-black text-primary">US${villa.price.toLocaleString()}</p>
+                    <div className="flex flex-col">
+                      <p className="text-lg font-black text-primary leading-none">RD${villa.price.toLocaleString()}</p>
+                      <p className="text-[10px] font-bold text-neutral-400 mt-1">US${Math.round(villa.price / 59).toLocaleString()}</p>
+                    </div>
                     <div className="flex -space-x-2">
                       {villa.gallery?.slice(0, 3).map((img: string, i: number) => (
                         <DriveImage key={i} src={img} alt="" className="w-6 h-6 rounded-full border-2 border-white object-cover shadow-sm" />
@@ -350,7 +353,7 @@ const AdminVillas = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-neutral-400">Precio / Noche (US$)</label>
+                    <label className="text-[10px] font-black uppercase text-neutral-400">Precio / Noche (RD$)</label>
                     <input required type="number" value={form.price} onChange={e => setForm({...form, price: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black" />
                   </div>
                   <div className="space-y-2">

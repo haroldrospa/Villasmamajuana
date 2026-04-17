@@ -128,7 +128,7 @@ const MyReservationsPage = () => {
                    </div>
                    <div className="flex items-center gap-2 text-neutral-900 justify-end">
                       <DollarSign size={14} className="text-emerald-500" />
-                      <span className="font-black">US${res.total_amount?.toLocaleString()}</span>
+                      <span className="font-black">RD${res.total_amount?.toLocaleString()}</span>
                    </div>
                 </div>
 

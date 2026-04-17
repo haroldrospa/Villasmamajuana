@@ -43,11 +43,11 @@ const AdminDashboard = () => {
     .reduce((s, r) => s + Number(r.remaining_amount), 0);
 
   const cards = [
-    { label: 'Ingresos Recibidos', value: `US$${totalIncome.toLocaleString()}`, icon: DollarSign, accent: true },
-    { label: 'Gastos del Mes', value: `US$${totalExpenses.toLocaleString()}`, icon: TrendingDown, accent: false },
-    { label: 'Ganancia Actual', value: `US$${netProfit.toLocaleString()}`, icon: TrendingUp, accent: true },
+    { label: 'Ingresos Recibidos', value: `RD$${totalIncome.toLocaleString()}`, icon: DollarSign, accent: true },
+    { label: 'Gastos del Mes', value: `RD$${totalExpenses.toLocaleString()}`, icon: TrendingDown, accent: false },
+    { label: 'Ganancia Actual', value: `RD$${netProfit.toLocaleString()}`, icon: TrendingUp, accent: true },
     { label: 'Reservas Activas', value: activeReservations, icon: CalendarDays, accent: false },
-    { label: 'Pagos Pendientes', value: `US$${pendingPayments.toLocaleString()}`, icon: Clock, accent: false },
+    { label: 'Pagos Pendientes', value: `RD$${pendingPayments.toLocaleString()}`, icon: Clock, accent: false },
   ];
 
   return (
@@ -96,8 +96,8 @@ const AdminDashboard = () => {
                         {statusLabels[r.status] || r.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right font-display font-bold text-foreground">US${r.total_amount.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right font-display font-bold text-muted-foreground">US${r.remaining_amount.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right font-display font-bold text-foreground">RD${r.total_amount.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right font-display font-bold text-muted-foreground">RD${r.remaining_amount.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
