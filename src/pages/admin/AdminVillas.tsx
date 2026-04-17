@@ -1,20 +1,17 @@
-﻿import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
 import { useVillas } from '@/hooks/useVillas';
 import { supabase } from '@/integrations/supabase/client';
 import { 
-  Plus, Trash2, Edit2, X, Eye, 
-  Image as ImageIcon, Video, MapPin, 
-  Loader2, Users, Navigation2, Home, 
-  ChevronRight, Sparkles, Layers,
-  LayoutGrid, Type, Map as MapIcon,
-  Search
+  Trash2, Edit2,
+  Image as ImageIcon,
+  Loader2, Home, 
+  Upload, Plus, X
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
-import { getDirectImageUrl } from '@/utils/imageUtils';
+import DriveImage from '@/components/DriveImage';
 import {
   Dialog,
   DialogContent,
@@ -23,14 +20,152 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+// ─── Supabase Storage Upload ───────────────────────────────────────────────
+const uploadToStorage = async (file: File, folder: string): Promise<string> => {
+  const ext = file.name.split('.').pop();
+  const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  const { data, error } = await supabase.storage
+    .from('villa-images')
+    .upload(fileName, file, { cacheControl: '3600', upsert: false });
+  if (error) throw error;
+  const { data: urlData } = supabase.storage.from('villa-images').getPublicUrl(data.path);
+  return urlData.publicUrl;
+};
+
+// ─── Image Uploader Sub-component ─────────────────────────────────────────
+const ImageUploader = ({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+}) => {
+  const [uploading, setUploading] = useState(false);
+  const ref = useRef<HTMLInputElement>(null);
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadToStorage(file, 'main');
+      onChange(url);
+      toast.success('Imagen subida correctamente');
+    } catch (err: any) {
+      toast.error('Error al subir imagen: ' + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <label className="text-[10px] font-black uppercase text-neutral-400">{label}</label>
+      <div className="flex gap-2">
+        <input
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          placeholder="URL directa o sube una foto..."
+          className="flex-1 bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black text-sm"
+        />
+        <button
+          type="button"
+          onClick={() => ref.current?.click()}
+          disabled={uploading}
+          className="px-4 py-3 bg-[#111827] text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-neutral-700 transition-colors disabled:opacity-50 whitespace-nowrap"
+        >
+          {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+          {uploading ? 'Subiendo...' : 'Subir foto'}
+        </button>
+      </div>
+      <input ref={ref} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+      {value && (
+        <div className="aspect-video rounded-2xl overflow-hidden border border-neutral-100 bg-neutral-50">
+          <DriveImage src={value} alt={label} className="w-full h-full object-cover" />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Gallery Uploader ──────────────────────────────────────────────────────
+const GalleryUploader = ({
+  gallery,
+  onChange,
+}: {
+  gallery: string[];
+  onChange: (g: string[]) => void;
+}) => {
+  const [uploading, setUploading] = useState(false);
+  const ref = useRef<HTMLInputElement>(null);
+
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setUploading(true);
+    try {
+      const urls = await Promise.all(files.map(f => uploadToStorage(f, 'gallery')));
+      onChange([...gallery, ...urls]);
+      toast.success(`${urls.length} foto(s) añadidas a la galería`);
+    } catch (err: any) {
+      toast.error('Error al subir: ' + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = (idx: number) => {
+    onChange(gallery.filter((_, i) => i !== idx));
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-[10px] font-black uppercase text-neutral-400">Galería de Fotos</label>
+        <button
+          type="button"
+          onClick={() => ref.current?.click()}
+          disabled={uploading}
+          className="px-3 py-1.5 bg-[#111827] text-white text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-1.5 hover:bg-neutral-700 transition-colors disabled:opacity-50"
+        >
+          {uploading ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
+          {uploading ? 'Subiendo...' : 'Añadir fotos'}
+        </button>
+      </div>
+      <input ref={ref} type="file" accept="image/*" multiple className="hidden" onChange={handleFiles} />
+      <div className="grid grid-cols-3 gap-2">
+        {gallery.map((img, idx) => (
+          <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-neutral-100 group">
+            <DriveImage src={img} alt={`gallery ${idx}`} className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={() => removeImage(idx)}
+              className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <X size={12} />
+            </button>
+          </div>
+        ))}
+        {gallery.length === 0 && (
+          <div className="col-span-3 py-8 border-2 border-dashed border-neutral-100 rounded-2xl flex flex-col items-center text-neutral-300">
+            <ImageIcon size={28} />
+            <p className="text-[9px] font-black uppercase tracking-widest mt-2">Sin fotos en galería</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ─── Main Page ─────────────────────────────────────────────────────────────
 const AdminVillas = () => {
   const { data: villas, isLoading, refetch } = useVillas();
   const queryClient = useQueryClient();
   const [editingVilla, setEditingVilla] = useState<any>(null);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [galleryUploading, setGalleryUploading] = useState(false);
 
   const initialForm = {
     id: '',
@@ -75,20 +210,6 @@ const AdminVillas = () => {
     setShowForm(true);
   };
 
-  const handleAddGalleryUrl = () => {
-    setForm(prev => ({ ...prev, gallery: [...prev.gallery, ''] }));
-  };
-
-  const handleUpdateGalleryUrl = (index: number, url: string) => {
-    const newGallery = [...form.gallery];
-    newGallery[index] = url;
-    setForm(prev => ({ ...prev, gallery: newGallery }));
-  };
-
-  const handleRemoveGalleryUrl = (index: number) => {
-    setForm(prev => ({ ...prev, gallery: form.gallery.filter((_, i) => i !== index) }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -104,48 +225,22 @@ const AdminVillas = () => {
       location: typeof form.location === 'object' ? form.location : { address: form.location }
     };
 
-    console.log('Intentando guardar villa con datos:', villaData);
-
     try {
       if (editingVilla) {
-        console.log('Actualizando villa existente ID:', editingVilla.id);
-        const { data, error } = await supabase
-          .from('villas')
-          .update(villaData)
-          .eq('id', editingVilla.id)
-          .select();
-
-        if (error) {
-          console.error('Error de Actualización:', error);
-          throw error;
-        }
-        console.log('Resultado de actualización:', data);
+        const { error } = await supabase.from('villas').update(villaData).eq('id', editingVilla.id).select();
+        if (error) throw error;
         toast.success('Villa actualizada correctamente');
       } else {
         const id = form.name.toLowerCase().trim().replace(/\s+/g, '-');
-        console.log('Insertando nueva villa con slug ID:', id);
-        const { data, error } = await supabase
-          .from('villas')
-          .insert([{ ...villaData, id }])
-          .select();
-
-        if (error) {
-          console.error('Error de Inserción:', error);
-          throw error;
-        }
-        console.log('Resultado de inserción:', data);
+        const { error } = await supabase.from('villas').insert([{ ...villaData, id }]).select();
+        if (error) throw error;
         toast.success('Nueva villa publicada correctamente');
       }
       setShowForm(false);
       await queryClient.invalidateQueries({ queryKey: ['villas'] });
       await refetch();
     } catch (error: any) {
-      console.error('DATABASE ERROR:', error);
-      const errorMessage = error.message || 'Error desconocido de la base de datos';
-      const errorDetails = error.details || '';
-      toast.error(`ERROR AL GUARDAR: ${errorMessage} ${errorDetails}`, {
-        duration: 5000,
-      });
+      toast.error(`ERROR AL GUARDAR: ${error.message || 'Error desconocido'}`, { duration: 5000 });
     } finally {
       setSubmitting(false);
     }
@@ -158,7 +253,7 @@ const AdminVillas = () => {
       if (error) throw error;
       toast.success('Villa eliminada');
       refetch();
-    } catch (error: any) {
+    } catch {
       toast.error('Error al borrar');
     }
   };
@@ -166,15 +261,16 @@ const AdminVillas = () => {
   return (
     <AdminLayout>
       <PageTransition className="px-6 py-10 md:px-12 md:py-16 bg-[#F9FAFB] min-h-screen">
-        {/* Header Section */}
-        <div className="max-w-7xl mx-auto mb-16 flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-neutral-200 pb-12">
-          <div className="space-y-4">
-             <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-[#111827] rounded-xl flex items-center justify-center text-white shadow-lg">
-                   <Home size={24} />
-                </div>
-                <h1 className="text-3xl font-display font-light text-[#111827]">Gestión de Villas</h1>
-             </div>
+        {/* Header */}
+        <div className="max-w-7xl mx-auto mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-neutral-200 pb-10">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-[#111827] rounded-xl flex items-center justify-center text-white shadow-lg">
+              <Home size={24} />
+            </div>
+            <div>
+              <h1 className="text-3xl font-display font-light text-[#111827]">Gestión de Villas</h1>
+              <p className="text-xs text-neutral-400 font-medium mt-0.5">Sube fotos directamente para evitar errores en móvil</p>
+            </div>
           </div>
           <button 
             onClick={handleAddNew} 
@@ -184,7 +280,7 @@ const AdminVillas = () => {
           </button>
         </div>
 
-        {/* Listings Grid */}
+        {/* Grid */}
         {isLoading ? (
           <div className="flex items-center justify-center py-40">
             <Loader2 className="animate-spin text-neutral-300" size={40} />
@@ -194,28 +290,27 @@ const AdminVillas = () => {
             {villas?.map((villa: any) => (
               <div key={villa.id} className="bg-white rounded-[2rem] border border-neutral-200 overflow-hidden hover:shadow-xl transition-all">
                 <div className="relative aspect-[4/3] bg-neutral-100">
-                  <img 
-                    src={getDirectImageUrl(villa.image) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'} 
+                  <DriveImage
+                    src={villa.image}
                     alt={villa.name}
                     className="w-full h-full object-cover transition-opacity duration-300"
-                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80' }}
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                     <button onClick={() => handleEdit(villa)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center transition-transform hover:scale-110"><Edit2 size={16} /></button>
-                     <button onClick={() => handleDelete(villa.id)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose-500 transition-transform hover:scale-110"><Trash2 size={16} /></button>
+                    <button onClick={() => handleEdit(villa)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center transition-transform hover:scale-110"><Edit2 size={16} /></button>
+                    <button onClick={() => handleDelete(villa.id)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose-500 transition-transform hover:scale-110"><Trash2 size={16} /></button>
                   </div>
                 </div>
                 <div className="p-6">
-                   <h2 className="text-xl font-display font-medium text-[#111827]">{villa.name}</h2>
-                   <p className="text-neutral-500 text-sm mt-1">Huéspedes: {villa.capacity}</p>
-                   <div className="flex items-center justify-between mt-4">
-                      <p className="text-lg font-black text-primary">US${villa.price.toLocaleString()}</p>
-                      <div className="flex -space-x-2">
-                         {villa.gallery?.slice(0, 3).map((img: string, i: number) => (
-                            <img key={i} src={getDirectImageUrl(img) || ''} className="w-6 h-6 rounded-full border-2 border-white object-cover shadow-sm" />
-                         ))}
-                      </div>
-                   </div>
+                  <h2 className="text-xl font-display font-medium text-[#111827]">{villa.name}</h2>
+                  <p className="text-neutral-500 text-sm mt-1">Huéspedes: {villa.capacity}</p>
+                  <div className="flex items-center justify-between mt-4">
+                    <p className="text-lg font-black text-primary">US${villa.price.toLocaleString()}</p>
+                    <div className="flex -space-x-2">
+                      {villa.gallery?.slice(0, 3).map((img: string, i: number) => (
+                        <DriveImage key={i} src={img} alt="" className="w-6 h-6 rounded-full border-2 border-white object-cover shadow-sm" />
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -233,31 +328,32 @@ const AdminVillas = () => {
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-10 py-10 bg-white">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
               {/* Data Section */}
-              <div className="lg:col-span-7 space-y-10">
-                <div className="space-y-6">
+              <div className="lg:col-span-7 space-y-8">
+                <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase text-neutral-400">Nombre de la propiedad</label>
                   <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-all" />
-                  
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase text-neutral-400">Precio / Noche</label>
-                      <input required type="number" value={form.price} onChange={e => setForm({...form, price: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black" />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase text-neutral-400">Capacidad</label>
-                       <input required type="number" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black" />
-                    </div>
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-neutral-400">Precio / Noche (US$)</label>
+                    <input required type="number" value={form.price} onChange={e => setForm({...form, price: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-neutral-400">Capacidad</label>
+                    <input required type="number" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black" />
                   </div>
                 </div>
-
-                <div className="space-y-6">
+                <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase text-neutral-400">Descripción</label>
                   <textarea rows={4} value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black resize-none" />
                 </div>
-
-                <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-neutral-400">Comodidades (separadas por coma)</label>
+                  <input value={form.amenities as string} onChange={e => setForm({...form, amenities: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black" placeholder="Piscina, WiFi, Cocina..." />
+                </div>
+                <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase text-neutral-400">Dirección</label>
                   <input value={form.location.address} onChange={e => setForm({...form, location: {...form.location, address: e.target.value}})} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none" />
                 </div>
@@ -265,73 +361,15 @@ const AdminVillas = () => {
 
               {/* Visual Section */}
               <div className="lg:col-span-5 space-y-8">
-                <div className="space-y-4">
-                  <label className="text-[10px] font-black uppercase text-neutral-400">Imagen Principal (URL)</label>
-                  <div className="relative">
-                    <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
-                    <input 
-                      value={form.image} 
-                      onChange={e => setForm({...form, image: e.target.value})} 
-                      className="w-full bg-neutral-50 border border-neutral-200 rounded-xl pl-12 pr-4 py-3 outline-none focus:border-black transition-all text-sm font-medium"
-                      placeholder="https://drive.google.com/..."
-                    />
-                  </div>
-                  <div className="aspect-video rounded-3xl overflow-hidden bg-neutral-50 border border-neutral-100 shadow-inner group relative">
-                    {form.image ? (
-                      <img src={getDirectImageUrl(form.image) || ''} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                    ) : (
-                      <div className="h-full flex items-center justify-center text-neutral-200"><ImageIcon size={40} /></div>
-                    )}
-                    <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur-sm p-2 opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
-                       <span className="text-white text-[9px] font-black uppercase tracking-widest">Vista Previa Real</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                   <div className="flex justify-between items-center">
-                      <label className="text-[10px] font-black uppercase text-neutral-400">Galería de Fotos (URLs)</label>
-                      <button 
-                        type="button"
-                        onClick={handleAddGalleryUrl}
-                        className="text-[10px] font-black uppercase text-primary bg-primary/10 px-3 py-1.5 rounded-full hover:bg-primary/20 transition-colors"
-                      >
-                        Añadir URL
-                      </button>
-                   </div>
-                   <div className="space-y-3">
-                      {form.gallery.map((img, idx) => (
-                         <div key={idx} className="flex gap-2 items-start group">
-                            <div className="flex-1 space-y-2">
-                               <input 
-                                 value={img} 
-                                 onChange={e => handleUpdateGalleryUrl(idx, e.target.value)} 
-                                 placeholder="Enlace de la foto..."
-                                 className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black text-xs font-medium"
-                               />
-                               {img && (
-                                 <div className="h-20 rounded-xl overflow-hidden border border-neutral-100 shadow-sm relative w-32 ml-1">
-                                    <img src={getDirectImageUrl(img) || ''} className="w-full h-full object-cover" />
-                                    <button 
-                                      type="button"
-                                      onClick={() => handleRemoveGalleryUrl(idx)}
-                                      className="absolute top-1 right-1 bg-white/80 p-1.5 rounded-full hover:bg-red-500 hover:text-white transition-colors"
-                                    >
-                                      <Trash2 size={12} />
-                                    </button>
-                                 </div>
-                               )}
-                            </div>
-                         </div>
-                      ))}
-                      {form.gallery.length === 0 && (
-                        <div className="py-8 border-2 border-dashed border-neutral-100 rounded-3xl flex flex-col items-center justify-center text-neutral-300">
-                           <ImageIcon size={32} />
-                           <p className="text-[9px] font-black uppercase tracking-widest mt-2">Sin fotos en galería</p>
-                        </div>
-                      )}
-                   </div>
-                </div>
+                <ImageUploader
+                  label="Imagen Principal"
+                  value={form.image}
+                  onChange={url => setForm({...form, image: url})}
+                />
+                <GalleryUploader
+                  gallery={form.gallery}
+                  onChange={g => setForm({...form, gallery: g})}
+                />
               </div>
             </div>
           </form>
