@@ -36,16 +36,20 @@ const PromotionsBanner = () => {
             
             <div className="relative z-10 flex items-start justify-between">
               <div className="pr-4">
-                <span className="inline-block px-3 py-1 bg-accent/10 border border-accent/20 text-accent rounded-full text-[9px] font-display font-black uppercase tracking-widest mb-3">
-                  {promo.badge}
-                </span>
+                {promo.badge && (
+                  <span className="inline-block px-3 py-1 bg-accent/10 border border-accent/20 text-accent rounded-full text-[9px] font-display font-black uppercase tracking-widest mb-3">
+                    {promo.badge}
+                  </span>
+                )}
                 <h3 className="font-display font-bold text-xl text-white tracking-tight leading-tight">
                   {promo.title}
                 </h3>
-                <p className="text-white/60 text-sm mt-2 leading-relaxed font-medium">
-                  {promo.description}
-                </p>
-                {promo.min_nights > 1 && (
+                {promo.description && (
+                  <p className="text-white/60 text-sm mt-2 leading-relaxed font-medium">
+                    {promo.description}
+                  </p>
+                )}
+                {promo.min_nights !== null && promo.min_nights > 1 && (
                    <p className="text-xs text-white/40 mt-3 font-display">Min. noches: {promo.min_nights}</p>
                 )}
               </div>
