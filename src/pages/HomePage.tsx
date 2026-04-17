@@ -136,6 +136,13 @@ const HomePage = () => {
           ))}
         </div>
 
+        {/* Copyright Footer */}
+        <footer className="w-full text-center py-6 mt-8 border-t border-white/10">
+            <p className="text-xs text-white/50 font-body">
+                &copy; {new Date().getFullYear()} Villas Mamajuana. Todos los derechos reservados.
+            </p>
+        </footer>
+
       </div>
     </PageTransition>
   </ClientLayout>
