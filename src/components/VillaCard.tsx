@@ -1,18 +1,22 @@
-import { Villa, promotions } from '@/data/mockData';
+import { usePromotions } from '@/hooks/usePromotions';
 import { Link } from 'react-router-dom';
 import { Tag, Users, ShieldCheck, Waves } from 'lucide-react';
 import { getDirectImageUrl } from '@/utils/imageUtils';
 
-const VillaCard = ({ villa }: { villa: Villa }) => {
+const VillaCard = ({ villa }: { villa: any }) => {
+  const { data: promotions } = usePromotions();
   const today = new Date().toISOString().split('T')[0];
-  const villaPromos = promotions.filter(
-    p => p.active && (!p.villaId || p.villaId === villa.id) && p.validFrom <= today && p.validTo >= today
+  
+  const villaPromos = (promotions || []).filter(
+    p => p.active && (!p.villa_id || p.villa_id === villa.id) && p.valid_from <= today && p.valid_to >= today
   );
+  
   const bestPromo = villaPromos.length > 0
-    ? villaPromos.reduce((best, p) => p.discountPercent > best.discountPercent ? p : best)
+    ? villaPromos.reduce((best, p) => p.discount_percent > best.discount_percent ? p : best)
     : null;
+    
   const discountedPrice = bestPromo
-    ? Math.round(villa.price * (1 - bestPromo.discountPercent / 100))
+    ? Math.round(villa.price * (1 - bestPromo.discount_percent / 100))
     : null;
 
   return (
@@ -23,7 +27,7 @@ const VillaCard = ({ villa }: { villa: Villa }) => {
         {bestPromo && (
           <div className="absolute top-4 left-4 z-20">
              <span className="bg-[#111827]/90 backdrop-blur-md text-[#FBBF24] border border-[#FBBF24]/20 px-4 py-1.5 rounded-full text-[10px] font-display font-black tracking-widest shadow-xl uppercase">
-                {bestPromo.badge} DESC.
+                {bestPromo.badge || `${bestPromo.discount_percent}% OFF`}
              </span>
           </div>
         )}

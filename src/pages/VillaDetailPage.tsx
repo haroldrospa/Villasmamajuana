@@ -146,7 +146,7 @@ const VillaDetailPage = () => {
             {bestPromo && (
               <div className="absolute top-5 right-5 z-20">
                  <span className="bg-accent/90 backdrop-blur-md text-accent-foreground px-4 py-1.5 rounded-full text-[10px] font-display font-black shadow-lg border border-white/10 tracking-widest uppercase">
-                    {bestPromo.badge} DESC.
+                    {bestPromo.badge || `${bestPromo.discount_percent}% OFF`}
                  </span>
               </div>
             )}
