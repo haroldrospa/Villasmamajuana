@@ -6,7 +6,7 @@ const WhatsAppButton = () => {
   const isHomePage = pathname === '/';
   
   // Replace with the actual phone number
-  const phoneNumber = "18095550101"; 
+  const phoneNumber = "18299735049"; 
   const defaultMessage = "Hola Villas Mamajuana, estoy viendo su página web y me gustaría obtener más información para hacer una reservación.";
   
   const handleWhatsAppClick = () => {
