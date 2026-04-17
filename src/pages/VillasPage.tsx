@@ -13,7 +13,7 @@ const VillasPage = () => {
         <div className="bg-[#1a2d1a] px-6 pt-16 pb-16 rounded-b-[2.5rem] shadow-2xl relative overflow-hidden">
           {/* Subtle decoration */}
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-white/5 blur-3xl" />
-          <div className="relative max-w-lg mx-auto text-center">
+          <div className="relative max-w-4xl mx-auto text-center">
             <h1 className="font-display font-black text-4xl text-white tracking-tight drop-shadow-sm">
               Nuestras Villas
             </h1>
@@ -23,7 +23,7 @@ const VillasPage = () => {
           </div>
         </div>
 
-        <div className="px-5 pt-8 pb-12 max-w-lg mx-auto -mt-6 relative z-10">
+        <div className="px-5 pt-8 pb-12 max-w-4xl mx-auto -mt-6 relative z-10 w-full">
           
           {isLoading ? (
             <div className="flex flex-col gap-8">

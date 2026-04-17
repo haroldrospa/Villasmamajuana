@@ -17,7 +17,7 @@ const VillaCard = ({ villa }: { villa: Villa }) => {
 
   return (
     <Link to={`/villa/${villa.id}`} className="group block focus:outline-none">
-      <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100/60 transition-all duration-500 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 relative">
+      <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100/60 transition-all duration-500 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 relative flex flex-col sm:flex-row">
         
         {/* Promotion Badge - Premium styling */}
         {bestPromo && (
@@ -29,44 +29,44 @@ const VillaCard = ({ villa }: { villa: Villa }) => {
         )}
 
         {/* Image Hub */}
-        <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
+        <div className="relative w-full sm:w-[42%] aspect-[4/3] sm:aspect-auto overflow-hidden bg-neutral-100 shrink-0">
           <img
             src={getDirectImageUrl(villa.image) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'}
             alt={villa.name}
-            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
             loading="lazy"
           />
-          {/* Cinematographic Gradient Base */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111827]/90 via-[#111827]/20 to-transparent pointer-events-none" />
-          
-          <div className="absolute bottom-6 left-6 right-6">
-             <h3 className="font-display font-black text-2xl text-white tracking-tight drop-shadow-lg leading-tight">
-               {villa.name}
-             </h3>
-             <p className="text-white/80 text-sm mt-1 line-clamp-1 font-medium text-shadow-sm">
-               {villa.description}
-             </p>
-          </div>
+          {/* Subtle dark overlay for contrast */}
+          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500 pointer-events-none" />
         </div>
 
         {/* Data Panel */}
-        <div className="p-6 bg-white">
-          <div className="flex flex-wrap items-center gap-2 mb-6">
-             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-50 rounded-full border border-neutral-100">
-                <Users size={14} className="text-neutral-500" />
-                <span className="text-[10px] font-bold text-neutral-600 uppercase tracking-wider">{villa.capacity} Personas</span>
-             </div>
-             {villa.amenities.some(a => a.toLowerCase().includes('piscina') || a.toLowerCase().includes('jacuzzi')) && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 rounded-full border border-blue-100">
-                   <Waves size={14} className="text-blue-500" />
-                   <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Piscina</span>
-                </div>
-             )}
+        <div className="p-6 sm:p-8 bg-white flex flex-col justify-between flex-1">
+          <div>
+            <h3 className="font-display font-black text-2xl sm:text-3xl text-[#111827] tracking-tight mb-2">
+              {villa.name}
+            </h3>
+            <p className="text-neutral-500 text-sm line-clamp-2 leading-relaxed mb-6 font-medium">
+              {villa.description}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-2 mb-6">
+               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-50 rounded-full border border-neutral-100">
+                  <Users size={14} className="text-neutral-500" />
+                  <span className="text-[10px] font-bold text-neutral-600 uppercase tracking-wider">{villa.capacity} Personas</span>
+               </div>
+               {villa.amenities.some(a => a.toLowerCase().includes('piscina') || a.toLowerCase().includes('jacuzzi')) && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 rounded-full border border-blue-100">
+                     <Waves size={14} className="text-blue-500" />
+                     <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Agua</span>
+                  </div>
+               )}
+            </div>
           </div>
 
           <div className="flex items-end justify-between pt-5 border-t border-neutral-100">
             <div className="flex flex-col">
-              <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.15em] mb-1">Precio por Noche</span>
+              <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.15em] mb-1">Precio / Noche</span>
               <div className="flex items-baseline gap-2">
                 {discountedPrice ? (
                   <>
