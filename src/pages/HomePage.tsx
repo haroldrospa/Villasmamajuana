@@ -39,7 +39,7 @@ const HomePage = () => {
   return (
   <ClientLayout>
     <PageTransition>
-      <div className="bg-neutral-800 min-h-screen pb-8">
+      <div className="min-h-screen pb-8" style={{backgroundColor: '#1a2d1a'}}>
 
         {/* Auth Bar */}
         <div className="absolute top-4 right-4 z-30 flex gap-2">
@@ -94,7 +94,7 @@ const HomePage = () => {
             loading="eager"
             decoding="async"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-neutral-800 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-[#1a2d1a] pointer-events-none" />
           <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
             <img src={logo} alt="Logo" className="w-16 h-16 mb-4" />
             <h1 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-tight">
@@ -129,7 +129,7 @@ const HomePage = () => {
             { emoji: '🌿', label: 'Eco-Luxury' },
             { emoji: '✨', label: 'Exclusivo' },
           ].map((f) => (
-            <div key={f.label} className="bg-neutral-700 rounded-lg py-4 shadow-lg">
+            <div key={f.label} className="rounded-lg py-4 shadow-lg" style={{backgroundColor: '#243d24'}}>
               <span className="text-2xl">{f.emoji}</span>
               <p className="text-xs font-display font-semibold mt-1 text-white/80">{f.label}</p>
             </div>
