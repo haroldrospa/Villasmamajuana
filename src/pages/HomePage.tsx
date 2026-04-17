@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import heroImg from '@/assets/villa-hero.jpg';
 import logo from '@/assets/logo.png';
 import PromotionsBanner from '@/components/PromotionsBanner';
+import LanguageToggle from '@/components/LanguageToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { LogIn, UserPlus, LogOut, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,7 +43,8 @@ const HomePage = () => {
       <div className="min-h-screen pb-8" style={{backgroundColor: '#1a2d1a'}}>
 
         {/* Auth Bar */}
-        <div className="absolute top-4 right-4 z-30 flex gap-2">
+        <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
+          <LanguageToggle />
           {!isLoading && (
             user ? (
               <div className="flex items-center gap-2">
