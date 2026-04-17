@@ -36,11 +36,9 @@ const PromotionsBanner = () => {
             
             <div className="relative z-10 flex items-start justify-between">
               <div className="pr-4">
-                {promo.badge && (
-                  <span className="inline-block px-3 py-1 bg-accent/10 border border-accent/20 text-accent rounded-full text-[9px] font-display font-black uppercase tracking-widest mb-3">
-                    {promo.badge}
-                  </span>
-                )}
+                <span className="inline-block px-3 py-1 bg-accent/10 border border-accent/20 text-accent rounded-full text-[9px] font-display font-black uppercase tracking-widest mb-3">
+                  {promo.badge || `${promo.discount_percent}% OFF`}
+                </span>
                 <h3 className="font-display font-bold text-xl text-white tracking-tight leading-tight">
                   {promo.title}
                 </h3>
