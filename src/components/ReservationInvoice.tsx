@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { Download, MessageCircle, FileText, MapPin, Phone, Hash, Globe, Mail, Share2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -219,10 +219,10 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
                   {invoice.stayType === '10h' ? '1 (Pasa Día)' : invoice.nights}
                 </td>
                 <td className="py-8 px-4 text-right font-bold">
-                  RD${invoice.pricePerNight.toLocaleString()}
+                  US${invoice.pricePerNight.toLocaleString()}
                 </td>
                 <td className="py-8 px-4 text-right font-black text-slate-900">
-                  RD${(invoice.nights * invoice.pricePerNight || invoice.pricePerNight).toLocaleString()}
+                  US${(invoice.nights * invoice.pricePerNight || invoice.pricePerNight).toLocaleString()}
                 </td>
               </tr>
               
@@ -234,10 +234,10 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
                   </td>
                   <td className="py-4 px-4 text-center">1</td>
                   <td className="py-4 px-4 text-right text-rose-500">
-                    -RD${((invoice.originalAmount || 0) - invoice.totalAmount).toLocaleString()}
+                    -US${((invoice.originalAmount || 0) - invoice.totalAmount).toLocaleString()}
                   </td>
                   <td className="py-4 px-4 text-right font-black text-rose-500">
-                    -RD${((invoice.originalAmount || 0) - invoice.totalAmount).toLocaleString()}
+                    -US${((invoice.originalAmount || 0) - invoice.totalAmount).toLocaleString()}
                   </td>
                 </tr>
               )}
@@ -258,25 +258,25 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
           <div className="w-full max-w-[320px] space-y-3">
             <div className="flex justify-between items-center text-sm">
               <span className="text-slate-400 font-bold uppercase">Sub-Total:</span>
-              <span className="font-bold text-slate-700 italic">RD${invoice.totalAmount.toLocaleString()}</span>
+              <span className="font-bold text-slate-700 italic">US${invoice.totalAmount.toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-slate-400 font-bold uppercase">Impuestos (0%):</span>
-              <span className="font-bold text-slate-700 italic">RD$0</span>
+              <span className="font-bold text-slate-700 italic">US$0</span>
             </div>
             <div className="flex justify-between items-center bg-slate-900 text-white p-4">
               <span className="text-xs font-black uppercase tracking-widest opacity-60">Total Factura:</span>
-              <span className="text-2xl font-display font-black tracking-tighter">RD${invoice.totalAmount.toLocaleString()}</span>
+              <span className="text-2xl font-display font-black tracking-tighter">US${invoice.totalAmount.toLocaleString()}</span>
             </div>
             
             <div className="space-y-1 pt-4">
               <div className="flex justify-between items-center text-xs px-1">
                 <span className="text-emerald-600 font-black uppercase">Depósito Pagado:</span>
-                <span className="font-black text-emerald-600">RD${invoice.depositAmount.toLocaleString()}</span>
+                <span className="font-black text-emerald-600">US${invoice.depositAmount.toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center text-sm px-4 py-2 border-2 border-slate-900 bg-slate-50 italic">
                 <span className="text-slate-900 font-black uppercase text-[10px]">Saldo Pendiente:</span>
-                <span className="font-black text-slate-900">RD${invoice.remainingAmount.toLocaleString()}</span>
+                <span className="font-black text-slate-900">US${invoice.remainingAmount.toLocaleString()}</span>
               </div>
             </div>
           </div>

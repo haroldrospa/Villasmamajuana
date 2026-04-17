@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+﻿import { useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
@@ -171,17 +171,17 @@ const VillaDetailPage = () => {
               {discountedPrice ? (
                 <>
                   <span className="font-display font-extrabold text-2xl text-primary">
-                    RD${discountedPrice}
+                    US${discountedPrice}
                   </span>
                   <span className="font-display text-base text-muted-foreground line-through">
-                    RD${villa.price}
+                    US${villa.price}
                   </span>
                   <span className="text-xs text-muted-foreground">/noche</span>
                 </>
               ) : (
                 <>
                   <span className="font-display font-extrabold text-2xl text-primary">
-                    RD${villa.price}
+                    US${villa.price}
                   </span>
                   <span className="text-xs text-muted-foreground">/noche</span>
                 </>

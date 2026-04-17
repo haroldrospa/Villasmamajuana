@@ -1,4 +1,4 @@
-import { usePromotions } from '@/hooks/usePromotions';
+﻿import { usePromotions } from '@/hooks/usePromotions';
 import { Link } from 'react-router-dom';
 import { Tag, Users, ShieldCheck, Waves } from 'lucide-react';
 import DriveImage from '@/components/DriveImage';
@@ -73,11 +73,11 @@ const VillaCard = ({ villa }: { villa: any }) => {
               <div className="flex items-baseline gap-2">
                 {discountedPrice ? (
                   <>
-                    <span className="font-display font-black text-3xl text-primary leading-none">RD${discountedPrice}</span>
-                    <span className="text-sm text-neutral-300 line-through font-bold">RD${villa.price}</span>
+                    <span className="font-display font-black text-3xl text-primary leading-none">US${discountedPrice}</span>
+                    <span className="text-sm text-neutral-300 line-through font-bold">US${villa.price}</span>
                   </>
                 ) : (
-                  <span className="font-display font-black text-3xl text-primary leading-none">RD${villa.price}</span>
+                  <span className="font-display font-black text-3xl text-primary leading-none">US${villa.price}</span>
                 )}
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+﻿import { useLocation, useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
 import ReservationInvoice, { InvoiceData } from '@/components/ReservationInvoice';
@@ -30,9 +30,9 @@ const InvoicePage = () => {
     `📅 Check-out: ${invoice.checkOut}\n` +
     `🌙 Noches: ${invoice.nights}\n\n` +
     `💰 *RESUMEN DE PAGO:*\n` +
-    `• Total: RD$${invoice.totalAmount.toLocaleString()}\n` +
-    `• Pagado (50%): RD$${invoice.depositAmount.toLocaleString()}\n` +
-    `• Pendiente: RD$${invoice.remainingAmount.toLocaleString()}\n\n` +
+    `• Total: US$${invoice.totalAmount.toLocaleString()}\n` +
+    `• Pagado (50%): US$${invoice.depositAmount.toLocaleString()}\n` +
+    `• Pendiente: US$${invoice.remainingAmount.toLocaleString()}\n\n` +
     `🏦 *Datos Bancarios:*\n` +
     `Banco: Banreservas\n` +
     `Cuenta Ahorro: 9601938364\n` +

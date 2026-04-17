@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
 import { useIncomes, useExpenses, useReservations } from '@/hooks/useFinances';
@@ -22,7 +22,7 @@ const AdminSummary = () => {
     .reduce((s, r) => s + Number(r.remaining_amount), 0);
 
   const handleExportCSV = () => {
-    let csvStr = 'TIPO,FECHA,CONCEPTO/CATEGORIA,MONTO (RD$)\n';
+    let csvStr = 'TIPO,FECHA,CONCEPTO/CATEGORIA,MONTO (US$)\n';
     
     (incomes || []).forEach(i => {
       csvStr += `INGRESO,${new Date(i.date).toLocaleDateString()},"${i.concept || 'Ingreso'}",${i.amount}\n`;
@@ -91,7 +91,7 @@ const AdminSummary = () => {
               </div>
               <span className="font-display font-semibold text-sm text-muted-foreground">Total Ingresos</span>
             </div>
-            <p className="font-display font-extrabold text-3xl text-foreground">RD${totalIncome.toLocaleString()}</p>
+            <p className="font-display font-extrabold text-3xl text-foreground">US${totalIncome.toLocaleString()}</p>
           </div>
 
           {/* Expenses card */}
@@ -102,7 +102,7 @@ const AdminSummary = () => {
               </div>
               <span className="font-display font-semibold text-sm text-muted-foreground">Total Gastos</span>
             </div>
-            <p className="font-display font-extrabold text-3xl text-foreground">RD${totalExpenses.toLocaleString()}</p>
+            <p className="font-display font-extrabold text-3xl text-foreground">US${totalExpenses.toLocaleString()}</p>
           </div>
 
           {/* Pending payments card */}
@@ -113,7 +113,7 @@ const AdminSummary = () => {
               </div>
               <span className="font-display font-semibold text-sm text-muted-foreground">Pagos Pendientes</span>
             </div>
-            <p className="font-display font-extrabold text-3xl text-foreground">RD${pendingPayments.toLocaleString()}</p>
+            <p className="font-display font-extrabold text-3xl text-foreground">US${pendingPayments.toLocaleString()}</p>
           </div>
 
           {/* Net profit card */}
@@ -124,7 +124,7 @@ const AdminSummary = () => {
               </div>
               <span className="font-display font-semibold text-sm text-primary-foreground/70">Ganancia Neta</span>
             </div>
-            <p className="font-display font-extrabold text-3xl text-primary-foreground">RD${netProfit.toLocaleString()}</p>
+            <p className="font-display font-extrabold text-3xl text-primary-foreground">US${netProfit.toLocaleString()}</p>
           </div>
         </div>
 
@@ -145,7 +145,7 @@ const AdminSummary = () => {
                     <div className="w-20 h-1.5 rounded-full bg-muted overflow-hidden">
                       <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
                     </div>
-                    <span className="text-sm font-display font-bold text-foreground min-w-[60px] text-right">RD${catTotal.toLocaleString()}</span>
+                    <span className="text-sm font-display font-bold text-foreground min-w-[60px] text-right">US${catTotal.toLocaleString()}</span>
                   </div>
                 </div>
               );

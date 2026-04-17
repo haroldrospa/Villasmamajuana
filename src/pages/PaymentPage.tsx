@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
@@ -190,15 +190,15 @@ const PaymentPage = () => {
             <div className="flex flex-col gap-1.5 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Total reserva</span>
-                <span className="font-display font-bold text-foreground">RD${booking.total.toLocaleString()}</span>
+                <span className="font-display font-bold text-foreground">US${booking.total.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-primary">
                 <span className="font-display font-bold">Monto a pagar (50%)</span>
-                <span className="font-display font-extrabold text-lg">RD${booking.deposit.toLocaleString()}</span>
+                <span className="font-display font-extrabold text-lg">US${booking.deposit.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Monto restante</span>
-                <span>RD${booking.remaining.toLocaleString()}</span>
+                <span>US${booking.remaining.toLocaleString()}</span>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+﻿import { useLocation, useNavigate, Link } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
 import { CheckCircle2, MessageCircle, Copy, Home, Calendar, Clock, DollarSign } from 'lucide-react';
@@ -112,7 +112,7 @@ const BookingConfirmationPage = () => {
               <div className="bg-primary/5 rounded-2xl p-4 mt-2">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-xs font-bold text-primary/70">Monto para confirmar (50%)</span>
-                  <span className="font-display font-black text-primary text-base">RD${booking.deposit.toLocaleString()}</span>
+                  <span className="font-display font-black text-primary text-base">US${booking.deposit.toLocaleString()}</span>
                 </div>
                 <p className="text-[10px] text-primary/60 italic text-right">* El 50% restante se paga al llegar.</p>
               </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
 import { useIncomes } from '@/hooks/useFinances';
@@ -67,7 +67,7 @@ const AdminIncome = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="font-display font-extrabold text-2xl text-foreground">Ingresos</h1>
-            <p className="text-muted-foreground text-sm mt-1">Total: <span className="font-bold text-foreground">RD${total.toLocaleString()}</span></p>
+            <p className="text-muted-foreground text-sm mt-1">Total: <span className="font-bold text-foreground">US${total.toLocaleString()}</span></p>
           </div>
           <button onClick={() => setShowForm(!showForm)} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-display font-semibold flex items-center gap-1.5">
             <Plus size={14} /> Agregar
@@ -121,7 +121,7 @@ const AdminIncome = () => {
                   <p className="text-xs text-muted-foreground mt-0.5">{inc.date} • {inc.payment_method}{inc.client ? ` • ${inc.client}` : ''}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <p className="font-display font-bold text-foreground">RD${Number(inc.amount).toLocaleString()}</p>
+                  <p className="font-display font-bold text-foreground">US${Number(inc.amount).toLocaleString()}</p>
                   <button onClick={() => deleteIncome(inc.id)} className="text-destructive">
                     <Trash2 size={14} />
                   </button>

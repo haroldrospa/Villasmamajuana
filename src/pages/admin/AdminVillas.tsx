@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
@@ -209,7 +209,7 @@ const AdminVillas = () => {
                    <h2 className="text-xl font-display font-medium text-[#111827]">{villa.name}</h2>
                    <p className="text-neutral-500 text-sm mt-1">Huéspedes: {villa.capacity}</p>
                    <div className="flex items-center justify-between mt-4">
-                      <p className="text-lg font-black text-primary">RD${villa.price.toLocaleString()}</p>
+                      <p className="text-lg font-black text-primary">US${villa.price.toLocaleString()}</p>
                       <div className="flex -space-x-2">
                          {villa.gallery?.slice(0, 3).map((img: string, i: number) => (
                             <img key={i} src={getDirectImageUrl(img) || ''} className="w-6 h-6 rounded-full border-2 border-white object-cover shadow-sm" />
