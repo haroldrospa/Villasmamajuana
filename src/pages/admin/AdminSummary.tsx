@@ -2,7 +2,7 @@ import { useState } from 'react';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
 import { useIncomes, useExpenses, useReservations } from '@/hooks/useFinances';
-import { TrendingUp, TrendingDown, DollarSign, Clock, Loader2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Clock, Loader2, Download } from 'lucide-react';
 
 type TimeFilter = 'hoy' | 'semana' | 'mes';
 
@@ -21,6 +21,26 @@ const AdminSummary = () => {
     .filter(r => r.status === 'pago_parcial' || r.status === 'pendiente_pago')
     .reduce((s, r) => s + Number(r.remaining_amount), 0);
 
+  const handleExportCSV = () => {
+    let csvStr = 'TIPO,FECHA,CONCEPTO/CATEGORIA,MONTO (RD$)\n';
+    
+    (incomes || []).forEach(i => {
+      csvStr += `INGRESO,${new Date(i.date).toLocaleDateString()},"${i.concept || 'Ingreso'}",${i.amount}\n`;
+    });
+    
+    (expenses || []).forEach(e => {
+      csvStr += `GASTO,${new Date(e.date).toLocaleDateString()},"${e.category || 'Gasto'}: ${e.description || ''}",${e.amount}\n`;
+    });
+
+    const blob = new Blob(['\uFEFF' + csvStr], { type: 'text/csv;charset=utf-8;' }); // utf-8 bom for excel
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `reporte_financiero_villas_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -34,8 +54,18 @@ const AdminSummary = () => {
   return (
     <AdminLayout>
       <PageTransition className="p-6">
-        <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Resumen Financiero</h1>
-        <p className="text-muted-foreground text-sm mb-5">Vista general de finanzas</p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Resumen Financiero</h1>
+            <p className="text-muted-foreground text-sm">Vista general de finanzas</p>
+          </div>
+          <button 
+            onClick={handleExportCSV} 
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#111827] text-white rounded-xl shadow-lg hover:scale-105 transition-all text-sm font-bold w-full sm:w-auto"
+          >
+            <Download size={16} /> Exportar Reporte CSV
+          </button>
+        </div>
 
         {/* Filters */}
         <div className="flex gap-2 mb-6">
