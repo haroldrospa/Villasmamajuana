@@ -22,11 +22,24 @@ import {
 
 // ─── Supabase Storage Upload ───────────────────────────────────────────────
 const uploadToStorage = async (file: File, folder: string): Promise<string> => {
-  const ext = file.name.split('.').pop();
+  const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
   const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  
+  let contentType = file.type;
+  if (!contentType || contentType === 'application/octet-stream') {
+    if (ext === 'png') contentType = 'image/png';
+    else if (ext === 'webp') contentType = 'image/webp';
+    else if (ext === 'gif') contentType = 'image/gif';
+    else contentType = 'image/jpeg';
+  }
+
   const { data, error } = await supabase.storage
     .from('villa-images')
-    .upload(fileName, file, { cacheControl: '3600', upsert: false });
+    .upload(fileName, file, { 
+      cacheControl: '3600', 
+      upsert: false,
+      contentType
+    });
   if (error) throw error;
   const { data: urlData } = supabase.storage.from('villa-images').getPublicUrl(data.path);
   return urlData.publicUrl;
