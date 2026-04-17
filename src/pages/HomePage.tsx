@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 const HomePage = () => {
   const { user, profile, signOut, isLoading, isAdmin } = useAuth();
   const [heroUrl, setHeroUrl] = useState<string | null>(null);
+  const [isHeroLoading, setIsHeroLoading] = useState(true);
 
   useEffect(() => {
     const fetchHero = async () => {
@@ -21,6 +22,8 @@ const HomePage = () => {
         if (data?.hero_image_url) setHeroUrl(data.hero_image_url);
       } catch (e) {
         console.error('Error loading hero settings');
+      } finally {
+        setIsHeroLoading(false);
       }
     };
     fetchHero();
@@ -88,14 +91,16 @@ const HomePage = () => {
         </div>
 
         {/* Hero */}
-        <div className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] min-h-[450px] overflow-hidden bg-neutral-900">
-          <img 
-            src={getDirectImageUrl(heroUrl) || heroImg} 
-            alt="Villas Mamajuana" 
-            className="absolute inset-0 w-full h-full object-cover will-change-transform scale-[1.01] transition-transform duration-700 hover:scale-105" 
-            loading="eager"
-            decoding="async"
-          />
+        <div className="relative h-[55vh] sm:h-[65vh] md:h-[75vh] min-h-[450px] overflow-hidden bg-neutral-900 transition-opacity duration-500">
+          {!isHeroLoading && (
+            <img 
+              src={getDirectImageUrl(heroUrl) || heroImg} 
+              alt="Villas Mamajuana" 
+              className="absolute inset-0 w-full h-full object-cover will-change-transform scale-[1.01] transition-transform duration-700 hover:scale-105 animate-fade-in" 
+              loading="eager"
+              decoding="async"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-[#1a2d1a] pointer-events-none" />
           <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
             <img src={logo} alt="Logo" className="w-16 h-16 mb-4" />
