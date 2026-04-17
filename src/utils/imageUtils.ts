@@ -8,8 +8,9 @@ export const getDirectImageUrl = (url: string | null | undefined): string | null
   if (url.includes('drive.google.com')) {
     const idMatch = url.match(/\/d\/(.+?)\/?(?:\/|$|\?)/) || url.match(/id=(.+?)(?:&|$)/);
     if (idMatch && idMatch[1]) {
-      // Usar endpoint oficial de thumbnail de Google Drive que previene errores 403
-      return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w1920`;
+      // Pasamos "export=download" a través de un proxy CDN Global optimizador para evadir permanentemente el bloqueo 403/CORS de Google Drive
+      const rawDriveUrl = `https://drive.google.com/uc?export=download&id=${idMatch[1]}`;
+      return `https://wsrv.nl/?url=${encodeURIComponent(rawDriveUrl)}&output=webp&w=1000`;
     }
   }
   
