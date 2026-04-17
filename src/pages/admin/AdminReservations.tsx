@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
@@ -88,7 +88,7 @@ const AdminReservations = () => {
     let details = "";
 
     if (form.stayType === '10h') {
-      subtotal = villa.price_10h || (villa.price * 0.6);
+      subtotal = villa.price_10h || 8000;
       details = `Pasa Día: RD$${subtotal.toLocaleString()}`;
     } else if (form.checkOut) {
       const days = Math.max(1, differenceInDays(parseISO(form.checkOut), parseISO(form.checkIn)));
@@ -501,7 +501,7 @@ const AdminReservations = () => {
                        <option value="">Elegir propiedad...</option>
                        {villas?.map(v => (
                          <option key={v.id} value={v.id}>
-                           {v.name} (RD${form.stayType === '24h' ? v.price : (v.price_10h || (v.price * 0.6))})
+                           {v.name} (RD${form.stayType === '24h' ? v.price.toLocaleString() : (v.price_10h || 8000).toLocaleString()})
                          </option>
                        ))}
                     </select>

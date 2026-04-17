@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
@@ -72,7 +72,7 @@ const BookingPage = () => {
 
     if (form.stayType === '10h') {
        nights = 1; // It's a day pass
-       subtotal = selectedVilla.price_pasa_dia || (selectedVilla.price * 0.6);
+       subtotal = selectedVilla.price_10h || selectedVilla.price_pasa_dia || 8000;
     } else {
        if (!form.checkOut) return null;
        nights = differenceInDays(new Date(form.checkOut), new Date(form.checkIn));
@@ -271,7 +271,7 @@ const BookingPage = () => {
                >
                  <option value="">Seleccionar villa</option>
                  {villas?.map(v => (
-                   <option key={v.id} value={v.id}>{v.name} — RD${form.stayType === '24h' ? v.price : (v.price_10h || (v.price * 0.6))}/{form.stayType === '24h' ? 'noche' : 'día'}</option>
+                   <option key={v.id} value={v.id}>{v.name} — RD${form.stayType === '24h' ? v.price.toLocaleString() : (v.price_10h || 8000).toLocaleString()}/{form.stayType === '24h' ? 'noche' : 'día'}</option>
                  ))}
                </select>
              )}
