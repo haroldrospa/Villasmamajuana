@@ -5,11 +5,11 @@
 export const getDirectImageUrl = (url: string | null | undefined): string | null => {
   if (!url) return null;
   
-  // Soporte para Google Drive
   if (url.includes('drive.google.com')) {
     const idMatch = url.match(/\/d\/(.+?)\/?(?:\/|$|\?)/) || url.match(/id=(.+?)(?:&|$)/);
     if (idMatch && idMatch[1]) {
-      return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+      // Usar endpoint oficial de thumbnail de Google Drive que previene errores 403
+      return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w1920`;
     }
   }
   
