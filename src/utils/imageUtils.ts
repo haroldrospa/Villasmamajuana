@@ -42,6 +42,7 @@ export const getDriveFallbackUrls = (url: string | null | undefined): string[] =
   const fileId = extractDriveFileId(url);
   if (!fileId) return [url];
   return [
+    `https://wsrv.nl/?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${fileId}`)}&output=webp&w=1000`,
     `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`,
     `https://lh3.googleusercontent.com/d/${fileId}`,
     `https://drive.google.com/uc?export=view&id=${fileId}`,
