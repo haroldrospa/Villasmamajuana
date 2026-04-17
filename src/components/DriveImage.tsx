@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { getDriveFallbackUrls } from '@/utils/imageUtils';
 
-const FINAL_FALLBACK = 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=800';
+const FINAL_FALLBACK = '/og-image.png';
 
 interface DriveImageProps {
   src: string | null | undefined;
