@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import PageTransition from '@/components/PageTransition';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Tag, Trash2, Edit2, Save, X, Loader2, Calendar } from 'lucide-react';
+import { Plus, Tag, Trash2, Edit2, Save, X, Loader2, Calendar, Home } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -290,7 +290,7 @@ const AdminPromotions = () => {
                       <Tag size={24} />
                     </div>
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h3 className="font-display font-bold text-foreground">{p.title}</h3>
                         <span className="bg-accent text-accent-foreground text-[10px] font-black uppercase px-2 py-0.5 rounded">
                           {p.discount_percent}% OFF
@@ -300,18 +300,27 @@ const AdminPromotions = () => {
                              {p.badge}
                            </span>
                         )}
+                        {(() => {
+                           const today = format(new Date(), 'yyyy-MM-dd');
+                           const isActive = p.active && p.valid_from <= today && p.valid_to >= today;
+                           return (
+                             <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${isActive ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'}`}>
+                               {isActive ? 'Vigente' : p.valid_to < today ? 'Expirada' : 'Programada'}
+                             </span>
+                           );
+                        })()}
                       </div>
                       <p className="text-xs text-muted-foreground mb-2">{p.description || 'Sin descripción'}</p>
                       <div className="flex flex-wrap gap-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar size={12} /> {format(new Date(p.valid_from), 'dd/MM/yy')} — {format(new Date(p.valid_to), 'dd/MM/yy')}
+                        <span className="flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded-md">
+                          <Calendar size={12} className="text-primary" /> {format(new Date(p.valid_from + 'T12:00:00'), 'dd MMM yy')} — {format(new Date(p.valid_to + 'T12:00:00'), 'dd MMM yy')}
                         </span>
-                        <span className="flex items-center gap-1">
-                          • {p.villa_id ? villas.find(v => v.id === p.villa_id)?.name : 'Todas las Villas'}
+                        <span className="flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded-md">
+                          <Home size={12} className="text-primary" /> {p.villa_id ? villas.find(v => v.id === p.villa_id)?.name : 'Todas las Villas'}
                         </span>
-                        {p.min_nights && p.min_nights > 0 && (
-                          <span className="flex items-center gap-1">
-                            • Mín. {p.min_nights} noches
+                        {p.min_nights !== null && p.min_nights > 0 && (
+                          <span className="flex items-center gap-1.5 bg-primary/5 text-primary px-2 py-1 rounded-md border border-primary/10">
+                            ✨ Mín. {p.min_nights} noches
                           </span>
                         )}
                       </div>
