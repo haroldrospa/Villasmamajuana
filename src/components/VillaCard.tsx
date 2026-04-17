@@ -1,6 +1,7 @@
 import { Villa, promotions } from '@/data/mockData';
 import { Link } from 'react-router-dom';
 import { Tag, Users, ShieldCheck, Waves } from 'lucide-react';
+import { getDirectImageUrl } from '@/utils/imageUtils';
 
 const VillaCard = ({ villa }: { villa: Villa }) => {
   const today = new Date().toISOString().split('T')[0];
@@ -20,7 +21,7 @@ const VillaCard = ({ villa }: { villa: Villa }) => {
         {/* Image with overlay gradient */}
         <div className="relative aspect-[16/10] overflow-hidden">
           <img
-            src={villa.image}
+            src={getDirectImageUrl(villa.image) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'}
             alt={villa.name}
             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
             loading="lazy"

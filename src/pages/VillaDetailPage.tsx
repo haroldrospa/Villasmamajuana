@@ -6,6 +6,7 @@ import { useVilla } from '@/hooks/useVillas';
 import { usePromotions } from '@/hooks/usePromotions';
 import { MapPin, Users, Play, ExternalLink, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getDirectImageUrl } from '@/utils/imageUtils';
 
 const VillaDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -94,13 +95,13 @@ const VillaDetailPage = () => {
             >
               {/* Main Image */}
               <div className="min-w-full snap-center aspect-[16/10] relative">
-                <img src={villa.image} alt={villa.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <img src={getDirectImageUrl(villa.image) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'} alt={villa.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
               </div>
               
               {/* Gallery Images */}
-              {villa.gallery && villa.gallery.map((img, idx) => (
+              {villa.gallery && villa.gallery.map((img: string, idx: number) => (
                 <div key={idx} className="min-w-full snap-center aspect-[16/10] relative">
-                  <img src={img} alt={`${villa.name} gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                  <img src={getDirectImageUrl(img) || ''} alt={`${villa.name} gallery ${idx + 1}`} className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>
