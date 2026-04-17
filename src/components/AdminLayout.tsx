@@ -51,17 +51,17 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
-      <aside className="hidden md:flex w-56 bg-card border-r border-border flex-col min-h-screen sticky top-0 shrink-0">
+      <aside className="hidden md:flex w-56 bg-card border-r border-border flex-col h-screen sticky top-0 shrink-0">
         <div className="p-5 border-b border-border">
           <h2 className="font-display font-extrabold text-sm text-foreground">Villas Mamajuana</h2>
           <p className="text-[10px] text-muted-foreground">Panel de Administración</p>
         </div>
-        <nav className="flex-1 p-3 flex flex-col gap-1 overflow-auto">
+        <nav className="flex-1 p-3 flex flex-col gap-0.5 overflow-hidden hover:overflow-y-auto">
           {links.map(({ to, icon: Icon, label }) => (
             <Link
               key={to}
               to={to}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 pathname === to ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'
               }`}
             >
@@ -70,7 +70,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
             </Link>
           ))}
         </nav>
-        <div className="p-3 border-t border-border flex flex-col gap-1">
+        <div className="p-3 border-t border-border flex flex-col gap-0.5">
           <Link to="/" className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm font-medium text-foreground hover:bg-muted transition-colors">
             <Home size={16} /> Sitio Cliente
           </Link>
