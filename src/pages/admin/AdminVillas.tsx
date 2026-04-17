@@ -43,10 +43,10 @@ const AdminVillas = () => {
     amenities: '',
     gallery: [] as string[],
     location: {
-      address: '',
-      lat: 19.0544,
-      lng: -70.5261,
-      googleMapsUrl: ''
+      address: 'Plaza Mama Juana, La Vega, República Dominicana',
+      lat: 19.2415408,
+      lng: -70.5689804,
+      googleMapsUrl: 'https://maps.app.goo.gl/8NNxrmNpX4Ax5zVRA'
     }
   };
 
