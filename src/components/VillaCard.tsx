@@ -1,7 +1,7 @@
 import { usePromotions } from '@/hooks/usePromotions';
 import { Link } from 'react-router-dom';
 import { Tag, Users, ShieldCheck, Waves } from 'lucide-react';
-import { getDirectImageUrl } from '@/utils/imageUtils';
+import DriveImage from '@/components/DriveImage';
 
 const VillaCard = ({ villa }: { villa: any }) => {
   const { data: promotions } = usePromotions();
@@ -34,12 +34,10 @@ const VillaCard = ({ villa }: { villa: any }) => {
 
         {/* Image Hub */}
         <div className="relative w-full sm:w-[42%] aspect-[4/3] sm:aspect-auto overflow-hidden bg-neutral-100 shrink-0">
-          <img
-            src={getDirectImageUrl(villa.image) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'}
+          <DriveImage
+            src={villa.image}
             alt={villa.name}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-            loading="lazy"
-            onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80' }}
           />
           {/* Subtle dark overlay for contrast */}
           <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500 pointer-events-none" />

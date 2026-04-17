@@ -4,7 +4,7 @@ import ClientLayout from '@/components/ClientLayout';
 import { useReservations } from '@/hooks/useFinances';
 import { useVillas } from '@/hooks/useVillas';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { getDirectImageUrl } from '@/utils/imageUtils';
+import DriveImage from '@/components/DriveImage';
 
 const daysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
 const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -83,11 +83,10 @@ const AvailabilityPage = () => {
                   className="group relative h-40 bg-card rounded-[2rem] overflow-hidden border border-border shadow-soft transition-all hover:scale-[1.02] active:scale-98"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-transparent z-10" />
-                  <img 
-                    src={getDirectImageUrl(v.image) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'} 
+                  <DriveImage 
+                    src={v.image}
                     alt={v.name} 
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80' }}
                   />
                   <div className="relative z-20 h-full flex flex-col justify-center px-8 text-left">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1">Villa Exclusiva</span>
