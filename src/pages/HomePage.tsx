@@ -92,7 +92,7 @@ const HomePage = () => {
           loading="eager"
           decoding="async"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/90 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-neutral-800/95 pointer-events-none" />
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
           <img src={logo} alt="Logo" className="w-16 h-16 mb-4" />
           <h1 className="font-display font-extrabold text-3xl md:text-5xl text-primary-foreground leading-tight">
