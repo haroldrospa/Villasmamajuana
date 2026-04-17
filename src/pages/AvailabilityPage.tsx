@@ -87,6 +87,7 @@ const AvailabilityPage = () => {
                     src={getDirectImageUrl(v.image) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'} 
                     alt={v.name} 
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80' }}
                   />
                   <div className="relative z-20 h-full flex flex-col justify-center px-8 text-left">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1">Villa Exclusiva</span>

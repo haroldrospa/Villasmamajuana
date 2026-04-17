@@ -39,6 +39,7 @@ const VillaCard = ({ villa }: { villa: any }) => {
             alt={villa.name}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
             loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80' }}
           />
           {/* Subtle dark overlay for contrast */}
           <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500 pointer-events-none" />
