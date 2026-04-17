@@ -16,71 +16,71 @@ const VillaCard = ({ villa }: { villa: Villa }) => {
     : null;
 
   return (
-    <Link to={`/villa/${villa.id}`} className="group block">
-      <div className="bg-white rounded-[2.5rem] overflow-hidden border border-neutral-100 shadow-soft transition-all hover:shadow-elevated hover:-translate-y-1">
-        {/* Image with overlay gradient */}
-        <div className="relative aspect-[16/10] overflow-hidden">
+    <Link to={`/villa/${villa.id}`} className="group block focus:outline-none">
+      <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100/60 transition-all duration-500 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 relative">
+        
+        {/* Promotion Badge - Premium styling */}
+        {bestPromo && (
+          <div className="absolute top-4 left-4 z-20">
+             <span className="bg-[#111827]/90 backdrop-blur-md text-[#FBBF24] border border-[#FBBF24]/20 px-4 py-1.5 rounded-full text-[10px] font-display font-black tracking-widest shadow-xl uppercase">
+                {bestPromo.badge} DESC.
+             </span>
+          </div>
+        )}
+
+        {/* Image Hub */}
+        <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
           <img
             src={getDirectImageUrl(villa.image) || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80'}
             alt={villa.name}
-            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          {/* Cinematographic Gradient Base */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#111827]/90 via-[#111827]/20 to-transparent pointer-events-none" />
           
-          {bestPromo && (
-            <div className="absolute top-4 right-4">
-               <span className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-[10px] font-display font-black tracking-widest shadow-lg uppercase">
-                  {bestPromo.badge}
-               </span>
-            </div>
-          )}
-
-          <div className="absolute bottom-4 left-6">
-             <h3 className="font-display font-extrabold text-2xl text-white drop-shadow-md">{villa.name}</h3>
+          <div className="absolute bottom-6 left-6 right-6">
+             <h3 className="font-display font-black text-2xl text-white tracking-tight drop-shadow-lg leading-tight">
+               {villa.name}
+             </h3>
+             <p className="text-white/80 text-sm mt-1 line-clamp-1 font-medium text-shadow-sm">
+               {villa.description}
+             </p>
           </div>
         </div>
 
-        {/* Content Section - Cleaner Hierarchy */}
-        <div className="p-7 space-y-5">
-          <p className="text-neutral-500 text-sm line-clamp-2 leading-relaxed">
-            {villa.description}
-          </p>
-
-          <div className="flex items-center gap-4 py-3 border-y border-neutral-50">
-             <div className="flex items-center gap-1.5 text-neutral-400">
-                <Users size={14} />
-                <span className="text-[11px] font-bold uppercase tracking-wider">{villa.capacity} Personas</span>
-             </div>
-             <div className="flex items-center gap-1.5 text-neutral-400">
-                <ShieldCheck size={14} className="text-green-500/60" />
-                <span className="text-[11px] font-bold uppercase tracking-wider">Verificado</span>
+        {/* Data Panel */}
+        <div className="p-6 bg-white">
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-50 rounded-full border border-neutral-100">
+                <Users size={14} className="text-neutral-500" />
+                <span className="text-[10px] font-bold text-neutral-600 uppercase tracking-wider">{villa.capacity} Personas</span>
              </div>
              {villa.amenities.some(a => a.toLowerCase().includes('piscina') || a.toLowerCase().includes('jacuzzi')) && (
-                <div className="flex items-center gap-1.5 text-neutral-400">
-                   <Waves size={14} className="text-blue-500/60" />
-                   <span className="text-[11px] font-bold uppercase tracking-wider">Agua</span>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 rounded-full border border-blue-100">
+                   <Waves size={14} className="text-blue-500" />
+                   <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Piscina</span>
                 </div>
              )}
           </div>
 
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-end justify-between pt-5 border-t border-neutral-100">
             <div className="flex flex-col">
-              <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest mb-0.5">Precio por noche</span>
+              <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.15em] mb-1">Precio por Noche</span>
               <div className="flex items-baseline gap-2">
                 {discountedPrice ? (
                   <>
-                    <span className="font-display font-black text-2xl text-[#111827]">RD${discountedPrice}</span>
-                    <span className="text-sm text-neutral-300 line-through font-medium">RD${villa.price}</span>
+                    <span className="font-display font-black text-3xl text-primary leading-none">RD${discountedPrice}</span>
+                    <span className="text-sm text-neutral-300 line-through font-bold">RD${villa.price}</span>
                   </>
                 ) : (
-                  <span className="font-display font-black text-2xl text-[#111827]">RD${villa.price}</span>
+                  <span className="font-display font-black text-3xl text-primary leading-none">RD${villa.price}</span>
                 )}
               </div>
             </div>
             
-            <div className="h-12 w-12 rounded-2xl bg-neutral-50 flex items-center justify-center text-[#111827] group-hover:bg-[#111827] group-hover:text-white transition-all">
-               <ChevronRight size={20} />
+            <div className="h-12 px-6 rounded-2xl bg-[#111827] flex items-center justify-center text-white font-display font-bold text-sm group-hover:bg-primary transition-colors shadow-md">
+               Explorar
             </div>
           </div>
         </div>
@@ -88,12 +88,5 @@ const VillaCard = ({ villa }: { villa: Villa }) => {
     </Link>
   );
 };
-
-// Helper for the icon
-const ChevronRight = ({ size }: { size: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m9 18 6-6-6-6"/>
-  </svg>
-);
 
 export default VillaCard;
