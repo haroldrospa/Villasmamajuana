@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getDriveFallbackUrls } from '@/utils/imageUtils';
 
 const FINAL_FALLBACK = '/og-image.png';
@@ -17,6 +17,10 @@ interface DriveImageProps {
 const DriveImage = ({ src, alt, className = '', style }: DriveImageProps) => {
   const urls = src ? getDriveFallbackUrls(src) : [];
   const [urlIndex, setUrlIndex] = useState(0);
+
+  useEffect(() => {
+    setUrlIndex(0);
+  }, [src]);
 
   const currentSrc = urls[urlIndex] ?? FINAL_FALLBACK;
 
