@@ -118,11 +118,15 @@ const AdminReservations = () => {
     ? (reservations || []) 
     : (reservations || []).filter(r => r.status === filter);
 
-  const updateStatus = async (id: string, status: string, silent = false) => {
+  const updateStatus = async (id: string, status: string, extraData: any = {}, silent = false) => {
     try {
       const { error } = await supabase
         .from('reservations')
-        .update({ status, updated_at: new Date().toISOString() })
+        .update({ 
+          status, 
+          ...extraData, 
+          updated_at: new Date().toISOString() 
+        })
         .eq('id', id);
 
       if (error) throw error;
@@ -161,7 +165,10 @@ const AdminReservations = () => {
 
     setIsSubmitting(true);
     try {
-      await updateStatus(reservation.id, 'pago_parcial', true);
+      await updateStatus(reservation.id, 'pago_parcial', {
+        deposit_amount: amount,
+        remaining_amount: amount
+      }, true);
       await handleRegisterIncome(reservation, amount, 'Reserva (50%)');
       
       const shortId = reservation.id.substring(0, 8).toUpperCase();
@@ -192,7 +199,10 @@ const AdminReservations = () => {
 
     setIsSubmitting(true);
     try {
-      await updateStatus(reservation.id, 'confirmada', true);
+      await updateStatus(reservation.id, 'confirmada', {
+        deposit_amount: reservation.total_amount,
+        remaining_amount: 0
+      }, true);
       await handleRegisterIncome(reservation, amount, 'Pago restante');
       toast.success('Pago total completado y reserva confirmada.');
     } finally {
@@ -276,8 +286,8 @@ const AdminReservations = () => {
       check_out: checkOutDate,
       status: form.status,
       total_amount: amount,
-      deposit_amount: form.status === 'confirmada' ? amount : amount / 2,
-      remaining_amount: form.status === 'confirmada' ? 0 : amount / 2,
+      deposit_amount: form.status === 'confirmada' ? amount : (form.status === 'pago_parcial' ? amount / 2 : 0),
+      remaining_amount: form.status === 'confirmada' ? 0 : (form.status === 'pago_parcial' ? amount / 2 : amount),
       payment_method: 'efectivo',
       original_amount: amount,
       stay_type: form.stayType
@@ -401,9 +411,21 @@ const AdminReservations = () => {
                           </div>
 
                           <div className="flex justify-between items-end">
-                             <div className="space-y-1">
-                                <p className="text-[10px] text-neutral-300 font-black uppercase">Total Facturado</p>
-                                <p className="text-2xl font-display font-black text-[#111827]">RD${r.total_amount?.toLocaleString()}</p>
+                             <div className="flex flex-wrap gap-x-8 gap-y-4">
+                                <div className="space-y-1">
+                                   <p className="text-[10px] text-neutral-300 font-black uppercase">Total Facturado</p>
+                                   <p className="text-xl font-display font-black text-[#111827]">RD${r.total_amount?.toLocaleString()}</p>
+                                </div>
+                                <div className="space-y-1">
+                                   <p className="text-[10px] text-emerald-400 font-black uppercase">Total Pagado</p>
+                                   <p className="text-xl font-display font-black text-emerald-600">RD${(r.deposit_amount || 0).toLocaleString()}</p>
+                                </div>
+                                {r.remaining_amount > 0 && (
+                                  <div className="space-y-1">
+                                     <p className="text-[10px] text-amber-500 font-black uppercase">Restante</p>
+                                     <p className="text-xl font-display font-black text-amber-600">RD${(r.remaining_amount || 0).toLocaleString()}</p>
+                                  </div>
+                                )}
                              </div>
                              <div className="flex gap-2">
                                  <button onClick={() => openEditModal(r)} title="Editar" className="bg-neutral-50 text-neutral-400 p-3 rounded-xl hover:bg-neutral-200 hover:text-black transition-all">
