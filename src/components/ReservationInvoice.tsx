@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Download, MessageCircle, FileText, MapPin, Phone, Hash, Globe, Mail, Share2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -147,7 +147,13 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
         className="bg-white text-slate-800 shadow-xl border border-slate-200 min-h-[1050px] p-10 md:p-16 flex flex-col print:shadow-none print:border-none print:m-0 print:p-8"
       >
         {/* HEADER SECTION */}
-        <div className="flex justify-between items-start border-b-2 border-slate-900 pb-10">
+        <div className="relative flex justify-between items-start border-b-2 border-slate-900 pb-10 overflow-hidden">
+          {/* PAID STAMP */}
+          {invoice.remainingAmount <= 0 && (
+            <div className="absolute left-1/2 top-8 -translate-x-1/2 -rotate-12 border-[10px] border-emerald-600/20 px-10 py-4 rounded-3xl pointer-events-none z-0">
+              <span className="text-7xl font-display font-black text-emerald-600/30 uppercase tracking-widest">PAGADO</span>
+            </div>
+          )}
           <div className="flex flex-col md:flex-row gap-6 md:items-center">
             <div className="space-y-1">
               <h1 className="text-3xl font-display font-black tracking-tighter text-slate-900 uppercase">
@@ -274,10 +280,17 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
                 <span className="text-emerald-600 font-black uppercase">Depósito Pagado:</span>
                 <span className="font-black text-emerald-600">RD${invoice.depositAmount.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between items-center text-sm px-4 py-2 border-2 border-slate-900 bg-slate-50 italic">
-                <span className="text-slate-900 font-black uppercase text-[10px]">Saldo Pendiente:</span>
-                <span className="font-black text-slate-900">RD${invoice.remainingAmount.toLocaleString()}</span>
-              </div>
+              {invoice.remainingAmount <= 0 ? (
+                <div className="mt-2 bg-emerald-600 text-white p-4 rounded-xl shadow-lg flex justify-between items-center transform transition-all animate-in fade-in zoom-in duration-500">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Balance:</span>
+                  <span className="text-lg font-display font-black tracking-tighter">TOTALMENTE PAGADO</span>
+                </div>
+              ) : (
+                <div className="flex justify-between items-center text-sm px-4 py-2 border-2 border-slate-900 bg-slate-50 italic">
+                  <span className="text-slate-900 font-black uppercase text-[10px]">Saldo Pendiente:</span>
+                  <span className="font-black text-slate-900">RD${invoice.remainingAmount.toLocaleString()}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
