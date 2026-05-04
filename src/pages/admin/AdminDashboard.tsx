@@ -1,11 +1,11 @@
-﻿import PageTransition from '@/components/PageTransition';
+import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
 import { useIncomes, useExpenses, useReservations } from '@/hooks/useFinances';
 import { DollarSign, TrendingUp, TrendingDown, CalendarDays, Clock, Loader2 } from 'lucide-react';
 
 const statusLabels: Record<string, string> = {
   pendiente_pago: 'Pendiente de pago',
-  pago_parcial: 'Pago parcial (50%)',
+  pago_parcial: 'Pago parcial',
   confirmada: 'Confirmada',
   cancelada: 'Cancelada',
 };

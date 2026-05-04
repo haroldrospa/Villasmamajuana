@@ -1,4 +1,4 @@
-﻿import { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
 import { useReservations } from '@/hooks/useFinances';
@@ -17,7 +17,7 @@ import {
 
 const statusLabels: Record<string, string> = {
   pendiente_pago: 'Pendiente de pago',
-  pago_parcial: 'Pago parcial (50%)',
+  pago_parcial: 'Pago parcial',
   confirmada: 'Confirmada',
   cancelada: 'Cancelada',
   bloqueada: '⛔ Bloqueo Admin'

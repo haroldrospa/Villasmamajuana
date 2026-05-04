@@ -21,7 +21,7 @@ import {
 
 const statusLabels: Record<string, string> = {
   pendiente_pago: 'Pendiente de pago',
-  pago_parcial: 'Pago parcial (50%)',
+  pago_parcial: 'Pago parcial',
   confirmada: 'Confirmada',
   cancelada: 'Cancelada',
   bloqueada: '⛔ BLOQUEO ADMIN'
@@ -72,7 +72,8 @@ const AdminReservations = () => {
     status: 'confirmada' as any,
     stayType: '24h' as '10h' | '24h',
     discountType: 'none' as 'none' | 'percent' | 'amount',
-    discountValue: ''
+    discountValue: '',
+    depositAmount: ''
   });
 
   const [calculationSummary, setCalculationSummary] = useState('');
@@ -231,8 +232,11 @@ const AdminReservations = () => {
       checkIn: res.check_in,
       checkOut: res.check_out,
       totalAmount: res.total_amount.toString(),
-      status: res.status,
-      stayType: res.stay_type || '24h'
+      status: (res.status === 'pago_parcial' && res.deposit_amount !== res.total_amount / 2) ? 'pago_parcial_custom' : res.status,
+      stayType: res.stay_type || '24h',
+      discountType: 'none',
+      discountValue: '',
+      depositAmount: res.deposit_amount?.toString() || ''
     });
     setShowAddModal(true);
   };
@@ -256,7 +260,8 @@ const AdminReservations = () => {
       status: 'confirmada', 
       stayType: '24h',
       discountType: 'none',
-      discountValue: ''
+      discountValue: '',
+      depositAmount: ''
     });
     setCalculationSummary('');
   };
@@ -277,6 +282,15 @@ const AdminReservations = () => {
     const selectedVilla = villas?.find(v => v.id === form.villaId);
     const amount = Number(form.totalAmount) || 0;
 
+    const actualStatus = form.status === 'pago_parcial_custom' ? 'pago_parcial' : form.status;
+    const depositAmt = form.status === 'confirmada' 
+      ? amount 
+      : form.status === 'pago_parcial' 
+        ? amount / 2 
+        : form.status === 'pago_parcial_custom'
+          ? Number(form.depositAmount) || 0
+          : 0;
+
     const data = {
       villa_id: form.villaId,
       villa_name: selectedVilla?.name || 'Villa',
@@ -284,10 +298,10 @@ const AdminReservations = () => {
       client_phone: form.clientPhone || 'N/A',
       check_in: form.checkIn,
       check_out: checkOutDate,
-      status: form.status,
+      status: actualStatus,
       total_amount: amount,
-      deposit_amount: form.status === 'confirmada' ? amount : (form.status === 'pago_parcial' ? amount / 2 : 0),
-      remaining_amount: form.status === 'confirmada' ? 0 : (form.status === 'pago_parcial' ? amount / 2 : amount),
+      deposit_amount: depositAmt,
+      remaining_amount: amount - depositAmt,
       payment_method: 'efectivo',
       original_amount: amount,
       stay_type: form.stayType
@@ -581,12 +595,23 @@ const AdminReservations = () => {
                        <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl px-6 py-[13.5px] outline-none focus:border-black transition-all text-sm font-bold">
                           <option value="confirmada">Confirmada (Pagó todo)</option>
                           <option value="pago_parcial">Pago Parcial (50%)</option>
+                          <option value="pago_parcial_custom">Pago Parcial (Monto Específico)</option>
                           <option value="pendiente_pago">Pendiente de Pago</option>
                           <option value="bloqueada">Cerrado/Bloqueada</option>
                           <option value="cancelada">Cancelada</option>
                        </select>
                     </div>
                  </div>
+
+                 {form.status === 'pago_parcial_custom' && (
+                    <div className="space-y-2 pt-2 animate-in fade-in slide-in-from-top-2">
+                       <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Monto Pagado (RD$)</label>
+                       <div className="relative">
+                          <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
+                          <input required type="number" placeholder="Ej: 3000" value={form.depositAmount} onChange={e => setForm({...form, depositAmount: e.target.value})} className="w-full bg-blue-50/50 border border-blue-200 rounded-2xl pl-12 pr-6 py-4 outline-none focus:border-blue-400 transition-all text-sm font-bold text-blue-900" />
+                       </div>
+                    </div>
+                 )}
 
                  <div className="space-y-2 pt-2">
                     <label className="text-[10px] font-black uppercase text-neutral-400 ml-1">Monto Acuerdo (RD$)</label>

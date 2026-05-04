@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,7 +11,7 @@ import { mapReservationToInvoice } from '@/utils/reservationMapper';
 
 const statusLabels: Record<string, string> = {
   pendiente_pago: 'Pendiente de pago',
-  pago_parcial: 'Pago parcial (50%)',
+  pago_parcial: 'Pago parcial',
   confirmada: 'Confirmada / Aprobada',
   cancelada: 'Cancelada',
 };
