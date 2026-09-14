@@ -1,8 +1,9 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
 import { useIncomes, useExpenses, useReservations } from '@/hooks/useFinances';
-import { TrendingUp, TrendingDown, DollarSign, Clock, Loader2, Download } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Clock, Loader2, Download, FileSpreadsheet } from 'lucide-react';
 
 type TimeFilter = 'hoy' | 'semana' | 'mes';
 
@@ -59,12 +60,20 @@ const AdminSummary = () => {
             <h1 className="font-display font-extrabold text-2xl text-foreground mb-1">Resumen Financiero</h1>
             <p className="text-muted-foreground text-sm">Vista general de finanzas</p>
           </div>
-          <button 
-            onClick={handleExportCSV} 
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#111827] text-white rounded-xl shadow-lg hover:scale-105 transition-all text-sm font-bold w-full sm:w-auto"
-          >
-            <Download size={16} /> Exportar Reporte CSV
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Link
+              to="/admin/contabilidad"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl shadow-lg hover:scale-105 transition-all text-sm font-bold w-full sm:w-auto"
+            >
+              <FileSpreadsheet size={16} /> Ver Módulo Contable
+            </Link>
+            <button 
+              onClick={handleExportCSV} 
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#111827] text-white rounded-xl shadow-lg hover:scale-105 transition-all text-sm font-bold w-full sm:w-auto"
+            >
+              <Download size={16} /> Exportar Reporte CSV
+            </button>
+          </div>
         </div>
 
         {/* Filters */}

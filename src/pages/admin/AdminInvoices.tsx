@@ -1,4 +1,4 @@
-﻿import { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
 import { useReservations } from '@/hooks/useFinances';
@@ -30,7 +30,7 @@ const AdminInvoices = () => {
   const { data: reservations, isLoading, refetch } = useReservations();
   const { data: villas } = useVillas();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('proximas');
   const [viewingInvoice, setViewingInvoice] = useState<StoredInvoice | null>(null);
 
   const invoices = useMemo(() => {
@@ -64,12 +64,34 @@ const AdminInvoices = () => {
       };
     });
   }, [reservations, villas]);
+
   const filtered = useMemo(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
     return invoices.filter(inv => {
-      const matchesSearch = inv.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        inv.reservationId.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = filterStatus === 'all' || inv.status === filterStatus;
-      return matchesSearch && matchesStatus;
+      const q = searchTerm.toLowerCase().trim();
+      const matchesSearch = !q ||
+        inv.clientName.toLowerCase().includes(q) ||
+        inv.reservationId.toLowerCase().includes(q) ||
+        inv.villaName.toLowerCase().includes(q) ||
+        inv.clientPhone.includes(q);
+
+      if (!matchesSearch) return false;
+
+      const isPast = (inv.checkOut || inv.checkIn) < todayStr;
+
+      if (filterStatus === 'proximas') {
+        return !isPast;
+      }
+      if (filterStatus === 'pendiente') {
+        return !isPast && (inv.remainingAmount > 0 || inv.status === 'pendiente' || inv.status === 'confirmado');
+      }
+      if (filterStatus === 'pagado') {
+        return !isPast && (inv.status === 'pagado' || inv.remainingAmount <= 0);
+      }
+      if (filterStatus === 'pasadas') {
+        return isPast;
+      }
+      return true; // 'all'
     });
   }, [invoices, searchTerm, filterStatus]);
 
@@ -98,11 +120,11 @@ const AdminInvoices = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="font-display font-extrabold text-2xl text-foreground">Facturas</h1>
-            <p className="text-muted-foreground text-sm mt-1">Historial de comprobantes de reserva</p>
+            <p className="text-muted-foreground text-sm mt-1">Gestión y control de comprobantes de pago</p>
           </div>
           <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-lg">
             <FileText size={16} className="text-primary" />
-            <span className="font-display font-bold text-primary text-sm">{invoices.length}</span>
+            <span className="font-display font-bold text-primary text-sm">{filtered.length} de {invoices.length}</span>
           </div>
         </div>
 
@@ -111,22 +133,28 @@ const AdminInvoices = () => {
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
-              placeholder="Buscar por cliente o nº reserva..."
+              placeholder="Buscar por cliente, villa o nº reserva..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-card border border-border rounded-lg pl-9 pr-4 py-2.5 text-sm font-body text-foreground placeholder:text-muted-foreground"
             />
           </div>
-          <div className="flex gap-2">
-            {(['all', 'pendiente', 'confirmado', 'pagado'] as const).map(s => (
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {[
+              { id: 'proximas', label: '📅 Próximas Facturas' },
+              { id: 'pendiente', label: 'Pendientes por Cobrar' },
+              { id: 'pagado', label: 'Pagadas Completo' },
+              { id: 'pasadas', label: 'Pasadas / Histórico' },
+              { id: 'all', label: 'Todas' }
+            ].map(tab => (
               <button
-                key={s}
-                onClick={() => setFilterStatus(s)}
-                className={`px-3 py-2 rounded-lg text-xs font-display font-semibold transition-colors ${
-                  filterStatus === s ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground border border-border'
+                key={tab.id}
+                onClick={() => setFilterStatus(tab.id)}
+                className={`px-3 py-2 rounded-lg text-xs font-display font-semibold transition-colors shrink-0 ${
+                  filterStatus === tab.id ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground border border-border'
                 }`}
               >
-                {s === 'all' ? 'Todas' : statusLabels[s]}
+                {tab.label}
               </button>
             ))}
           </div>

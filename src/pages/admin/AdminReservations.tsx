@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import AdminLayout from '@/components/AdminLayout';
 import { useReservations } from '@/hooks/useFinances';
 import { useVillas } from '@/hooks/useVillas';
 import { supabase } from '@/integrations/supabase/client';
-import { Trash2, Eye, X, Loader2, Plus, Home, Check, Phone, User, DollarSign, Pencil, Clock, Sun, FileText } from 'lucide-react';
+import { Trash2, Eye, X, Loader2, Plus, Home, Check, Phone, User, DollarSign, Pencil, Clock, Sun, FileText, Search, ArrowUpDown, History, AlertCircle, CalendarDays } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { differenceInDays, parseISO, format } from 'date-fns';
@@ -39,12 +39,37 @@ const AdminReservations = () => {
   const navigate = useNavigate();
   const { data: reservations, isLoading, refetch } = useReservations();
   const { data: villas } = useVillas();
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<string>('proximas');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'check_in_asc' | 'check_in_desc' | 'remaining_desc' | 'created_desc'>('check_in_asc');
   const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [whatsappNumber, setWhatsappNumber] = useState('8299735049');
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const currentMonthYear = format(new Date(), 'yyyy-MM');
+  const currentMonthName = format(new Date(), "MMMM yyyy", { locale: es });
+  const capitalizedMonthName = currentMonthName.charAt(0).toUpperCase() + currentMonthName.slice(1);
+
+  // Unique available months sorted chronologically
+  const availableMonths = useMemo(() => {
+    if (!reservations) return [];
+    const set = new Set<string>();
+    reservations.forEach((r: any) => {
+      if (r.check_in) {
+        set.add(r.check_in.substring(0, 7));
+      }
+    });
+    return Array.from(set).sort();
+  }, [reservations]);
+
+  const isReservationPast = (r: any) => {
+    const endDate = r.stay_type === '10h' ? r.check_in : (r.check_out || r.check_in);
+    return endDate < todayStr;
+  };
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -115,9 +140,174 @@ const AdminReservations = () => {
     }
   }, [form.villaId, form.checkIn, form.checkOut, form.stayType, form.discountType, form.discountValue, villas]);
 
-  const filtered = filter === 'all' 
-    ? (reservations || []) 
-    : (reservations || []).filter(r => r.status === filter);
+  // Statistics calculation
+  const stats = useMemo(() => {
+    if (!reservations) return { 
+      upcomingCount: 0,
+      pendingCount: 0, 
+      pendingAmount: 0, 
+      paidCount: 0, 
+      pastCount: 0,
+      cancelledCount: 0
+    };
+    let upcomingCount = 0;
+    let pendingCount = 0;
+    let pendingAmount = 0;
+    let paidCount = 0;
+    let pastCount = 0;
+    let cancelledCount = 0;
+
+    reservations.forEach((r: any) => {
+      if (r.status === 'cancelada' || r.status === 'bloqueada') {
+        cancelledCount++;
+        return;
+      }
+
+      const isPast = isReservationPast(r);
+
+      if (isPast) {
+        pastCount++;
+      } else {
+        upcomingCount++;
+        const isPending = (r.status === 'pendiente_pago' || r.status === 'pago_parcial' || Number(r.remaining_amount) > 0);
+        if (isPending) {
+          pendingCount++;
+          pendingAmount += Number(r.remaining_amount) || 0;
+        } else {
+          paidCount++;
+        }
+      }
+    });
+
+    return { 
+      upcomingCount,
+      pendingCount, 
+      pendingAmount, 
+      paidCount, 
+      pastCount,
+      cancelledCount
+    };
+  }, [reservations, todayStr]);
+
+  // Filtering logic
+  const filtered = useMemo(() => {
+    if (!reservations) return [];
+    return reservations.filter((r: any) => {
+      const q = searchTerm.toLowerCase().trim();
+      const matchesSearch = !q || 
+        (r.client_name && r.client_name.toLowerCase().includes(q)) ||
+        (r.villa_name && r.villa_name.toLowerCase().includes(q)) ||
+        (r.client_phone && r.client_phone.includes(q)) ||
+        (r.id && r.id.toLowerCase().includes(q));
+
+      if (!matchesSearch) return false;
+
+      const isPast = isReservationPast(r);
+
+      if (filter === 'proximas') {
+        return !isPast && r.status !== 'cancelada' && r.status !== 'bloqueada';
+      }
+      if (filter === 'pendientes') {
+        return !isPast && (r.status === 'pendiente_pago' || r.status === 'pago_parcial' || Number(r.remaining_amount) > 0) && r.status !== 'cancelada' && r.status !== 'bloqueada';
+      }
+      if (filter === 'confirmadas') {
+        return !isPast && (r.status === 'confirmada' || Number(r.remaining_amount) <= 0) && r.status !== 'cancelada' && r.status !== 'bloqueada';
+      }
+      if (filter === 'pasadas') {
+        return isPast && r.status !== 'cancelada' && r.status !== 'bloqueada';
+      }
+      if (filter === 'canceladas') {
+        return r.status === 'cancelada' || r.status === 'bloqueada';
+      }
+      return true; // 'all'
+    });
+  }, [reservations, searchTerm, filter, todayStr]);
+
+  // Sorting logic
+  const sortedReservations = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      if (sortBy === 'check_in_asc') {
+        return parseISO(a.check_in).getTime() - parseISO(b.check_in).getTime();
+      }
+      if (sortBy === 'check_in_desc') {
+        return parseISO(b.check_in).getTime() - parseISO(a.check_in).getTime();
+      }
+      if (sortBy === 'remaining_desc') {
+        return (Number(b.remaining_amount) || 0) - (Number(a.remaining_amount) || 0);
+      }
+      if (sortBy === 'created_desc') {
+        return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+      }
+      return 0;
+    });
+  }, [filtered, sortBy]);
+
+  // Strict chronological grouping by Month (YYYY-MM) and Day (YYYY-MM-DD)
+  const groupedChronologicalReservations = useMemo(() => {
+    const monthMap = new Map<string, {
+      monthKey: string;
+      monthLabel: string;
+      totalPendingAmount: number;
+      reservationsCount: number;
+      daysMap: Map<string, { dayKey: string; dayLabel: string; reservations: any[] }>;
+    }>();
+
+    sortedReservations.forEach((res: any) => {
+      if (!res.check_in) return;
+      const monthKey = res.check_in.substring(0, 7);
+      
+      if (selectedMonth !== 'all' && monthKey !== selectedMonth) return;
+
+      const dateObj = parseISO(res.check_in);
+      const monthLabelRaw = format(dateObj, 'MMMM yyyy', { locale: es });
+      const monthLabel = monthLabelRaw.charAt(0).toUpperCase() + monthLabelRaw.slice(1);
+
+      const dayKey = res.check_in;
+      const dayLabelRaw = format(dateObj, "EEEE d 'de' MMMM", { locale: es });
+      const dayLabel = dayLabelRaw.charAt(0).toUpperCase() + dayLabelRaw.slice(1);
+
+      if (!monthMap.has(monthKey)) {
+        monthMap.set(monthKey, {
+          monthKey,
+          monthLabel,
+          totalPendingAmount: 0,
+          reservationsCount: 0,
+          daysMap: new Map(),
+        });
+      }
+
+      const monthData = monthMap.get(monthKey)!;
+      monthData.reservationsCount += 1;
+      if (res.status === 'pendiente_pago' || res.status === 'pago_parcial' || Number(res.remaining_amount) > 0) {
+        monthData.totalPendingAmount += Number(res.remaining_amount) || 0;
+      }
+
+      if (!monthData.daysMap.has(dayKey)) {
+        monthData.daysMap.set(dayKey, {
+          dayKey,
+          dayLabel,
+          reservations: [],
+        });
+      }
+
+      monthData.daysMap.get(dayKey)!.reservations.push(res);
+    });
+
+    const monthArray = Array.from(monthMap.values()).sort((a, b) => {
+      return sortBy === 'check_in_desc' 
+        ? b.monthKey.localeCompare(a.monthKey)
+        : a.monthKey.localeCompare(b.monthKey);
+    });
+
+    return monthArray.map(m => ({
+      ...m,
+      days: Array.from(m.daysMap.values()).sort((a, b) => {
+        return sortBy === 'check_in_desc'
+          ? b.dayKey.localeCompare(a.dayKey)
+          : a.dayKey.localeCompare(b.dayKey);
+      })
+    }));
+  }, [sortedReservations, selectedMonth, sortBy]);
 
   const updateStatus = async (id: string, status: string, extraData: any = {}, silent = false) => {
     try {
@@ -330,10 +520,10 @@ const AdminReservations = () => {
   return (
     <AdminLayout>
       <PageTransition className="px-6 py-10 md:px-12 bg-neutral-50 min-h-screen">
-        <div className="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
            <div className="space-y-1">
               <h1 className="text-3xl font-display font-light text-[#111827]">Gestión de Reservas</h1>
-              <p className="text-neutral-500 text-sm font-medium">Panel administrativo para control total.</p>
+              <p className="text-neutral-500 text-sm font-medium">Control organizado por pendientes, pagadas e historial de reservas.</p>
            </div>
            <button 
              onClick={() => { setEditingId(null); setShowAddModal(true); }}
@@ -343,64 +533,222 @@ const AdminReservations = () => {
            </button>
         </div>
 
-        {/* Filters */}
-        <div className="max-w-7xl mx-auto flex gap-3 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-          {['all', 'pendiente_pago', 'pago_parcial', 'confirmada', 'cancelada'].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em] transition-all shrink-0 border ${
-                filter === f 
-                  ? 'bg-[#111827] text-white border-[#111827] shadow-lg' 
-                  : 'bg-white text-neutral-400 border-neutral-200 hover:border-black'
-              }`}
-            >
-              {f === 'all' ? 'Ver Todas' : statusLabels[f] || f}
-            </button>
-          ))}
+        {/* Summary Stat Cards */}
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+           <div 
+             onClick={() => setFilter('proximas')}
+             className={`p-5 rounded-2xl border transition-all cursor-pointer relative overflow-hidden ${filter === 'proximas' ? 'bg-[#111827] text-white border-[#111827] shadow-md ring-2 ring-[#111827]/30' : 'bg-white border-neutral-100 hover:border-neutral-300 text-[#111827]'}`}
+           >
+              <div className="flex items-center justify-between">
+                 <span className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 ${filter === 'proximas' ? 'text-white/80' : 'text-neutral-500'}`}>
+                    <CalendarDays size={14} className={filter === 'proximas' ? 'text-white' : 'text-primary'} /> Próximas Reservas
+                 </span>
+                 <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${filter === 'proximas' ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'}`}>{stats.upcomingCount}</span>
+              </div>
+              <p className={`text-2xl font-black mt-2 ${filter === 'proximas' ? 'text-white' : 'text-[#111827]'}`}>{stats.upcomingCount} en agenda</p>
+              <p className={`text-[11px] mt-1 ${filter === 'proximas' ? 'text-white/60' : 'text-neutral-400'}`}>Ordenadas por mes y día</p>
+           </div>
+
+           <div 
+             onClick={() => setFilter('pendientes')}
+             className={`p-5 rounded-2xl border transition-all cursor-pointer ${filter === 'pendientes' ? 'bg-amber-500/10 border-amber-400 shadow-sm' : 'bg-white border-neutral-100 hover:border-neutral-300'}`}
+           >
+              <div className="flex items-center justify-between">
+                 <span className="text-[10px] font-black text-amber-700 uppercase tracking-widest flex items-center gap-1.5">
+                    <AlertCircle size={14} /> Total Pendientes
+                 </span>
+                 <span className="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">{stats.pendingCount}</span>
+              </div>
+              <p className="text-2xl font-black text-amber-900 mt-2">RD${stats.pendingAmount.toLocaleString()}</p>
+              <p className="text-[11px] text-neutral-400 mt-1">Por liquidar al check-in</p>
+           </div>
+
+           <div 
+             onClick={() => setFilter('confirmadas')}
+             className={`p-5 rounded-2xl border transition-all cursor-pointer ${filter === 'confirmadas' ? 'bg-emerald-500/10 border-emerald-400 shadow-sm' : 'bg-white border-neutral-100 hover:border-neutral-300'}`}
+           >
+              <div className="flex items-center justify-between">
+                 <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest flex items-center gap-1.5">
+                    <Check size={14} /> Pagadas / Activas
+                 </span>
+                 <span className="text-xs font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">{stats.paidCount}</span>
+              </div>
+              <p className="text-2xl font-black text-emerald-900 mt-2">{stats.paidCount} completadas</p>
+              <p className="text-[11px] text-neutral-400 mt-1">Estadías aprobadas sin saldo</p>
+           </div>
+
+           <div 
+             onClick={() => setFilter('pasadas')}
+             className={`p-5 rounded-2xl border transition-all cursor-pointer ${filter === 'pasadas' ? 'bg-neutral-800/10 border-neutral-400 shadow-sm' : 'bg-white border-neutral-100 hover:border-neutral-300'}`}
+           >
+              <div className="flex items-center justify-between">
+                 <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest flex items-center gap-1.5">
+                    <History size={14} /> Histórico / Pasadas
+                 </span>
+                 <span className="text-xs font-bold bg-neutral-100 text-neutral-700 px-2.5 py-0.5 rounded-full">{stats.pastCount}</span>
+              </div>
+              <p className="text-2xl font-black text-neutral-800 mt-2">{stats.pastCount} pasadas</p>
+              <p className="text-[11px] text-neutral-400 mt-1">Auto-movidas al vencer</p>
+           </div>
+        </div>
+
+        {/* Navigation Tabs & Search Toolbar */}
+        <div className="max-w-7xl mx-auto space-y-4 mb-8">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {[
+              { id: 'proximas', label: '📅 Próximas Reservas (por Mes)', count: stats.upcomingCount, highlight: true },
+              { id: 'pendientes', label: 'Pendientes por Cobrar', count: stats.pendingCount },
+              { id: 'confirmadas', label: 'Pagadas / Aprobadas', count: stats.paidCount },
+              { id: 'pasadas', label: 'Histórico / Pasadas', count: stats.pastCount },
+              { id: 'canceladas', label: 'Canceladas', count: stats.cancelledCount },
+              { id: 'all', label: 'Ver Todas' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setFilter(tab.id)}
+                className={`px-5 py-3 rounded-2xl text-[11px] font-black uppercase tracking-[0.08em] transition-all shrink-0 border flex items-center gap-2 ${
+                  filter === tab.id 
+                    ? 'bg-[#111827] text-white border-[#111827] shadow-lg' 
+                    : 'bg-white text-neutral-500 border-neutral-200 hover:border-neutral-400'
+                }`}
+              >
+                <span>{tab.label}</span>
+                {tab.count !== undefined && (
+                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${filter === tab.id ? 'bg-white/20 text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+             <div className="relative flex-1">
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar por cliente, villa, teléfono o ID de reserva..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-white border border-neutral-200 rounded-2xl pl-11 pr-10 py-3 text-sm outline-none focus:border-black transition-all shadow-sm"
+                />
+                {searchTerm && (
+                  <button onClick={() => setSearchTerm('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black">
+                    <X size={16} />
+                  </button>
+                )}
+             </div>
+
+             <div className="flex items-center gap-2 bg-white border border-neutral-200 rounded-2xl px-4 py-2 shrink-0 shadow-sm">
+                <CalendarDays size={14} className="text-neutral-400" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Filtrar Mes:</span>
+                <select 
+                  value={selectedMonth} 
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="bg-transparent text-xs font-bold text-[#111827] outline-none cursor-pointer capitalize"
+                >
+                  <option value="all">📅 Todos los Meses</option>
+                  {availableMonths.map(mKey => {
+                    const dateObj = parseISO(`${mKey}-01`);
+                    const mLabel = format(dateObj, 'MMMM yyyy', { locale: es });
+                    const capLabel = mLabel.charAt(0).toUpperCase() + mLabel.slice(1);
+                    return (
+                      <option key={mKey} value={mKey}>
+                        {capLabel}
+                      </option>
+                    );
+                  })}
+                </select>
+             </div>
+             
+             <div className="flex items-center gap-2 bg-white border border-neutral-200 rounded-2xl px-4 py-2 shrink-0 shadow-sm">
+                <ArrowUpDown size={14} className="text-neutral-400" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Orden:</span>
+                <select 
+                  value={sortBy} 
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="bg-transparent text-xs font-bold text-[#111827] outline-none cursor-pointer"
+                >
+                  <option value="check_in_asc">Próximas primero (Check-in)</option>
+                  <option value="check_in_desc">Más lejanas (Check-in)</option>
+                  <option value="remaining_desc">Mayor monto pendiente</option>
+                  <option value="created_desc">Agregadas recientemente</option>
+                </select>
+             </div>
+          </div>
         </div>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-40">
             <Loader2 className="animate-spin text-neutral-300" size={40} />
           </div>
+        ) : groupedChronologicalReservations.length === 0 ? (
+          <div className="max-w-7xl mx-auto bg-white border border-dashed border-neutral-200 rounded-[2.5rem] p-16 text-center space-y-4">
+             <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto text-neutral-300">
+                <FileText size={32} />
+             </div>
+             <div className="space-y-1">
+                <h3 className="font-display font-bold text-neutral-800 text-lg">No hay reservas en esta sección</h3>
+                <p className="text-xs text-neutral-400 max-w-sm mx-auto">
+                  {searchTerm 
+                    ? `No se encontraron resultados para "${searchTerm}". Intenta con otros términos.` 
+                    : filter === 'pendientes_mes' 
+                      ? `No hay reservas pendientes registradas en ${capitalizedMonthName}.`
+                      : 'No existen registros para el filtro seleccionado.'}
+                </p>
+             </div>
+             {(searchTerm || selectedMonth !== 'all') && (
+               <button onClick={() => { setSearchTerm(''); setSelectedMonth('all'); }} className="px-4 py-2 bg-neutral-100 rounded-xl text-xs font-bold text-neutral-600 hover:bg-neutral-200">
+                 Limpiar Filtros
+               </button>
+             )}
+          </div>
         ) : (
           <div className="max-w-7xl mx-auto space-y-16">
-            {Object.entries(
-              [...filtered]
-                .sort((a, b) => parseISO(a.check_in).getTime() - parseISO(b.check_in).getTime())
-                .reduce((acc: any, res: any) => {
-                  const month = format(parseISO(res.check_in), 'MMMM yyyy', { locale: es });
-                  const capitalizedMonth = month.charAt(0) ? month.charAt(0).toUpperCase() + month.slice(1) : month;
-                  if (!acc[capitalizedMonth]) acc[capitalizedMonth] = {};
-                  
-                  const day = format(parseISO(res.check_in), "EEEE d 'de' MMMM", { locale: es });
-                  const capitalizedDay = day.charAt(0) ? day.charAt(0).toUpperCase() + day.slice(1) : day;
-                  
-                  if (!acc[capitalizedMonth][capitalizedDay]) acc[capitalizedMonth][capitalizedDay] = [];
-                  acc[capitalizedMonth][capitalizedDay].push(res);
-                  return acc;
-                }, {})
-            ).map(([month, days]: [string, any]) => (
-              <div key={month} className="space-y-10">
-                <div className="flex items-center gap-6">
-                  <h2 className="text-xl font-display font-medium text-[#111827] whitespace-nowrap">{month}</h2>
-                  <div className="h-[1px] w-full bg-neutral-200/60"></div>
+            {groupedChronologicalReservations.map(({ monthKey, monthLabel, totalPendingAmount, reservationsCount, days }) => (
+              <div key={monthKey} className="space-y-10 border-t border-neutral-200/60 pt-10 first:border-t-0 first:pt-0">
+                {/* Month Banner Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[2rem] border border-neutral-200/80 shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-[#111827] text-white flex items-center justify-center font-black text-sm shadow-md">
+                      {monthKey.substring(5, 7)}
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-display font-extrabold text-[#111827]">{monthLabel}</h2>
+                      <p className="text-xs text-neutral-400 font-semibold">{reservationsCount} {reservationsCount === 1 ? 'reserva registrada' : 'reservas registradas'}</p>
+                    </div>
+                  </div>
+                  {totalPendingAmount > 0 && (
+                    <div className="bg-amber-50 border border-amber-200/80 text-amber-900 px-5 py-2.5 rounded-2xl flex items-center gap-3 self-start md:self-auto">
+                      <AlertCircle size={16} className="text-amber-600 shrink-0" />
+                      <div className="text-right">
+                         <span className="text-[10px] font-black uppercase text-amber-700 block">Saldo por Cobrar en {monthLabel.split(' ')[0]}</span>
+                         <span className="text-base font-black text-amber-950">RD${totalPendingAmount.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                
-                {Object.entries(days).map(([day, dayReservations]: [string, any]) => (
-                  <div key={day} className="space-y-6">
+
+                {days.map(({ dayKey, dayLabel, reservations: dayReservations }) => (
+                  <div key={dayKey} className="space-y-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-2 h-2 rounded-full bg-primary/40 shrink-0"></div>
-                      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">{day}</h3>
+                      <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0"></div>
+                      <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-neutral-500">{dayLabel}</h3>
                     </div>
                     
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pl-6 border-l border-neutral-100">
-                      {dayReservations.map((r: any) => (
-                        <motion.div layout key={r.id} className="bg-white rounded-[2.5rem] border border-neutral-100 p-8 shadow-sm group">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pl-6 border-l-2 border-neutral-100">
+                      {dayReservations.map((r: any) => {
+                        const isPast = isReservationPast(r);
+                        return (
+                        <motion.div layout key={r.id} className={`bg-white rounded-[2.5rem] border p-8 shadow-sm group ${isPast ? 'border-neutral-100 opacity-80 bg-neutral-50/50' : 'border-neutral-100'}`}>
                           <div className="flex justify-between items-start mb-6">
                             <div className="space-y-1">
-                              <h3 className="text-xl font-display font-medium text-[#111827] truncate max-w-[200px]">{r.client_name}</h3>
+                              <div className="flex items-center gap-2">
+                                <h3 className="text-xl font-display font-medium text-[#111827] truncate max-w-[200px]">{r.client_name}</h3>
+                                {isPast && (
+                                  <span className="bg-neutral-200 text-neutral-600 text-[8px] font-black px-2 py-0.5 rounded uppercase">PASADA</span>
+                                )}
+                              </div>
                               <div className="flex items-center gap-2 text-[10px] font-black text-neutral-400 uppercase tracking-widest">
                                  <Home size={12} /> {r.villa_name} 
                                  {r.stay_type === '10h' && (
@@ -436,7 +784,7 @@ const AdminReservations = () => {
                                 </div>
                                 {r.remaining_amount > 0 && (
                                   <div className="space-y-1">
-                                     <p className="text-[10px] text-amber-500 font-black uppercase">Restante</p>
+                                     <p className="text-[10px] text-amber-500 font-black uppercase">Restante Por Cobrar</p>
                                      <p className="text-xl font-display font-black text-amber-600">RD${(r.remaining_amount || 0).toLocaleString()}</p>
                                   </div>
                                 )}
@@ -473,7 +821,8 @@ const AdminReservations = () => {
                              </div>
                           </div>
                         </motion.div>
-                      ))}
+                       );
+                      })}
                     </div>
                   </div>
                 ))}

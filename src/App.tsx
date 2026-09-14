@@ -23,6 +23,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import VillaDetailPage from "./pages/VillaDetailPage";
 import InvoicePage from "./pages/InvoicePage";
 import AdminInvoices from "./pages/admin/AdminInvoices";
+import AdminAccounting from "./pages/admin/AdminAccounting";
 import AdminVillas from "./pages/admin/AdminVillas";
 import AdminPromotions from "./pages/admin/AdminPromotions";
 import AdminCalendar from "./pages/admin/AdminCalendar";
@@ -66,6 +67,7 @@ const App = () => {
               <Route path="/admin/ingresos" element={<AdminIncome />} />
               <Route path="/admin/gastos" element={<AdminExpenses />} />
               <Route path="/admin/resumen" element={<AdminSummary />} />
+              <Route path="/admin/contabilidad" element={<AdminAccounting />} />
               <Route path="/admin/usuarios" element={<AdminUsers />} />
               <Route path="/admin/facturas" element={<AdminInvoices />} />
               <Route path="/admin/villas" element={<AdminVillas />} />

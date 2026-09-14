@@ -1,12 +1,13 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, CalendarDays, DollarSign, Receipt, BarChart3, LogOut, Home, Users, FileText, Loader2, Settings, Tag, Menu, X } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, DollarSign, Receipt, BarChart3, LogOut, Home, Users, FileText, Loader2, Settings, Tag, Menu, X, FileSpreadsheet } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const links = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/admin/reservas', icon: CalendarDays, label: 'Reservas' },
   { to: '/admin/calendario', icon: CalendarDays, label: 'Calendario' },
+  { to: '/admin/contabilidad', icon: FileSpreadsheet, label: 'Contabilidad' },
   { to: '/admin/ingresos', icon: DollarSign, label: 'Ingresos' },
   { to: '/admin/gastos', icon: Receipt, label: 'Gastos' },
   { to: '/admin/resumen', icon: BarChart3, label: 'Resumen' },

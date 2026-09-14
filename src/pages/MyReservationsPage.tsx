@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useVillas } from '@/hooks/useVillas';
 import ClientLayout from '@/components/ClientLayout';
 import PageTransition from '@/components/PageTransition';
-import { ClipboardList, Calendar, Home, DollarSign, FileText, ChevronRight, Loader2, Building2 } from 'lucide-react';
+import { ClipboardList, Calendar, Home, DollarSign, FileText, ChevronRight, Loader2, Building2, History, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { mapReservationToInvoice } from '@/utils/reservationMapper';
 
@@ -29,6 +29,9 @@ const MyReservationsPage = () => {
   const navigate = useNavigate();
   const [reservations, setReservations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'proximas' | 'pasadas' | 'todas'>('proximas');
+
+  const todayStr = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     if (!isLoadingAuth && !user) {
@@ -48,7 +51,7 @@ const MyReservationsPage = () => {
         .from('reservations')
         .select('*')
         .eq('client_id', user?.id)
-        .order('created_at', { ascending: false });
+        .order('check_in', { ascending: true });
 
       if (error) throw error;
       setReservations(data || []);
@@ -60,6 +63,17 @@ const MyReservationsPage = () => {
     }
   };
 
+  const filteredReservations = useMemo(() => {
+    return reservations.filter((res) => {
+      const endDate = res.stay_type === '10h' ? res.check_in : (res.check_out || res.check_in);
+      const isPast = endDate < todayStr;
+
+      if (activeTab === 'proximas') return !isPast;
+      if (activeTab === 'pasadas') return isPast;
+      return true;
+    });
+  }, [reservations, activeTab, todayStr]);
+
   const handleVerFactura = (res: any) => {
     if (!villas) return;
     const invoice = mapReservationToInvoice(res, villas);
@@ -69,7 +83,7 @@ const MyReservationsPage = () => {
   return (
     <ClientLayout>
       <PageTransition className="px-6 pt-10 pb-24 max-w-lg mx-auto min-h-screen bg-neutral-50/30">
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
             <ClipboardList size={24} />
           </div>
@@ -79,19 +93,47 @@ const MyReservationsPage = () => {
           </div>
         </div>
 
+        {/* Tab Selector */}
+        <div className="flex bg-neutral-100 p-1 rounded-2xl mb-6 gap-1">
+           <button 
+             onClick={() => setActiveTab('proximas')}
+             className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'proximas' ? 'bg-white text-[#111827] shadow-sm' : 'text-neutral-500 hover:text-black'}`}
+           >
+             <Clock size={14} /> Próximas
+           </button>
+           <button 
+             onClick={() => setActiveTab('pasadas')}
+             className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'pasadas' ? 'bg-white text-[#111827] shadow-sm' : 'text-neutral-500 hover:text-black'}`}
+           >
+             <History size={14} /> Pasadas
+           </button>
+           <button 
+             onClick={() => setActiveTab('todas')}
+             className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'todas' ? 'bg-white text-[#111827] shadow-sm' : 'text-neutral-500 hover:text-black'}`}
+           >
+             Todas
+           </button>
+        </div>
+
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="animate-spin text-primary/40" size={32} />
             <p className="text-sm text-muted-foreground font-medium italic">Buscando tus reservas...</p>
           </div>
-        ) : reservations.length === 0 ? (
+        ) : filteredReservations.length === 0 ? (
           <div className="bg-white border border-dashed border-neutral-200 rounded-[2.5rem] p-12 text-center space-y-4">
              <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto text-neutral-300">
                 <Home size={32} />
              </div>
              <div className="space-y-1">
-                <h3 className="font-display font-bold text-neutral-800">No tienes reservas aún</h3>
-                <p className="text-xs text-neutral-500 max-w-[180px] mx-auto">Tus próximas aventuras en Villas Mamajuana aparecerán aquí.</p>
+                <h3 className="font-display font-bold text-neutral-800">No tienes reservas en esta sección</h3>
+                <p className="text-xs text-neutral-500 max-w-[200px] mx-auto">
+                  {activeTab === 'proximas' 
+                    ? 'No tienes próximas estadías programadas.' 
+                    : activeTab === 'pasadas' 
+                      ? 'No cuentas con historial de reservas pasadas.' 
+                      : 'Tus aventuras en Villas Mamajuana aparecerán aquí.'}
+                </p>
              </div>
              <button 
                onClick={() => navigate('/villas')}
@@ -102,15 +144,19 @@ const MyReservationsPage = () => {
           </div>
         ) : (
           <div className="grid gap-6">
-            {reservations.map((res) => (
+            {filteredReservations.map((res) => {
+              const endDate = res.stay_type === '10h' ? res.check_in : (res.check_out || res.check_in);
+              const isPast = endDate < todayStr;
+              return (
               <div 
                 key={res.id} 
-                className="group bg-white border border-neutral-100 rounded-[2.5rem] p-6 shadow-sm hover:shadow-md transition-all duration-300"
+                className={`group bg-white border rounded-[2.5rem] p-6 shadow-sm hover:shadow-md transition-all duration-300 ${isPast ? 'border-neutral-100 opacity-75' : 'border-neutral-100'}`}
               >
                 <div className="flex justify-between items-start mb-5">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-widest">
                        <Building2 size={12} /> {res.villa_name}
+                       {isPast && <span className="bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded text-[8px] font-bold">PASADA</span>}
                     </div>
                     <h3 className="font-display font-bold text-lg text-neutral-800">
                       Entrada: {new Date(res.check_in).toLocaleDateString()}
@@ -148,14 +194,15 @@ const MyReservationsPage = () => {
                    </button>
                 </div>
                 
-                {res.status === 'confirmada' && (
+                {res.status === 'confirmada' && !isPast && (
                   <div className="mt-4 px-4 py-2 bg-emerald-50 rounded-xl flex items-center gap-2 text-[10px] text-emerald-700 font-bold italic animate-in slide-in-from-top-1 duration-500">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     ¡Tu estadía está aprobada! Te esperamos.
                   </div>
                 )}
               </div>
-            ))}
+             );
+            })}
           </div>
         )}
       </PageTransition>
@@ -164,3 +211,4 @@ const MyReservationsPage = () => {
 };
 
 export default MyReservationsPage;
+
