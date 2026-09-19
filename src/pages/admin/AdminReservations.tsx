@@ -54,21 +54,63 @@ const AdminReservations = () => {
   const currentMonthName = format(new Date(), "MMMM yyyy", { locale: es });
   const capitalizedMonthName = currentMonthName.charAt(0).toUpperCase() + currentMonthName.slice(1);
 
+  // Robust date helpers to prevent UTC timezone offset shifts
+  const getMonthKey = (dateStr: string): string => {
+    if (!dateStr) return '';
+    const clean = dateStr.split('T')[0].replace(/\//g, '-');
+    const parts = clean.split('-');
+    if (parts.length >= 2) {
+      const year = parts[0];
+      const month = parts[1].padStart(2, '0');
+      return `${year}-${month}`;
+    }
+    return dateStr.substring(0, 7);
+  };
+
+  const getMonthLabel = (mKey: string): string => {
+    if (!mKey || !mKey.includes('-')) return mKey;
+    const [yearStr, monthStr] = mKey.split('-');
+    const year = Number(yearStr);
+    const month = Number(monthStr);
+    if (isNaN(year) || isNaN(month)) return mKey;
+    // Set to 15th at noon in local timezone to guarantee no month shift
+    const dateObj = new Date(year, month - 1, 15, 12, 0, 0);
+    const mLabelRaw = format(dateObj, 'MMMM yyyy', { locale: es });
+    return mLabelRaw.charAt(0).toUpperCase() + mLabelRaw.slice(1);
+  };
+
+  const getDayLabel = (dateStr: string): string => {
+    if (!dateStr) return dateStr;
+    const clean = dateStr.split('T')[0].replace(/\//g, '-');
+    const parts = clean.split('-');
+    if (parts.length >= 3) {
+      const year = Number(parts[0]);
+      const month = Number(parts[1]) - 1;
+      const day = Number(parts[2]);
+      const dateObj = new Date(year, month, day, 12, 0, 0);
+      const dayLabelRaw = format(dateObj, "EEEE d 'de' MMMM", { locale: es });
+      return dayLabelRaw.charAt(0).toUpperCase() + dayLabelRaw.slice(1);
+    }
+    return dateStr;
+  };
+
   // Unique available months sorted chronologically
   const availableMonths = useMemo(() => {
     if (!reservations) return [];
     const set = new Set<string>();
     reservations.forEach((r: any) => {
       if (r.check_in) {
-        set.add(r.check_in.substring(0, 7));
+        const key = getMonthKey(r.check_in);
+        if (key) set.add(key);
       }
     });
     return Array.from(set).sort();
   }, [reservations]);
 
   const isReservationPast = (r: any) => {
-    const endDate = r.stay_type === '10h' ? r.check_in : (r.check_out || r.check_in);
-    return endDate < todayStr;
+    if (!r.check_in) return false;
+    const endStr = (r.stay_type === '10h' ? r.check_in : (r.check_out || r.check_in)).split('T')[0];
+    return endStr < todayStr;
   };
 
   useEffect(() => {
@@ -254,17 +296,13 @@ const AdminReservations = () => {
 
     sortedReservations.forEach((res: any) => {
       if (!res.check_in) return;
-      const monthKey = res.check_in.substring(0, 7);
+      const monthKey = getMonthKey(res.check_in);
       
       if (selectedMonth !== 'all' && monthKey !== selectedMonth) return;
 
-      const dateObj = parseISO(res.check_in);
-      const monthLabelRaw = format(dateObj, 'MMMM yyyy', { locale: es });
-      const monthLabel = monthLabelRaw.charAt(0).toUpperCase() + monthLabelRaw.slice(1);
-
-      const dayKey = res.check_in;
-      const dayLabelRaw = format(dateObj, "EEEE d 'de' MMMM", { locale: es });
-      const dayLabel = dayLabelRaw.charAt(0).toUpperCase() + dayLabelRaw.slice(1);
+      const monthLabel = getMonthLabel(monthKey);
+      const dayKey = res.check_in.split('T')[0];
+      const dayLabel = getDayLabel(dayKey);
 
       if (!monthMap.has(monthKey)) {
         monthMap.set(monthKey, {
