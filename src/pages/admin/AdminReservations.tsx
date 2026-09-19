@@ -54,17 +54,34 @@ const AdminReservations = () => {
   const currentMonthName = format(new Date(), "MMMM yyyy", { locale: es });
   const capitalizedMonthName = currentMonthName.charAt(0).toUpperCase() + currentMonthName.slice(1);
 
-  // Robust date helpers to prevent UTC timezone offset shifts
-  const getMonthKey = (dateStr: string): string => {
+  // Normalize any date string (ISO, YYYY-MM-DD, DD/MM/YYYY, DD-MM-YYYY) to strict YYYY-MM-DD
+  const toNormalizedDateStr = (dateStr: string): string => {
     if (!dateStr) return '';
-    const clean = dateStr.split('T')[0].replace(/\//g, '-');
+    const clean = dateStr.split('T')[0].trim();
+    if (clean.includes('/') || (clean.includes('-') && clean.split('-')[0].length <= 2)) {
+      const delimiter = clean.includes('/') ? '/' : '-';
+      const parts = clean.split(delimiter);
+      if (parts.length === 3) {
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
+        return `${year}-${month}-${day}`;
+      }
+    }
     const parts = clean.split('-');
-    if (parts.length >= 2) {
+    if (parts.length >= 3) {
       const year = parts[0];
       const month = parts[1].padStart(2, '0');
-      return `${year}-${month}`;
+      const day = parts[2].padStart(2, '0');
+      return `${year}-${month}-${day}`;
     }
-    return dateStr.substring(0, 7);
+    return clean;
+  };
+
+  const getMonthKey = (dateStr: string): string => {
+    const norm = toNormalizedDateStr(dateStr);
+    if (!norm) return '';
+    return norm.substring(0, 7);
   };
 
   const getMonthLabel = (mKey: string): string => {
@@ -80,9 +97,9 @@ const AdminReservations = () => {
   };
 
   const getDayLabel = (dateStr: string): string => {
-    if (!dateStr) return dateStr;
-    const clean = dateStr.split('T')[0].replace(/\//g, '-');
-    const parts = clean.split('-');
+    const norm = toNormalizedDateStr(dateStr);
+    if (!norm) return dateStr;
+    const parts = norm.split('-');
     if (parts.length >= 3) {
       const year = Number(parts[0]);
       const month = Number(parts[1]) - 1;
@@ -109,8 +126,9 @@ const AdminReservations = () => {
 
   const isReservationPast = (r: any) => {
     if (!r.check_in) return false;
-    const endStr = (r.stay_type === '10h' ? r.check_in : (r.check_out || r.check_in)).split('T')[0];
-    return endStr < todayStr;
+    const rawEnd = r.stay_type === '10h' ? r.check_in : (r.check_out || r.check_in);
+    const normEnd = toNormalizedDateStr(rawEnd);
+    return normEnd < todayStr;
   };
 
   useEffect(() => {
@@ -269,10 +287,10 @@ const AdminReservations = () => {
   const sortedReservations = useMemo(() => {
     return [...filtered].sort((a, b) => {
       if (sortBy === 'check_in_asc') {
-        return parseISO(a.check_in).getTime() - parseISO(b.check_in).getTime();
+        return parseISO(toNormalizedDateStr(a.check_in)).getTime() - parseISO(toNormalizedDateStr(b.check_in)).getTime();
       }
       if (sortBy === 'check_in_desc') {
-        return parseISO(b.check_in).getTime() - parseISO(a.check_in).getTime();
+        return parseISO(toNormalizedDateStr(b.check_in)).getTime() - parseISO(toNormalizedDateStr(a.check_in)).getTime();
       }
       if (sortBy === 'remaining_desc') {
         return (Number(b.remaining_amount) || 0) - (Number(a.remaining_amount) || 0);
