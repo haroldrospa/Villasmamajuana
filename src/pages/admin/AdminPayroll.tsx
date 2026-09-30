@@ -80,6 +80,7 @@ export default function AdminPayroll() {
     issueDate: new Date().toLocaleDateString('es-DO', { day: 'numeric', month: 'long', year: 'numeric' }) + ' a las ' + new Date().toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }),
     companyName: 'Villas Mamajuana',
     status: 'pagado' as 'pagado' | 'pendiente',
+    isQuincenal: true,
     selectedEmployeeIds: employees.map(e => e.id)
   });
 
@@ -153,6 +154,13 @@ export default function AdminPayroll() {
     }
   };
 
+  const handleDeletePayroll = (id: string) => {
+    if (confirm('¿Está seguro de eliminar esta nómina procesada del historial?')) {
+      setPayrolls(prev => prev.filter(p => p.id !== id));
+      toast.success('Nómina eliminada exitosamente');
+    }
+  };
+
   // Handle Generate New Payroll
   const handleCreatePayroll = (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,6 +170,17 @@ export default function AdminPayroll() {
       return;
     }
 
+    // Process employee salaries (if Quincenal, compute 50% of base salary)
+    const processedEmps: PayrollEmployeeItem[] = selectedEmps.map(emp => {
+      const base = payrollForm.isQuincenal ? (emp.baseSalary / 2) : emp.baseSalary;
+      const net = base - (emp.tss || 0) - (emp.deductions || 0);
+      return {
+        ...emp,
+        baseSalary: base,
+        netPay: net
+      };
+    });
+
     const newPayroll: PayrollReceiptData = {
       id: `payroll-${Date.now()}`,
       receiptNumber: `NOM-${new Date().getFullYear()}-${String(payrolls.length + 1).padStart(3, '0')}`,
@@ -169,15 +188,15 @@ export default function AdminPayroll() {
       periodEnd: payrollForm.periodEnd,
       issueDate: payrollForm.issueDate,
       status: payrollForm.status,
-      companyName: payrollForm.companyName || 'Mamajuana SuperMarket',
-      employees: selectedEmps
+      companyName: payrollForm.companyName || 'Villas Mamajuana',
+      employees: processedEmps
     };
 
     setPayrolls(prev => [newPayroll, ...prev]);
     toast.success('Nómina generada exitosamente');
 
     // Auto-register expense into Supabase if available
-    const totalPay = selectedEmps.reduce((sum, emp) => sum + emp.netPay, 0);
+    const totalPay = processedEmps.reduce((sum, emp) => sum + emp.netPay, 0);
     supabase.from('expenses').insert([{
       description: `Pago de Nómina (${newPayroll.periodStart} al ${newPayroll.periodEnd})`,
       amount: totalPay,
@@ -351,8 +370,8 @@ export default function AdminPayroll() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
-                      <div className="text-right">
+                    <div className="flex items-center justify-between md:justify-end gap-3 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
+                      <div className="text-right mr-2">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Total Neto</span>
                         <span className="text-lg font-black text-slate-900">${totalPay.toLocaleString()}</span>
                       </div>
@@ -362,6 +381,14 @@ export default function AdminPayroll() {
                         className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all shadow-sm"
                       >
                         <Eye size={15} /> Ver Comprobante PDF
+                      </button>
+
+                      <button
+                        onClick={() => handleDeletePayroll(pay.id)}
+                        className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100 transition-colors"
+                        title="Eliminar Nómina Procesada"
+                      >
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
@@ -518,15 +545,21 @@ export default function AdminPayroll() {
                   </div>
                 </div>
 
-                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs flex justify-between items-center">
-                  <span className="font-bold text-slate-600">Neto Calculado:</span>
-                  <span className="font-black text-slate-900 text-sm">
-                    RD$ {(
-                      (parseFloat(empForm.baseSalary) || 0) -
-                      (parseFloat(empForm.tss) || 0) -
-                      (parseFloat(empForm.deductions) || 0)
-                    ).toLocaleString()}
-                  </span>
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-slate-600">Neto Quincenal (50% base):</span>
+                    <span className="font-black text-emerald-600 text-sm">
+                      RD$ {(
+                        ((parseFloat(empForm.baseSalary) || 0) / 2) -
+                        (parseFloat(empForm.tss) || 0) -
+                        (parseFloat(empForm.deductions) || 0)
+                      ).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px] text-slate-400 border-t border-slate-200/60 pt-1">
+                    <span>Base por Quincena (15 y 30):</span>
+                    <span className="font-semibold">RD$ {((parseFloat(empForm.baseSalary) || 0) / 2).toLocaleString()}</span>
+                  </div>
                 </div>
 
                 <div className="flex gap-3 pt-2">
@@ -610,6 +643,41 @@ export default function AdminPayroll() {
                     onChange={e => setPayrollForm({ ...payrollForm, issueDate: e.target.value })}
                     className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-slate-900 focus:outline-none"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">Modalidad de Sueldo</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPayrollForm({ ...payrollForm, isQuincenal: true })}
+                      className={`p-3 rounded-xl border text-left text-xs transition-all ${
+                        payrollForm.isQuincenal
+                          ? 'border-slate-900 bg-slate-900 text-white font-bold shadow-sm'
+                          : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="font-extrabold text-xs">Quincenal (50%)</div>
+                      <div className={`text-[10px] ${payrollForm.isQuincenal ? 'text-slate-300' : 'text-slate-500'}`}>
+                        Calcula la mitad del sueldo base (días 15 y 30)
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPayrollForm({ ...payrollForm, isQuincenal: false })}
+                      className={`p-3 rounded-xl border text-left text-xs transition-all ${
+                        !payrollForm.isQuincenal
+                          ? 'border-slate-900 bg-slate-900 text-white font-bold shadow-sm'
+                          : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="font-extrabold text-xs">Mensual (100%)</div>
+                      <div className={`text-[10px] ${!payrollForm.isQuincenal ? 'text-slate-300' : 'text-slate-500'}`}>
+                        Aplica el 100% del sueldo base completo
+                      </div>
+                    </button>
+                  </div>
                 </div>
 
                 <div>
