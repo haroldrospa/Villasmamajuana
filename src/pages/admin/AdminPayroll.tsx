@@ -35,7 +35,7 @@ const INITIAL_PAYROLL: PayrollReceiptData = {
   periodEnd: '14 de septiembre de 2026',
   issueDate: '15 de septiembre de 2026 a las 01:43 p. m.',
   status: 'pagado',
-  companyName: 'Mamajuana SuperMarket',
+  companyName: 'Villas Mamajuana',
   employees: DEFAULT_EMPLOYEES,
   notes: 'Pago quincenal de nómina correspondiente a la primera quincena de septiembre.'
 };
@@ -48,7 +48,14 @@ export default function AdminPayroll() {
 
   const [payrolls, setPayrolls] = useState<PayrollReceiptData[]>(() => {
     const saved = localStorage.getItem('payroll_history');
-    return saved ? JSON.parse(saved) : [INITIAL_PAYROLL];
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.map((p: PayrollReceiptData) => ({
+        ...p,
+        companyName: p.companyName === 'Mamajuana SuperMarket' ? 'Villas Mamajuana' : p.companyName
+      }));
+    }
+    return [INITIAL_PAYROLL];
   });
 
   const [activeTab, setActiveTab] = useState<'payrolls' | 'employees'>('payrolls');
@@ -71,7 +78,7 @@ export default function AdminPayroll() {
     periodStart: '15 de septiembre de 2026',
     periodEnd: '30 de septiembre de 2026',
     issueDate: new Date().toLocaleDateString('es-DO', { day: 'numeric', month: 'long', year: 'numeric' }) + ' a las ' + new Date().toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }),
-    companyName: 'Mamajuana SuperMarket',
+    companyName: 'Villas Mamajuana',
     status: 'pagado' as 'pagado' | 'pendiente',
     selectedEmployeeIds: employees.map(e => e.id)
   });
@@ -330,9 +337,6 @@ export default function AdminPayroll() {
                   <div key={pay.id} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/80 transition-colors">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-slate-900 uppercase tracking-wide">
-                          {pay.companyName || 'Mamajuana SuperMarket'}
-                        </span>
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-700">
                           {pay.status}
                         </span>
@@ -566,7 +570,7 @@ export default function AdminPayroll() {
                     type="text"
                     value={payrollForm.companyName}
                     onChange={e => setPayrollForm({ ...payrollForm, companyName: e.target.value })}
-                    placeholder="Mamajuana SuperMarket"
+                    placeholder="Villas Mamajuana"
                     className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-slate-900 focus:outline-none"
                   />
                 </div>
