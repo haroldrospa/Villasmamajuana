@@ -170,13 +170,15 @@ export default function AdminPayroll() {
       return;
     }
 
-    // Process employee salaries (if Quincenal, compute 50% of base salary)
+    // Process employee salaries (if Quincenal, compute 50% of base salary for net pay, keeping full base salary for SALARIO BASE display)
     const processedEmps: PayrollEmployeeItem[] = selectedEmps.map(emp => {
-      const base = payrollForm.isQuincenal ? (emp.baseSalary / 2) : emp.baseSalary;
-      const net = base - (emp.tss || 0) - (emp.deductions || 0);
+      const fullBase = emp.baseSalary;
+      const quincenalBase = payrollForm.isQuincenal ? (fullBase / 2) : fullBase;
+      const net = quincenalBase - (emp.tss || 0) - (emp.deductions || 0);
       return {
         ...emp,
-        baseSalary: base,
+        baseSalary: quincenalBase,
+        fullBaseSalary: fullBase,
         netPay: net
       };
     });

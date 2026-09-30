@@ -10,6 +10,7 @@ export interface PayrollEmployeeItem {
   name: string;
   position?: string;
   baseSalary: number;
+  fullBaseSalary?: number;
   tss: number;
   deductions: number;
   netPay: number;
@@ -36,7 +37,7 @@ const PayrollReceiptDocument = ({ payroll }: PayrollReceiptDocumentProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const totalEmployees = payroll.employees.length;
-  const subtotalBase = payroll.employees.reduce((acc, emp) => acc + (Number(emp.baseSalary) || 0), 0);
+  const subtotalBase = payroll.employees.reduce((acc, emp) => acc + (Number(emp.fullBaseSalary !== undefined ? emp.fullBaseSalary : emp.baseSalary) || 0), 0);
   const totalTss = payroll.employees.reduce((acc, emp) => acc + (Number(emp.tss) || 0), 0);
   const totalDeductions = payroll.employees.reduce((acc, emp) => acc + (Number(emp.deductions) || 0), 0);
   const totalNetToPay = payroll.employees.reduce((acc, emp) => acc + (Number(emp.netPay) || (emp.baseSalary - emp.tss - emp.deductions)), 0);
@@ -188,7 +189,7 @@ const PayrollReceiptDocument = ({ payroll }: PayrollReceiptDocumentProps) => {
                         {emp.position && <span className="block text-[11px] font-medium text-slate-500">({emp.position})</span>}
                       </td>
                       <td className="py-3.5 px-4 text-right font-medium text-slate-800">
-                        ${Number(emp.baseSalary).toLocaleString()}
+                        ${Number(emp.fullBaseSalary !== undefined ? emp.fullBaseSalary : emp.baseSalary).toLocaleString()}
                       </td>
                       <td className="py-3.5 px-4 text-right font-medium text-slate-600">
                         ${Number(emp.tss).toLocaleString()}
