@@ -8,6 +8,7 @@ const links = [
   { to: '/admin/reservas', icon: CalendarDays, label: 'Reservas' },
   { to: '/admin/calendario', icon: CalendarDays, label: 'Calendario' },
   { to: '/admin/contabilidad', icon: FileSpreadsheet, label: 'Contabilidad' },
+  { to: '/admin/nomina', icon: Users, label: 'Nómina' },
   { to: '/admin/cotizaciones', icon: FileCheck, label: 'Cotizaciones' },
   { to: '/admin/ingresos', icon: DollarSign, label: 'Ingresos' },
   { to: '/admin/gastos', icon: Receipt, label: 'Gastos' },
