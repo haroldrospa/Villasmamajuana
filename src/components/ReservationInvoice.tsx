@@ -136,7 +136,7 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
     address: 'Jarabacoa, La Vega, República Dominicana',
     phone: '809-555-5555',
     email: 'info@villasmamajuana.com',
-    terms: 'Políticas de Reserva: Cancelación con 50% de retención. Devoluciones según aviso anticipado de 7 días. El saldo restante debe ser completado al hacer Check-In.',
+    terms: 'Políticas de Reserva: Cancelación con 50% de retención. Devoluciones según aviso anticipado de 7 días. El saldo restante debe ser completado al hacer Check-In. 🚫 Importante: No está permitido ningún tipo de música preparada, kitipo ni equipos de alto volumen. Buscamos mantener un ambiente tranquilo y agradable para todos.',
     bank_info: 'Banreservas - Cuenta Ahorro: 9601938364 | Titular: Harold Man'
   };
 
@@ -416,8 +416,19 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
           </div>
         </div>
 
+        {/* REGLAS DE CONVIVENCIA - AVISO IMPORTANTE */}
+        <div className="relative z-10 mt-6 bg-rose-50/90 border border-rose-200/90 rounded-2xl p-4 space-y-1 text-slate-900 shadow-sm">
+          <div className="flex items-center gap-1.5 text-rose-700 font-black text-xs uppercase tracking-wider">
+            <span className="text-sm">🚫</span>
+            <span>Importante</span>
+          </div>
+          <p className="text-xs font-semibold text-rose-950 leading-relaxed">
+            No está permitido ningún tipo de música preparada, kitipo ni equipos de alto volumen. Buscamos mantener un ambiente tranquilo y agradable para todos.
+          </p>
+        </div>
+
         {/* FOOTER & SIGNATURE */}
-        <div className="relative z-10 mt-12 pt-6 border-t border-slate-200 space-y-6">
+        <div className="relative z-10 mt-8 pt-6 border-t border-slate-200 space-y-6">
           <div className="flex justify-between items-end">
             <div className="text-[10px] text-slate-500 space-y-1 max-w-md">
               <p className="font-bold text-slate-700 uppercase">TÉRMINOS Y CONDICIONES:</p>

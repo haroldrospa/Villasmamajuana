@@ -1,4 +1,4 @@
-﻿import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
 import ReservationInvoice, { InvoiceData } from '@/components/ReservationInvoice';
@@ -37,6 +37,8 @@ const InvoicePage = () => {
     `Banco: Banreservas\n` +
     `Cuenta Ahorro: 9601938364\n` +
     `Titular: Harold Man\n\n` +
+    `*🚫 Importante*\n` +
+    `No está permitido ningún tipo de música preparada, kitipo ni equipos de alto volumen. Buscamos mantener un ambiente tranquilo y agradable para todos.\n\n` +
     `Gracias por elegir Villas Mamajuana 🌿`
   );
 
