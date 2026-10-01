@@ -340,16 +340,6 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
                   )}
                 </div>
               </div>
-
-              {/* AVISO IMPORTANTE EN ROJO DESTACADO */}
-              <div className="bg-red-50 border-2 border-red-600 rounded-2xl p-4 space-y-1.5 shadow-sm text-red-900">
-                <div className="flex items-center gap-1.5 font-black text-xs text-red-700 uppercase tracking-wider">
-                  <span className="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded font-black">🚫 IMPORTANTE</span>
-                </div>
-                <p className="text-xs font-bold text-red-700 leading-snug">
-                  No está permitido ningún tipo de música preparada, kitipo ni equipos de alto volumen. Buscamos mantener un ambiente tranquilo y agradable para todos.
-                </p>
-              </div>
             </div>
 
             {/* HIGH-END CORPORATE FINANCIAL SUMMARY TABLE */}
