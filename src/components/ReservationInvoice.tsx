@@ -340,6 +340,16 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
                   )}
                 </div>
               </div>
+
+              {/* AVISO IMPORTANTE EN ROJO DESTACADO */}
+              <div className="bg-red-50 border-2 border-red-600 rounded-2xl p-4 space-y-1.5 shadow-sm text-red-900">
+                <div className="flex items-center gap-1.5 font-black text-xs text-red-700 uppercase tracking-wider">
+                  <span className="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded font-black">🚫 IMPORTANTE</span>
+                </div>
+                <p className="text-xs font-bold text-red-700 leading-snug">
+                  No está permitido ningún tipo de música preparada, kitipo ni equipos de alto volumen. Buscamos mantener un ambiente tranquilo y agradable para todos.
+                </p>
+              </div>
             </div>
 
             {/* HIGH-END CORPORATE FINANCIAL SUMMARY TABLE */}
@@ -416,13 +426,14 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
           </div>
         </div>
 
-        {/* REGLAS DE CONVIVENCIA - AVISO IMPORTANTE */}
-        <div className="relative z-10 mt-6 bg-rose-50/90 border border-rose-200/90 rounded-2xl p-4 space-y-1 text-slate-900 shadow-sm">
-          <div className="flex items-center gap-1.5 text-rose-700 font-black text-xs uppercase tracking-wider">
-            <span className="text-sm">🚫</span>
-            <span>Importante</span>
+        {/* REGLAS DE CONVIVENCIA - AVISO IMPORTANTE EN ROJO */}
+        <div className="relative z-10 mt-6 bg-red-50 border-2 border-red-600 rounded-2xl p-4 space-y-1.5 text-red-900 shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded uppercase tracking-wider">
+              🚫 IMPORTANTE
+            </span>
           </div>
-          <p className="text-xs font-semibold text-rose-950 leading-relaxed">
+          <p className="text-xs font-bold text-red-700 leading-relaxed">
             No está permitido ningún tipo de música preparada, kitipo ni equipos de alto volumen. Buscamos mantener un ambiente tranquilo y agradable para todos.
           </p>
         </div>
