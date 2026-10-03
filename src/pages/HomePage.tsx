@@ -182,11 +182,11 @@ const HomePage = () => {
                 transition={{ duration: 0.8 }}
                 className="relative"
               >
-                <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden bg-white p-2 shadow-2xl border-2 border-[#c5a059] flex items-center justify-center">
+                <div className="w-32 h-32 md:w-44 md:h-44 rounded-full overflow-hidden bg-white p-3 md:p-4 shadow-2xl border-2 border-[#c5a059] flex items-center justify-center">
                   <img 
                     src={logo} 
                     alt="Villas Mamajuana" 
-                    className="w-full h-full object-cover rounded-full select-none" 
+                    className="w-full h-full object-contain select-none" 
                   />
                 </div>
               </motion.div>
@@ -447,7 +447,7 @@ const HomePage = () => {
           {/* FOOTER */}
           <footer className="w-full text-center py-8 mt-16 border-t border-[#c5a059]/20 space-y-2 bg-[#112418]">
             <div className="flex items-center justify-center gap-3">
-              <img src={logo} alt="Logo" className="w-9 h-9 object-cover p-0.5 bg-white rounded-full border border-[#c5a059]/40 shadow-sm" />
+              <img src={logo} alt="Logo" className="w-10 h-10 object-contain p-1 bg-white rounded-full border border-[#c5a059]/40 shadow-sm select-none" />
               <span className="font-light text-sm tracking-[0.2em] uppercase text-[#f4e8c1] font-display">Villas Mamajuana</span>
             </div>
             <p className="text-xs text-[#f4e8c1]/60 font-light font-body">
