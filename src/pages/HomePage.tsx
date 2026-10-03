@@ -323,7 +323,7 @@ const HomePage = () => {
                 <div>
                   <button
                     type="submit"
-                    className={`w-full h-[42px] rounded-xl font-medium text-xs uppercase tracking-[0.15em] shadow-md flex items-center justify-center gap-2 transition-all ${
+                    className={`w-full h-[42px] px-3.5 rounded-xl font-semibold text-[11px] xl:text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2 transition-all ${
                       checkIn && !availability.isAvailable
                         ? 'bg-rose-700 hover:bg-rose-800 text-white'
                         : 'bg-[#163322] hover:bg-[#234b33] text-white hover:scale-[1.01] active:scale-95'
@@ -332,12 +332,12 @@ const HomePage = () => {
                     {checkIn && !availability.isAvailable ? (
                       <>
                         <CalendarX size={15} className="text-rose-200 shrink-0" />
-                        <span className="truncate">Sin Disponibilidad</span>
+                        <span className="whitespace-nowrap">Sin Disponibilidad</span>
                       </>
                     ) : (
                       <>
                         <Search size={15} className="text-[#c5a059] shrink-0" />
-                        <span className="truncate">Consultar Disponibilidad</span>
+                        <span className="whitespace-nowrap">Consultar Disponibilidad</span>
                       </>
                     )}
                   </button>
