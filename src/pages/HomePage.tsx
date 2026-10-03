@@ -37,9 +37,8 @@ import { supabase } from '@/integrations/supabase/client';
 const HERO_IMAGES = [heroImg, villa1, villa2];
 
 const TOURISM_HIGHLIGHTS = [
-  { icon: Trees, label: 'NaturalezaVirgen', desc: 'Rodeado de abundante vegetación y clima fresco en Bayacanes, La Vega' },
+  { icon: Trees, label: 'Naturaleza Virgen', desc: 'Rodeado de abundante vegetación y clima fresco en Bayacanes, La Vega' },
   { icon: Waves, label: 'Piscinas & Clima', desc: 'Aguas cristalinas y clima fresco de montaña' },
-  { icon: Flame, label: 'Noches de Fogata', desc: 'Espacios de chimenea y fogata al aire libre con vista a las estrellas' },
   { icon: Coffee, label: 'Confort de Lujo', desc: 'Villas privadas equipadas con cocina, terrazas y WiFi de alta velocidad' },
 ];
 
@@ -209,11 +208,11 @@ const HomePage = () => {
                 className="space-y-4"
               >
                 <h1 className="text-4xl sm:text-6xl md:text-7xl font-light text-white tracking-tight leading-none font-display">
-                  Santuario de Montaña
+                  Villas Mamajuana
                 </h1>
                 
                 <p className="text-sm md:text-base text-[#f4f1ea]/90 font-light max-w-xl mx-auto leading-relaxed font-body">
-                  Una colección privada de villas rodeadas de naturaleza virgen, clima fresco y paz absoluta.
+                  Una colección privada de villas en Bayacanes, La Vega, rodeadas de naturaleza virgen, clima fresco y paz absoluta.
                 </p>
               </motion.div>
 
@@ -230,10 +229,6 @@ const HomePage = () => {
                 <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-[#c5a059]/50"></span>
                 <span className="flex items-center gap-2">
                   <Trees size={14} className="text-[#c5a059]" /> Vistas Panorámicas
-                </span>
-                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-[#c5a059]/50"></span>
-                <span className="flex items-center gap-2">
-                  <Flame size={14} className="text-[#c5a059]" /> Área BBQ & Fogata
                 </span>
                 <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-[#c5a059]/50"></span>
                 <span className="flex items-center gap-2">
@@ -348,7 +343,7 @@ const HomePage = () => {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {TOURISM_HIGHLIGHTS.map((item, idx) => {
                 const IconComponent = item.icon;
                 return (
