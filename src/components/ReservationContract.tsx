@@ -192,6 +192,8 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
   // Editable extra fields
   const [guestId, setGuestId] = useState('');
   const [guestCount, setGuestCount] = useState(reservation?.capacity || '6');
+  const [checkInTime, setCheckInTime] = useState('3:00 PM');
+  const [checkOutTime, setCheckOutTime] = useState('1:00 PM');
 
   // Digital Signature States
   const [arrendadorSignature, setArrendadorSignature] = useState<string | null>(null);
@@ -309,7 +311,7 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
 
   const handleShareWhatsApp = () => {
     const text = encodeURIComponent(
-      `Hola ${clientName}, adjuntamos tu Contrato de Alquiler de ${villaName} en Villas Mamajuana para tu estadía del ${checkIn} al ${checkOut}.\n\nPor favor revísalo y firma digitalmente.`
+      `Hola ${clientName}, adjuntamos tu Contrato de Alquiler de ${villaName} en Villas Mamajuana para tu estadía del ${checkIn} (${checkInTime}) al ${checkOut} (${checkOutTime}).\n\nPor favor revísalo y firma digitalmente.`
     );
     const cleanPhone = clientPhone.replace(/\D/g, '');
     const phoneWithCode = cleanPhone.length === 10 ? `1${cleanPhone}` : cleanPhone;
@@ -424,11 +426,31 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
             </div>
             <div>
               <span className="font-bold text-slate-700">Check-in (fecha y hora):</span>{' '}
-              <span className="border-b border-slate-400 font-semibold px-1">{checkIn} — 3:00 PM</span>
+              <span className="border-b border-slate-400 font-semibold px-1 inline-flex items-center gap-1">
+                <span>{checkIn}</span>
+                <span>—</span>
+                <input
+                  type="text"
+                  value={checkInTime}
+                  onChange={(e) => setCheckInTime(e.target.value)}
+                  placeholder="3:00 PM"
+                  className="font-semibold text-slate-900 bg-transparent focus:outline-none focus:bg-amber-50 rounded px-1 w-24 text-center border-b border-slate-400 print:border-b inline-block"
+                />
+              </span>
             </div>
             <div>
               <span className="font-bold text-slate-700">Check-out (fecha y hora):</span>{' '}
-              <span className="border-b border-slate-400 font-semibold px-1">{checkOut} — 1:00 PM</span>
+              <span className="border-b border-slate-400 font-semibold px-1 inline-flex items-center gap-1">
+                <span>{checkOut}</span>
+                <span>—</span>
+                <input
+                  type="text"
+                  value={checkOutTime}
+                  onChange={(e) => setCheckOutTime(e.target.value)}
+                  placeholder="1:00 PM"
+                  className="font-semibold text-slate-900 bg-transparent focus:outline-none focus:bg-amber-50 rounded px-1 w-24 text-center border-b border-slate-400 print:border-b inline-block"
+                />
+              </span>
             </div>
           </div>
           <p className="text-[11px] italic text-rose-700 font-medium mt-2 bg-rose-50 p-2 rounded-lg border border-rose-200">
