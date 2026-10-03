@@ -263,23 +263,42 @@ const VillaDetailPage = () => {
             })()}
 
             {/* Video */}
-            {villa.videoUrl && (
-              <div className="mt-6">
-                <h2 className="font-display font-bold text-sm text-foreground mb-3 flex items-center gap-2">
-                  <Play size={16} className="text-primary" />
-                  Tour Virtual
-                </h2>
-                <div className="rounded-lg overflow-hidden border border-border aspect-video">
-                  <iframe
-                    src={villa.videoUrl}
-                    title={`Tour ${villa.name}`}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+            {(() => {
+              const formatVideoEmbedUrl = (url: string | null | undefined): string | null => {
+                if (!url) return null;
+                const trimmed = url.trim();
+                if (!trimmed) return null;
+                if (trimmed.includes('/embed/')) return trimmed;
+                const ytMatch = trimmed.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+                if (ytMatch && ytMatch[1]) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+                const shortsMatch = trimmed.match(/youtube\.com\/shorts\/([^"&?\/\s]{11})/);
+                if (shortsMatch && shortsMatch[1]) return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+                const vimeoMatch = trimmed.match(/vimeo\.com\/(\d+)/);
+                if (vimeoMatch && vimeoMatch[1]) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+                return trimmed;
+              };
+
+              const embedUrl = formatVideoEmbedUrl(villa.videoUrl);
+              if (!embedUrl) return null;
+
+              return (
+                <div className="mt-6">
+                  <h2 className="font-display font-bold text-sm text-foreground mb-3 flex items-center gap-2">
+                    <Play size={16} className="text-primary" />
+                    Tour Virtual
+                  </h2>
+                  <div className="rounded-lg overflow-hidden border border-border aspect-video shadow-sm">
+                    <iframe
+                      src={embedUrl}
+                      title={`Tour ${villa.name}`}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Map */}
             <div className="mt-6">

@@ -100,7 +100,7 @@ export const villas: Villa[] = [
       address: 'Bayacanes, La Vega, República Dominicana',
       googleMapsUrl: 'https://maps.app.goo.gl/8NNxrmNpX4Ax5zVRA',
     },
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    videoUrl: '',
     amenities: ['Wi-Fi', 'Cocina', 'Deck privado', 'Piscina', 'BBQ', 'Área verde'],
   },
   {
@@ -116,7 +116,7 @@ export const villas: Villa[] = [
       address: 'Bayacanes, La Vega, República Dominicana',
       googleMapsUrl: 'https://maps.app.goo.gl/8NNxrmNpX4Ax5zVRA',
     },
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    videoUrl: '',
     amenities: ['Wi-Fi', 'Jacuzzi', 'Terraza privada', 'Hamacas', 'Fogata'],
   },
 ];

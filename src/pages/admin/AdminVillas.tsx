@@ -8,7 +8,7 @@ import {
   Trash2, Edit2,
   Image as ImageIcon,
   Loader2, Home, 
-  Upload, Plus, X
+  Upload, Plus, X, Video
 } from 'lucide-react';
 import { toast } from 'sonner';
 import DriveImage from '@/components/DriveImage';
@@ -368,6 +368,21 @@ const AdminVillas = () => {
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase text-neutral-400">Comodidades (separadas por coma)</label>
                   <input value={form.amenities as string} onChange={e => setForm({...form, amenities: e.target.value})} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black" placeholder="Piscina, WiFi, Cocina..." />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-neutral-400 flex items-center gap-1.5">
+                    <Video size={13} className="text-[#c5a059]" /> URL del Video / Tour Virtual (YouTube o Vimeo)
+                  </label>
+                  <input 
+                    type="url"
+                    value={form.video_url} 
+                    onChange={e => setForm({...form, video_url: e.target.value})} 
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:border-black text-xs font-medium" 
+                    placeholder="Ej: https://www.youtube.com/watch?v=... o https://youtu.be/..." 
+                  />
+                  <p className="text-[10px] text-neutral-400 font-medium">
+                    Pega el enlace de YouTube o Vimeo. Si lo dejas vacío, no se mostrará video en la página del cliente.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase text-neutral-400">Dirección</label>
