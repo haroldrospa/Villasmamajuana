@@ -4,9 +4,11 @@ import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
 import { useVillas } from '@/hooks/useVillas';
 import { usePromotions, useCoupons } from '@/hooks/usePromotions';
+import { useReservations } from '@/hooks/useFinances';
+import { checkRangeAvailability } from '@/utils/availability';
 import { supabase } from '@/integrations/supabase/client';
 import { differenceInDays, isSameDay, parseISO } from 'date-fns';
-import { CreditCard, Tag, Check, X, Loader2, Clock, Sun } from 'lucide-react';
+import { CreditCard, Tag, Check, X, Loader2, Clock, Sun, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Tables } from '@/integrations/supabase/types';
@@ -19,10 +21,13 @@ const BookingPage = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const preselectedVilla = params.get('villa') || '';
+  const paramCheckIn = params.get('checkIn') || '';
+  const paramCheckOut = params.get('checkOut') || '';
 
   const { data: villas, isLoading: isLoadingVillas } = useVillas();
   const { data: promotions, isLoading: isLoadingPromos } = usePromotions();
   const { data: coupons, isLoading: isLoadingCoupons } = useCoupons();
+  const { data: reservations } = useReservations();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOtherPerson, setIsOtherPerson] = useState(false);
@@ -31,8 +36,8 @@ const BookingPage = () => {
     name: '',
     phone: '',
     villaId: preselectedVilla,
-    checkIn: '',
-    checkOut: '',
+    checkIn: paramCheckIn,
+    checkOut: paramCheckOut,
     stayType: '24h' as '10h' | '24h'
   });
 
@@ -58,11 +63,34 @@ const BookingPage = () => {
     }
   }, [profile, isOtherPerson]);
 
+  // Auto-match preselected villa name/ID to villa ID
+  useEffect(() => {
+    if (villas && villas.length > 0 && preselectedVilla) {
+      const match = villas.find(
+        v => v.id === preselectedVilla || v.name === preselectedVilla || preselectedVilla.toLowerCase().includes(v.name.toLowerCase())
+      );
+      if (match) {
+        setForm(prev => ({ ...prev, villaId: match.id }));
+      }
+    }
+  }, [villas, preselectedVilla]);
+
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountPercent: number } | null>(null);
   const [couponError, setCouponError] = useState('');
 
   const selectedVilla = (villas || []).find(v => v.id === form.villaId);
+
+  // Real-time availability calculation for selected villa
+  const availability = useMemo(() => {
+    return checkRangeAvailability(
+      reservations,
+      form.villaId,
+      form.checkIn,
+      form.stayType === '10h' ? form.checkIn : form.checkOut,
+      villas || []
+    );
+  }, [reservations, form.villaId, form.checkIn, form.checkOut, form.stayType, villas]);
 
   const pricing = useMemo(() => {
     if (!selectedVilla || !form.checkIn) return null;
@@ -154,10 +182,15 @@ const BookingPage = () => {
     (form.stayType === '10h' || form.checkOut) && 
     pricing && 
     pricing.nights > 0 && 
+    availability.isAvailable &&
     !isSubmitting;
 
   const handleContinue = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!availability.isAvailable) {
+      toast.error('La villa no está disponible para las fechas seleccionadas.');
+      return;
+    }
     if (!canContinue || !pricing || !user) return;
 
     setIsSubmitting(true);
@@ -317,6 +350,21 @@ const BookingPage = () => {
                 </div>
               )}
             </div>
+
+            {/* REAL-TIME AVAILABILITY WARNING BANNER */}
+            {form.checkIn && !availability.isAvailable && (
+              <div className="p-3.5 bg-rose-50 border-2 border-rose-300 rounded-xl flex items-center gap-3 text-rose-900 shadow-sm animate-in fade-in duration-300">
+                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                <div className="flex-1 text-left">
+                  <p className="font-bold text-xs uppercase tracking-wider text-rose-900">
+                    ❌ Sin Disponibilidad en estas fechas
+                  </p>
+                  <p className="text-xs text-rose-700 font-medium mt-0.5">
+                    {availability.statusText}. Selecciona otras fechas u otra villa para continuar.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Coupon */}
             {pricing && (

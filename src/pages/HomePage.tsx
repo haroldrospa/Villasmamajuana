@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
 import { Link, useNavigate } from 'react-router-dom';
@@ -11,6 +11,9 @@ import PromotionsBanner from '@/components/PromotionsBanner';
 import LanguageToggle from '@/components/LanguageToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useVillas } from '@/hooks/useVillas';
+import { useReservations } from '@/hooks/useFinances';
+import { checkRangeAvailability } from '@/utils/availability';
+import { toast } from 'sonner';
 import { 
   LogIn, 
   UserPlus, 
@@ -30,6 +33,8 @@ import {
   ChevronDown,
   Building2,
   CheckCircle2,
+  AlertCircle,
+  CalendarX,
   SlidersHorizontal
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,6 +50,7 @@ const TOURISM_HIGHLIGHTS = [
 const HomePage = () => {
   const { user, profile, signOut, isLoading, isAdmin } = useAuth();
   const { data: dbVillas } = useVillas();
+  const { data: reservations } = useReservations();
   const navigate = useNavigate();
   const [heroUrl, setHeroUrl] = useState<string | null>(null);
   const [isHeroLoading, setIsHeroLoading] = useState(true);
@@ -55,6 +61,17 @@ const HomePage = () => {
   const [checkIn, setCheckIn] = useState<string>('');
   const [checkOut, setCheckOut] = useState<string>('');
   const [guests, setGuests] = useState<string>('2');
+
+  // Real-time availability calculation
+  const availability = useMemo(() => {
+    return checkRangeAvailability(
+      reservations,
+      selectedVilla,
+      checkIn,
+      checkOut,
+      dbVillas || []
+    );
+  }, [reservations, selectedVilla, checkIn, checkOut, dbVillas]);
 
   useEffect(() => {
     const fetchHero = async () => {
@@ -92,6 +109,12 @@ const HomePage = () => {
 
   const handleSearchDisponibilidad = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (checkIn && !availability.isAvailable) {
+      toast.error('No hay disponibilidad para las fechas seleccionadas. Por favor elige otras fechas.');
+      return;
+    }
+
     const queryParams = new URLSearchParams();
     if (selectedVilla && selectedVilla !== 'todas') queryParams.set('villa', selectedVilla);
     if (checkIn) queryParams.set('checkIn', checkIn);
@@ -300,12 +323,68 @@ const HomePage = () => {
                 <div>
                   <button
                     type="submit"
-                    className="w-full h-[42px] bg-[#163322] hover:bg-[#234b33] text-white rounded-xl font-medium text-xs uppercase tracking-[0.15em] shadow-md flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-95"
+                    className={`w-full h-[42px] rounded-xl font-medium text-xs uppercase tracking-[0.15em] shadow-md flex items-center justify-center gap-2 transition-all ${
+                      checkIn && !availability.isAvailable
+                        ? 'bg-rose-700 hover:bg-rose-800 text-white'
+                        : 'bg-[#163322] hover:bg-[#234b33] text-white hover:scale-[1.01] active:scale-95'
+                    }`}
                   >
-                    <Search size={15} className="text-[#c5a059]" />
-                    <span>Consultar Disponibilidad</span>
+                    {checkIn && !availability.isAvailable ? (
+                      <>
+                        <CalendarX size={15} className="text-rose-200 shrink-0" />
+                        <span className="truncate">Sin Disponibilidad</span>
+                      </>
+                    ) : (
+                      <>
+                        <Search size={15} className="text-[#c5a059] shrink-0" />
+                        <span className="truncate">Consultar Disponibilidad</span>
+                      </>
+                    )}
                   </button>
                 </div>
+
+                {/* REAL-TIME AVAILABILITY FEEDBACK BANNER */}
+                {checkIn && (
+                  <div className="col-span-1 sm:col-span-2 lg:col-span-4 mt-1">
+                    {!availability.isAvailable ? (
+                      <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3 text-rose-900 shadow-sm animate-in fade-in duration-300">
+                        <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                        <div className="flex-1 text-left">
+                          <p className="font-bold uppercase tracking-wider text-[11px] text-rose-900 leading-tight">
+                            ❌ No hay disponibilidad en estas fechas
+                          </p>
+                          <p className="text-[11px] text-rose-700/90 font-medium mt-0.5">
+                            {availability.statusText}. Por favor selecciona otras fechas u otra villa.
+                          </p>
+                        </div>
+                      </div>
+                    ) : availability.hasConflict && !availability.isFullyOccupied ? (
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3 text-amber-900 shadow-sm animate-in fade-in duration-300">
+                        <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+                        <div className="flex-1 text-left">
+                          <p className="font-bold uppercase tracking-wider text-[11px] text-amber-900 leading-tight">
+                            ⚠️ Disponibilidad Parcial
+                          </p>
+                          <p className="text-[11px] text-amber-700/90 font-medium mt-0.5">
+                            {availability.statusText}. Hay otras villas libres para estas fechas.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-emerald-900 shadow-sm animate-in fade-in duration-300">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                        <div className="flex-1 text-left">
+                          <p className="font-bold uppercase tracking-wider text-[11px] text-emerald-900 leading-tight">
+                            ✅ ¡Fechas disponibles para reservar!
+                          </p>
+                          <p className="text-[11px] text-emerald-700/90 font-medium mt-0.5">
+                            La villa está totalmente libre para el período seleccionado.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </form>
             </motion.div>
           </div>
