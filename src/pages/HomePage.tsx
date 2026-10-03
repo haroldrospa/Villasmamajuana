@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import heroImg from '@/assets/villa-hero.jpg';
 import villa1 from '@/assets/villa-1.jpg';
 import villa2 from '@/assets/villa-2.jpg';
-import villa3 from '@/assets/villa-3.jpg';
 import logo from '@/assets/logo-villa.png';
 import PromotionsBanner from '@/components/PromotionsBanner';
 import LanguageToggle from '@/components/LanguageToggle';
 import { useAuth } from '@/hooks/useAuth';
+import { useVillas } from '@/hooks/useVillas';
 import { 
   LogIn, 
   UserPlus, 
@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-const HERO_IMAGES = [heroImg, villa1, villa2, villa3];
+const HERO_IMAGES = [heroImg, villa1, villa2];
 
 const TOURISM_HIGHLIGHTS = [
   { icon: Trees, label: 'NaturalezaVirgen', desc: 'Rodeado de abundante vegetación y clima fresco en Bayacanes, La Vega' },
@@ -45,6 +45,7 @@ const TOURISM_HIGHLIGHTS = [
 
 const HomePage = () => {
   const { user, profile, signOut, isLoading, isAdmin } = useAuth();
+  const { data: dbVillas } = useVillas();
   const navigate = useNavigate();
   const [heroUrl, setHeroUrl] = useState<string | null>(null);
   const [isHeroLoading, setIsHeroLoading] = useState(true);
@@ -307,9 +308,12 @@ const HomePage = () => {
                     className="w-full bg-slate-800/90 border border-white/15 rounded-xl px-3.5 py-3 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
                   >
                     <option value="todas">Todas las Villas</option>
-                    <option value="Villa 1">Villa 1 (Piscina & Terraza)</option>
-                    <option value="Villa 2">Villa 2 (Vista a las Montañas)</option>
-                    <option value="Villa 3">Villa 3 (Exclusiva & Privada)</option>
+                    {(dbVillas && dbVillas.length > 0 ? dbVillas : [
+                      { id: 'villa-1', name: 'Villa 1 (12 pers. - RD$12,500)' },
+                      { id: 'villa-2', name: 'Villa 2 (4 pers. - RD$8,000)' }
+                    ]).map(v => (
+                      <option key={v.id} value={v.name}>{v.name}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -444,37 +448,57 @@ const HomePage = () => {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { img: villa1, title: 'Villa 1 - Pasa Día & Estancia', price: 'RD$ 12,500 / noche', capacity: 'Hasta 12 Personas' },
-                { img: villa2, title: 'Villa 2 - Vista a la Montaña', price: 'RD$ 14,000 / noche', capacity: 'Hasta 15 Personas' },
-                { img: villa3, title: 'Villa 3 - Suite de Lujo', price: 'RD$ 10,000 / noche', capacity: 'Hasta 8 Personas' },
-              ].map((v, i) => (
-                <div key={i} className="bg-slate-900 rounded-2xl overflow-hidden border border-white/10 shadow-xl group hover:border-amber-400/50 transition-all">
-                  <div className="relative h-48 overflow-hidden">
-                    <img 
-                      src={v.img} 
-                      alt={v.title} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                    />
-                    <div className="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-amber-300 border border-amber-400/30">
-                      {v.price}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {(dbVillas && dbVillas.length > 0 ? dbVillas : [
+                {
+                  id: 'villa-1',
+                  image: villa1,
+                  name: 'Villa 1',
+                  price: 12500,
+                  capacity: 12
+                },
+                {
+                  id: 'villa-2',
+                  image: villa2,
+                  name: 'Villa 2',
+                  price: 8000,
+                  capacity: 4
+                }
+              ]).map((v: any, i: number) => {
+                const displayImg = v.image || (v.id === 'villa-2' ? villa2 : villa1);
+                const displayTitle = v.name;
+                const displayPrice = typeof v.price === 'number' 
+                  ? `RD$ ${v.price.toLocaleString()} / noche` 
+                  : String(v.price);
+                const displayCapacity = `Hasta ${v.capacity} Personas`;
+
+                return (
+                  <div key={v.id || i} className="bg-slate-900 rounded-2xl overflow-hidden border border-white/10 shadow-xl group hover:border-amber-400/50 transition-all">
+                    <div className="relative h-56 overflow-hidden">
+                      <img 
+                        src={displayImg} 
+                        alt={displayTitle} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                      />
+                      <div className="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-amber-300 border border-amber-400/30">
+                        {displayPrice}
+                      </div>
+                    </div>
+                    <div className="p-5 space-y-3">
+                      <h3 className="font-bold text-lg text-white">{displayTitle}</h3>
+                      <p className="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
+                        <CheckCircle2 size={14} className="text-emerald-400" /> {displayCapacity}
+                      </p>
+                      <Link
+                        to="/villas"
+                        className="block w-full text-center py-3 bg-white/10 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-md"
+                      >
+                        Ver Detalles & Reservar
+                      </Link>
                     </div>
                   </div>
-                  <div className="p-4 space-y-3">
-                    <h3 className="font-bold text-sm text-white">{v.title}</h3>
-                    <p className="text-xs text-slate-400 flex items-center gap-1.5">
-                      <CheckCircle2 size={14} className="text-emerald-400" /> {v.capacity}
-                    </p>
-                    <Link
-                      to="/villas"
-                      className="block w-full text-center py-2.5 bg-white/10 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all"
-                    >
-                      Ver Detalles & Reservar
-                    </Link>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

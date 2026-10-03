@@ -1,6 +1,5 @@
 import villa1 from '@/assets/villa-1.jpg';
 import villa2 from '@/assets/villa-2.jpg';
-import villa3 from '@/assets/villa-3.jpg';
 
 export interface Villa {
   id: string;
@@ -90,50 +89,35 @@ export interface Expense {
 export const villas: Villa[] = [
   {
     id: 'villa-1',
-    name: 'Villa Ceiba',
-    price: 250,
+    name: 'Villa 1',
+    price: 12500,
     image: villa1,
-    capacity: 6,
-    description: 'Cabaña de montaña con deck privado y vistas panorámicas.',
+    capacity: 12,
+    description: 'Hermosa villa privada ideal para pasa día y estancias familiares, con amplia terraza y áreas verdes.',
     location: {
-      lat: 19.0544,
-      lng: -70.5261,
+      lat: 19.2415408,
+      lng: -70.5689804,
       address: 'Bayacanes, La Vega, República Dominicana',
-      googleMapsUrl: 'https://maps.google.com/?q=19.0544,-70.5261',
+      googleMapsUrl: 'https://maps.app.goo.gl/8NNxrmNpX4Ax5zVRA',
     },
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    amenities: ['Wi-Fi', 'Cocina', 'Deck privado', 'Vista panorámica', 'BBQ'],
+    amenities: ['Wi-Fi', 'Cocina', 'Deck privado', 'Piscina', 'BBQ', 'Área verde'],
   },
   {
     id: 'villa-2',
-    name: 'Villa Canopy',
-    price: 320,
+    name: 'Villa 2',
+    price: 8000,
     image: villa2,
     capacity: 4,
-    description: 'Casa del árbol de lujo rodeada de naturaleza.',
+    description: 'Acogedora villa privada de montaña, perfecta para parejas o grupos pequeños.',
     location: {
-      lat: 19.0610,
-      lng: -70.5320,
+      lat: 19.2415408,
+      lng: -70.5689804,
       address: 'Bayacanes, La Vega, República Dominicana',
-      googleMapsUrl: 'https://maps.google.com/?q=19.0610,-70.5320',
+      googleMapsUrl: 'https://maps.app.goo.gl/8NNxrmNpX4Ax5zVRA',
     },
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    amenities: ['Wi-Fi', 'Jacuzzi', 'Terraza elevada', 'Hamacas', 'Fogata'],
-  },
-  {
-    id: 'villa-3',
-    name: 'Villa Piedra',
-    price: 280,
-    image: villa3,
-    capacity: 8,
-    description: 'Villa rústica con terraza privada y comedor al aire libre.',
-    location: {
-      lat: 19.0480,
-      lng: -70.5190,
-      address: 'Bayacanes, La Vega, República Dominicana',
-      googleMapsUrl: 'https://maps.google.com/?q=19.0480,-70.5190',
-    },
-    amenities: ['Wi-Fi', 'Cocina completa', 'Comedor al aire libre', 'Piscina', 'Estacionamiento'],
+    amenities: ['Wi-Fi', 'Jacuzzi', 'Terraza privada', 'Hamacas', 'Fogata'],
   },
 ];
 
@@ -210,8 +194,8 @@ export const sampleReservations: Reservation[] = [
   },
   {
     id: 'r3',
-    villaId: 'villa-3',
-    villaName: 'Villa Piedra',
+    villaId: 'villa-2',
+    villaName: 'Villa 2',
     clientName: 'Ana Rodríguez',
     clientPhone: '+1 809-555-0303',
     checkIn: '2026-04-01',
@@ -225,13 +209,13 @@ export const sampleReservations: Reservation[] = [
 ];
 
 export const sampleIncomes: Income[] = [
-  { id: 'i1', date: '2026-03-10', concept: 'Depósito 50% - Villa Ceiba', amount: 375, paymentMethod: 'Transferencia', client: 'María García', villaId: 'villa-1', incomeType: 'Reserva (50%)' },
-  { id: 'i1b', date: '2026-03-18', concept: 'Pago restante - Villa Ceiba', amount: 375, paymentMethod: 'Transferencia', client: 'María García', villaId: 'villa-1', incomeType: 'Pago restante' },
-  { id: 'i2', date: '2026-03-12', concept: 'Depósito 50% - Villa Canopy', amount: 480, paymentMethod: 'Pago Móvil', client: 'Carlos Méndez', villaId: 'villa-2', incomeType: 'Reserva (50%)' },
+  { id: 'i1', date: '2026-03-10', concept: 'Depósito 50% - Villa 1', amount: 375, paymentMethod: 'Transferencia', client: 'María García', villaId: 'villa-1', incomeType: 'Reserva (50%)' },
+  { id: 'i1b', date: '2026-03-18', concept: 'Pago restante - Villa 1', amount: 375, paymentMethod: 'Transferencia', client: 'María García', villaId: 'villa-1', incomeType: 'Pago restante' },
+  { id: 'i2', date: '2026-03-12', concept: 'Depósito 50% - Villa 2', amount: 480, paymentMethod: 'Pago Móvil', client: 'Carlos Méndez', villaId: 'villa-2', incomeType: 'Reserva (50%)' },
 ];
 
 export const sampleExpenses: Expense[] = [
-  { id: 'e1', date: '2026-03-05', category: 'Limpieza', description: 'Limpieza profunda Villa Ceiba', amount: 80, villaId: 'villa-1' },
-  { id: 'e2', date: '2026-03-08', category: 'Mantenimiento', description: 'Reparación deck Villa Piedra', amount: 200, villaId: 'villa-3' },
+  { id: 'e1', date: '2026-03-05', category: 'Limpieza', description: 'Limpieza profunda Villa 1', amount: 80, villaId: 'villa-1' },
+  { id: 'e2', date: '2026-03-08', category: 'Mantenimiento', description: 'Reparación deck Villa 2', amount: 200, villaId: 'villa-2' },
   { id: 'e3', date: '2026-03-12', category: 'Servicios', description: 'Electricidad mes de marzo', amount: 150 },
 ];
