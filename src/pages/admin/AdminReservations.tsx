@@ -859,6 +859,10 @@ const AdminReservations = () => {
                                  <button onClick={() => handleGenerateInvoice(r)} title="Generar Factura" className="bg-primary/5 text-primary p-3 rounded-xl hover:bg-primary hover:text-white transition-all">
                                     <FileText size={18} />
                                  </button>
+                                 <button onClick={() => navigate(`/contrato/${r.id}`, { state: r })} title="Ver Contrato de Alquiler" className="bg-[#163322]/10 text-[#163322] px-3.5 py-3 rounded-xl hover:bg-[#163322] hover:text-white transition-all flex items-center gap-1 text-xs font-bold">
+                                    <FileText size={18} className="text-[#c5a059]" />
+                                    <span>Contrato</span>
+                                 </button>
                                  {r.status === 'pendiente_pago' && (
                                     <button 
                                       onClick={() => handleApprove(r)} 

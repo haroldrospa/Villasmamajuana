@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
 import ReservationInvoice, { InvoiceData } from '@/components/ReservationInvoice';
-import { ArrowLeft } from 'lucide-react';
+import ReservationContract from '@/components/ReservationContract';
+import { ArrowLeft, FileText, Receipt } from 'lucide-react';
 
 const InvoicePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const invoice = location.state as InvoiceData | null;
+  const [docType, setDocType] = useState<'invoice' | 'contract'>('invoice');
 
   if (!invoice) {
     navigate('/');
@@ -15,7 +18,6 @@ const InvoicePage = () => {
   }
 
   const handleDownloadPDF = () => {
-    // Use browser print as PDF
     window.print();
   };
 
@@ -50,19 +52,55 @@ const InvoicePage = () => {
     <ClientLayout>
       <PageTransition>
         <div className="px-4 pt-6 pb-8 max-w-5xl mx-auto print:p-0 print:max-w-full">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-sm text-muted-foreground mb-4 font-display hover:text-foreground transition-colors print:hidden"
-          >
-            <ArrowLeft size={16} />
-            Volver
-          </button>
+          <div className="flex items-center justify-between gap-4 mb-4 print:hidden">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-sm text-slate-600 font-bold hover:text-slate-900 transition-colors"
+            >
+              <ArrowLeft size={16} />
+              Volver
+            </button>
 
-          <ReservationInvoice
-            invoice={invoice}
-            onDownloadPDF={handleDownloadPDF}
-            onShareWhatsApp={handleShareWhatsApp}
-          />
+            {/* DOCUMENT TYPE SWITCHER TABS */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setDocType('invoice')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-all border ${
+                  docType === 'invoice'
+                    ? 'bg-[#163322] text-white border-[#163322] shadow-md'
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <Receipt size={15} className="text-[#c5a059]" />
+                <span>Factura</span>
+              </button>
+
+              <button
+                onClick={() => setDocType('contract')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-all border ${
+                  docType === 'contract'
+                    ? 'bg-[#163322] text-white border-[#163322] shadow-md'
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <FileText size={15} className="text-[#c5a059]" />
+                <span>Contrato</span>
+              </button>
+            </div>
+          </div>
+
+          {docType === 'invoice' ? (
+            <ReservationInvoice
+              invoice={invoice}
+              onDownloadPDF={handleDownloadPDF}
+              onShareWhatsApp={handleShareWhatsApp}
+            />
+          ) : (
+            <ReservationContract
+              reservation={invoice}
+              invoiceData={invoice}
+            />
+          )}
         </div>
       </PageTransition>
     </ClientLayout>

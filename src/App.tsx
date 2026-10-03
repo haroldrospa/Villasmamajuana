@@ -22,6 +22,7 @@ import AdminSummary from "./pages/admin/AdminSummary";
 import AdminUsers from "./pages/admin/AdminUsers";
 import VillaDetailPage from "./pages/VillaDetailPage";
 import InvoicePage from "./pages/InvoicePage";
+import ContractPage from "./pages/ContractPage";
 import AdminInvoices from "./pages/admin/AdminInvoices";
 import AdminQuotations from "./pages/admin/AdminQuotations";
 import AdminAccounting from "./pages/admin/AdminAccounting";
@@ -60,6 +61,8 @@ const App = () => {
               <Route path="/confirmacion" element={<BookingConfirmationPage />} />
               <Route path="/pago" element={<PaymentPage />} />
               <Route path="/factura" element={<InvoicePage />} />
+              <Route path="/contrato" element={<ContractPage />} />
+              <Route path="/contrato/:id" element={<ContractPage />} />
               <Route path="/auth" element={<ClientAuthPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/mis-reservas" element={<MyReservationsPage />} />

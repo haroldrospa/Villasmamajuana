@@ -1,7 +1,7 @@
-﻿import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
-import { CheckCircle2, MessageCircle, Copy, Home, Calendar, Clock, DollarSign } from 'lucide-react';
+import { CheckCircle2, MessageCircle, Copy, Home, Calendar, Clock, DollarSign, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -133,11 +133,20 @@ const BookingConfirmationPage = () => {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 w-full py-4 bg-emerald-500 text-white rounded-2xl font-display font-black text-sm shadow-soft hover:bg-emerald-600 transition-all mb-4"
+            className="flex items-center justify-center gap-3 w-full py-4 bg-emerald-500 text-white rounded-2xl font-display font-black text-sm shadow-soft hover:bg-emerald-600 transition-all mb-3"
           >
             <MessageCircle size={20} />
             CONFIRMAR POR WHATSAPP
           </a>
+
+          <Link
+            to={`/contrato/${booking.id}`}
+            state={booking}
+            className="flex items-center justify-center gap-2.5 w-full py-3.5 bg-white border border-[#c5a059]/40 text-[#163322] rounded-2xl font-display font-bold text-xs shadow-sm hover:bg-neutral-50 transition-all mb-4"
+          >
+            <FileText size={18} className="text-[#c5a059]" />
+            <span>VER / DESCARGAR CONTRATO DE ALQUILER</span>
+          </Link>
 
           <Link
             to="/"
