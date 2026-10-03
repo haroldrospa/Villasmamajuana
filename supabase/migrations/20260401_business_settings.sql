@@ -15,5 +15,5 @@ CREATE TABLE IF NOT EXISTS business_settings (
 
 -- Seed with initial data if empty
 INSERT INTO business_settings (business_name, rnc, address, phone, email)
-SELECT 'Villas Mamajuana', '123-45678-9', 'Jarabacoa, La Vega, Rep. Dom.', '809-555-5555', 'info@villasmamajuana.com'
+SELECT 'Villas Mamajuana', '123-45678-9', 'Bayacanes, La Vega, Rep. Dom.', '809-555-5555', 'info@villasmamajuana.com'
 WHERE NOT EXISTS (SELECT 1 FROM business_settings);

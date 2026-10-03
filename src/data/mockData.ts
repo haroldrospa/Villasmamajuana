@@ -98,7 +98,7 @@ export const villas: Villa[] = [
     location: {
       lat: 19.0544,
       lng: -70.5261,
-      address: 'Jarabacoa, La Vega, República Dominicana',
+      address: 'Bayacanes, La Vega, República Dominicana',
       googleMapsUrl: 'https://maps.google.com/?q=19.0544,-70.5261',
     },
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
@@ -114,7 +114,7 @@ export const villas: Villa[] = [
     location: {
       lat: 19.0610,
       lng: -70.5320,
-      address: 'Jarabacoa, La Vega, República Dominicana',
+      address: 'Bayacanes, La Vega, República Dominicana',
       googleMapsUrl: 'https://maps.google.com/?q=19.0610,-70.5320',
     },
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
@@ -130,7 +130,7 @@ export const villas: Villa[] = [
     location: {
       lat: 19.0480,
       lng: -70.5190,
-      address: 'Jarabacoa, La Vega, República Dominicana',
+      address: 'Bayacanes, La Vega, República Dominicana',
       googleMapsUrl: 'https://maps.google.com/?q=19.0480,-70.5190',
     },
     amenities: ['Wi-Fi', 'Cocina completa', 'Comedor al aire libre', 'Piscina', 'Estacionamiento'],

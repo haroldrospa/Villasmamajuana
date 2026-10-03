@@ -113,7 +113,7 @@ const QuotationDocument = ({ quotation, onConvertToReservation }: QuotationDocum
   const business = {
     business_name: 'VILLAS MAMAJUANA',
     rnc: '132-95847-1',
-    address: 'Jarabacoa, La Vega, República Dominicana',
+    address: 'Bayacanes, La Vega, República Dominicana',
     phone: '809-555-5555',
     email: 'info@villasmamajuana.com',
     terms: 'Cotización válida por 7 días calendario a partir de su fecha de emisión. La reserva no quedará confirmada en el calendario hasta recibir el pago del depósito inicial del 50%.'
@@ -386,7 +386,7 @@ const QuotationDocument = ({ quotation, onConvertToReservation }: QuotationDocum
           </div>
 
           <p className="text-center text-[9px] text-slate-400 font-bold uppercase tracking-[0.25em] border-t border-slate-100 pt-3">
-            ¡GRACIAS POR CONSIDERARNOS! • UN PARAÍSO NATURAL ENTRE MONTAÑAS DE JARABACOA
+            ¡GRACIAS POR CONSIDERARNOS! • UN PARAÍSO NATURAL ENTRE MONTAÑAS DE BAYACANES, LA VEGA
           </p>
         </div>
       </div>

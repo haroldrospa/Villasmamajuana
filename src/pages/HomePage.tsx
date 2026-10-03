@@ -37,8 +37,8 @@ import { supabase } from '@/integrations/supabase/client';
 const HERO_IMAGES = [heroImg, villa1, villa2, villa3];
 
 const TOURISM_HIGHLIGHTS = [
-  { icon: Trees, label: 'NaturalezaVirgen', desc: 'Rodeado de pinos y vegetación de montaña en Jarabacoa' },
-  { icon: Waves, label: 'Piscinas & Clima', desc: 'Aguas cristalinas y clima fresco promedio de 18°C a 22°C' },
+  { icon: Trees, label: 'NaturalezaVirgen', desc: 'Rodeado de abundante vegetación y clima fresco en Bayacanes, La Vega' },
+  { icon: Waves, label: 'Piscinas & Clima', desc: 'Aguas cristalinas y clima fresco de montaña' },
   { icon: Flame, label: 'Noches de Fogata', desc: 'Espacios de chimenea y fogata al aire libre con vista a las estrellas' },
   { icon: Coffee, label: 'Confort de Lujo', desc: 'Villas privadas equipadas con cocina, terrazas y WiFi de alta velocidad' },
 ];
@@ -160,7 +160,7 @@ const HomePage = () => {
               <motion.img
                 key={currentBgImage}
                 src={currentBgImage}
-                alt="Villas Mamajuana Jarabacoa"
+                alt="Villas Mamajuana Bayacanes, La Vega"
                 initial={{ opacity: 0, scale: 1.15 }}
                 animate={{ opacity: 1, scale: 1.05 }}
                 exit={{ opacity: 0 }}
@@ -216,7 +216,7 @@ const HomePage = () => {
                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-amber-300 text-xs font-black uppercase tracking-widest shadow-xl"
               >
                 <MapPin size={14} className="text-emerald-400 animate-bounce" />
-                <span>Jarabacoa, República Dominicana</span>
+                <span>Bayacanes, La Vega, República Dominicana</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
               </motion.div>
 
@@ -250,7 +250,7 @@ const HomePage = () => {
                 </h1>
                 
                 <p className="text-sm md:text-lg text-emerald-100/90 font-medium max-w-2xl mx-auto leading-relaxed drop-shadow-sm font-body">
-                  Tu santuario privado en las montañas de Jarabacoa. Vive una experiencia inolvidable de lujo, paz y contacto puro con la naturaleza.
+                  Tu santuario privado en Bayacanes, La Vega. Vive una experiencia inolvidable de lujo, paz y contacto puro con la naturaleza.
                 </p>
               </motion.div>
 
@@ -392,7 +392,7 @@ const HomePage = () => {
           <div className="px-4 mt-12 max-w-5xl mx-auto space-y-6">
             <div className="text-center space-y-2">
               <span className="text-xs font-black text-amber-400 uppercase tracking-widest bg-amber-400/10 border border-amber-400/20 px-3.5 py-1 rounded-full inline-block">
-                Por Qué Elegir Jarabacoa
+                Por Qué Elegir Bayacanes, La Vega
               </span>
               <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight uppercase font-display">
                 Una Experiencia Turística Inolvidable
@@ -485,7 +485,7 @@ const HomePage = () => {
               <span className="font-black text-sm tracking-wider uppercase text-white">Villas Mamajuana</span>
             </div>
             <p className="text-xs text-white/50 font-body">
-              &copy; {new Date().getFullYear()} Villas Mamajuana • Jarabacoa, República Dominicana. Todos los derechos reservados.
+              &copy; {new Date().getFullYear()} Villas Mamajuana • Bayacanes, La Vega, República Dominicana. Todos los derechos reservados.
             </p>
           </footer>
 

@@ -133,7 +133,7 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
   const business = settings || {
     business_name: 'VILLAS MAMAJUANA',
     rnc: '132-95847-1',
-    address: 'Jarabacoa, La Vega, República Dominicana',
+    address: 'Bayacanes, La Vega, República Dominicana',
     phone: '809-555-5555',
     email: 'info@villasmamajuana.com',
     terms: 'Políticas de Reserva: Cancelación con 50% de retención. Devoluciones según aviso anticipado de 7 días. El saldo restante debe ser completado al hacer Check-In. 🚫 Importante: No está permitido ningún tipo de música preparada, kitipo ni equipos de alto volumen. Buscamos mantener un ambiente tranquilo y agradable para todos.',
@@ -445,7 +445,7 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
           </div>
 
           <p className="text-center text-[9px] text-slate-400 font-bold uppercase tracking-[0.25em] border-t border-slate-100 pt-3">
-            ¡GRACIAS POR SU PREFERENCIA! • UN PARAÍSO NATURAL ENTRE MONTAÑAS DE JARABACOA
+            ¡GRACIAS POR SU PREFERENCIA! • UN PARAÍSO NATURAL EN BAYACANES, LA VEGA
           </p>
         </div>
       </div>

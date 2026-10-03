@@ -117,9 +117,9 @@ CREATE TABLE IF NOT EXISTS expenses (
 -- Seed villas (from mock data)
 INSERT INTO villas (id, name, price, image, capacity, description, location, video_url, amenities)
 VALUES 
-('villa-1', 'Villa Ceiba', 250, '/assets/villa-1.jpg', 6, 'Cabaña de montaña con deck privado y vistas panorámicas.', '{"lat": 19.0544, "lng": -70.5261, "address": "Jarabacoa, La Vega, República Dominicana", "googleMapsUrl": "https://maps.google.com/?q=19.0544,-70.5261"}', 'https://www.youtube.com/embed/dQw4w9WgXcQ', ARRAY['Wi-Fi', 'Cocina', 'Deck privado', 'Vista panorámica', 'BBQ']),
-('villa-2', 'Villa Canopy', 320, '/assets/villa-2.jpg', 4, 'Casa del árbol de lujo rodeada de naturaleza.', '{"lat": 19.0610, "lng": -70.5320, "address": "Jarabacoa, La Vega, República Dominicana", "googleMapsUrl": "https://maps.google.com/?q=19.0610,-70.5320"}', 'https://www.youtube.com/embed/dQw4w9WgXcQ', ARRAY['Wi-Fi', 'Jacuzzi', 'Terraza elevada', 'Hamacas', 'Fogata']),
-('villa-3', 'Villa Piedra', 280, '/assets/villa-3.jpg', 8, 'Villa rústica con terraza privada y comedor al aire libre.', '{"lat": 19.0480, "lng": -70.5190, "address": "Jarabacoa, La Vega, República Dominicana", "googleMapsUrl": "https://maps.google.com/?q=19.0480,-70.5190"}', NULL, ARRAY['Wi-Fi', 'Cocina completa', 'Comedor al aire libre', 'Piscina', 'Estacionamiento'])
+('villa-1', 'Villa Ceiba', 250, '/assets/villa-1.jpg', 6, 'Cabaña de montaña con deck privado y vistas panorámicas.', '{"lat": 19.0544, "lng": -70.5261, "address": "Bayacanes, La Vega, República Dominicana", "googleMapsUrl": "https://maps.google.com/?q=19.0544,-70.5261"}', 'https://www.youtube.com/embed/dQw4w9WgXcQ', ARRAY['Wi-Fi', 'Cocina', 'Deck privado', 'Vista panorámica', 'BBQ']),
+('villa-2', 'Villa Canopy', 320, '/assets/villa-2.jpg', 4, 'Casa del árbol de lujo rodeada de naturaleza.', '{"lat": 19.0610, "lng": -70.5320, "address": "Bayacanes, La Vega, República Dominicana", "googleMapsUrl": "https://maps.google.com/?q=19.0610,-70.5320"}', 'https://www.youtube.com/embed/dQw4w9WgXcQ', ARRAY['Wi-Fi', 'Jacuzzi', 'Terraza elevada', 'Hamacas', 'Fogata']),
+('villa-3', 'Villa Piedra', 280, '/assets/villa-3.jpg', 8, 'Villa rústica con terraza privada y comedor al aire libre.', '{"lat": 19.0480, "lng": -70.5190, "address": "Bayacanes, La Vega, República Dominicana", "googleMapsUrl": "https://maps.google.com/?q=19.0480,-70.5190"}', NULL, ARRAY['Wi-Fi', 'Cocina completa', 'Comedor al aire libre', 'Piscina', 'Estacionamiento'])
 ON CONFLICT (id) DO NOTHING;
 
 -- Seed promotions
