@@ -41,11 +41,12 @@ const INVENTORY_ITEMS = [
 ];
 
 const STATUS_OPTIONS = [
-  '✔ Excelente',
-  '✔ Buen estado',
-  '⚠️ Con detalles',
-  '✖ Faltante',
-  '— N/A'
+  { value: '', label: '—' },
+  { value: '✔ Excelente', label: '✔ Excelente' },
+  { value: '✔ Buen estado', label: '✔ Buen estado' },
+  { value: '⚠️ Con detalles', label: '⚠️ Con detalles' },
+  { value: '✖ Dañado / Faltante', label: '✖ Dañado / Faltante' },
+  { value: '— N/A', label: '— N/A' }
 ];
 
 // Interactive Signature Canvas Component
@@ -200,7 +201,7 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
   const [inventoryStatuses, setInventoryStatuses] = useState<Record<number, { entrada: string; salida: string }>>(() => {
     const initial: Record<number, { entrada: string; salida: string }> = {};
     INVENTORY_ITEMS.forEach((_, idx) => {
-      initial[idx] = { entrada: '✔ Excelente', salida: '✔ Excelente' };
+      initial[idx] = { entrada: '', salida: '' };
     });
     return initial;
   });
@@ -473,7 +474,7 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
             </h2>
 
             {/* Quick Fill Toolbar (Hidden in print) */}
-            <div className="flex gap-2 print:hidden">
+            <div className="flex flex-wrap gap-2 print:hidden">
               <button
                 type="button"
                 onClick={() => bulkSetStatus('entrada', '✔ Excelente')}
@@ -491,6 +492,22 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
                 <CheckSquare size={12} />
                 <span>Todo Excelente Salida</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const updated: Record<number, { entrada: string; salida: string }> = {};
+                  INVENTORY_ITEMS.forEach((_, idx) => {
+                    updated[idx] = { entrada: '', salida: '' };
+                  });
+                  setInventoryStatuses(updated);
+                  toast.success('Inventario vaciado');
+                }}
+                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all border border-slate-300"
+              >
+                <RotateCcw size={12} />
+                <span>Vaciar todo</span>
+              </button>
             </div>
           </div>
 
@@ -506,7 +523,7 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
               </thead>
               <tbody>
                 {INVENTORY_ITEMS.map((item, idx) => {
-                  const status = inventoryStatuses[idx] || { entrada: '✔ Excelente', salida: '✔ Excelente' };
+                  const status = inventoryStatuses[idx] || { entrada: '', salida: '' };
                   return (
                     <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
                       <td className="p-1.5 border border-slate-300 font-medium text-slate-800">{item.area}</td>
@@ -524,11 +541,11 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
                               ? 'text-amber-700 font-black'
                               : status.entrada.includes('✖')
                               ? 'text-rose-700 font-black'
-                              : 'text-slate-500'
+                              : 'text-slate-400 font-normal'
                           }`}
                         >
                           {STATUS_OPTIONS.map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
                           ))}
                         </select>
                       </td>
@@ -545,11 +562,11 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
                               ? 'text-amber-700 font-black'
                               : status.salida.includes('✖')
                               ? 'text-rose-700 font-black'
-                              : 'text-slate-500'
+                              : 'text-slate-400 font-normal'
                           }`}
                         >
                           {STATUS_OPTIONS.map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
                           ))}
                         </select>
                       </td>
