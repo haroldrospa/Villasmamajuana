@@ -107,7 +107,7 @@ const HomePage = () => {
   return (
     <ClientLayout>
       <PageTransition>
-        <div className="min-h-screen pb-12 font-sans bg-[#0f1d0f] text-slate-100 overflow-x-hidden">
+        <div className="min-h-screen pb-12 font-sans bg-[#faf8f5] text-[#163322] overflow-x-hidden">
 
           {/* TOP AUTH & UTILITY BAR */}
           <div className="absolute top-4 right-4 z-40 flex items-center gap-2">
@@ -118,17 +118,17 @@ const HomePage = () => {
                   {isAdmin && (
                     <Link
                       to="/admin"
-                      className="flex items-center gap-1.5 bg-amber-500/90 text-slate-950 backdrop-blur-md rounded-full px-3.5 py-1.5 text-xs font-black shadow-lg hover:bg-amber-400 transition-all hover:scale-105"
+                      className="flex items-center gap-1.5 bg-[#c5a059] text-white backdrop-blur-md rounded-full px-3.5 py-1.5 text-xs font-bold shadow-md hover:bg-[#b58f48] transition-all hover:scale-105"
                     >
                       <Shield size={14} /> Admin
                     </Link>
                   )}
-                  <span className="text-xs font-semibold text-white/90 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-3.5 py-1.5 shadow-sm">
+                  <span className="text-xs font-medium text-white/90 bg-[#163322]/40 backdrop-blur-md border border-[#c5a059]/30 rounded-full px-3.5 py-1.5 shadow-sm">
                     Hola, {profile?.full_name?.split(' ')[0] || 'Usuario'}
                   </span>
                   <button
                     onClick={() => signOut()}
-                    className="bg-white/10 backdrop-blur-md border border-white/15 text-white rounded-full p-2 hover:bg-rose-500/80 transition-all hover:scale-105"
+                    className="bg-[#163322]/40 backdrop-blur-md border border-[#c5a059]/30 text-white rounded-full p-2 hover:bg-rose-500/80 transition-all hover:scale-105"
                     title="Cerrar sesión"
                   >
                     <LogOut size={15} />
@@ -138,14 +138,14 @@ const HomePage = () => {
                 <>
                   <Link
                     to="/auth"
-                    className="flex items-center gap-1.5 bg-emerald-600/90 backdrop-blur-md text-white rounded-full px-4 py-2 text-xs font-bold shadow-lg hover:bg-emerald-500 transition-all hover:scale-105 border border-emerald-400/30"
+                    className="flex items-center gap-1.5 bg-[#163322]/90 backdrop-blur-md text-white rounded-full px-4 py-2 text-xs font-medium shadow-md hover:bg-[#163322] transition-all hover:scale-105 border border-[#c5a059]/40"
                   >
                     <LogIn size={14} /> Ingresar
                   </Link>
                   <Link
                     to="/auth"
                     state={{ register: true }}
-                    className="flex items-center gap-1.5 bg-amber-500/90 backdrop-blur-md text-slate-950 rounded-full px-4 py-2 text-xs font-black shadow-lg hover:bg-amber-400 transition-all hover:scale-105"
+                    className="flex items-center gap-1.5 bg-[#c5a059] backdrop-blur-md text-white rounded-full px-4 py-2 text-xs font-bold shadow-md hover:bg-[#b58f48] transition-all hover:scale-105"
                   >
                     <UserPlus size={14} /> Registrarse
                   </Link>
@@ -154,158 +154,158 @@ const HomePage = () => {
             )}
           </div>
 
-          {/* HERO COVER SECTION WITH PARALLAX CAROUSEL & CREATIVE OVERLAYS */}
-          <div className="relative min-h-[85vh] md:min-h-[90vh] flex flex-col justify-center items-center overflow-hidden bg-slate-950">
+          {/* HERO COVER SECTION */}
+          <div className="relative min-h-[82vh] md:min-h-[88vh] flex flex-col justify-center items-center overflow-hidden bg-[#112418]">
             {/* DYNAMIC BACKGROUND IMAGE CAROUSEL WITH KEN-BURNS ANIMATION */}
             <AnimatePresence mode="wait">
               <motion.img
                 key={currentBgImage}
                 src={currentBgImage}
                 alt="Villas Mamajuana Bayacanes, La Vega"
-                initial={{ opacity: 0, scale: 1.15 }}
-                animate={{ opacity: 1, scale: 1.05 }}
+                initial={{ opacity: 0, scale: 1.12 }}
+                animate={{ opacity: 1, scale: 1.04 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.8, ease: "easeOut" }}
-                className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+                className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-45"
               />
             </AnimatePresence>
 
-            {/* ATMOSPHERIC LUXURY GRADIENT OVERLAYS */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0f1d0f] via-slate-950/60 to-slate-950/70 pointer-events-none z-10" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(15,29,15,0.7)_100%)] pointer-events-none z-10" />
+            {/* ELEGANT FOREST GRADIENT OVERLAYS */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#112418] via-[#163322]/70 to-[#0d1d13]/80 pointer-events-none z-10" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(17,36,24,0.75)_100%)] pointer-events-none z-10" />
 
             {/* FLOATING AMBIENT DECORATIVE BADGES */}
             <div className="hidden lg:block absolute top-28 left-12 z-20 pointer-events-none">
               <motion.div 
-                animate={{ y: [0, -10, 0] }}
+                animate={{ y: [0, -8, 0] }}
                 transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                className="bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-2xl p-3.5 shadow-2xl flex items-center gap-3"
+                className="bg-[#163322]/60 backdrop-blur-xl border border-[#c5a059]/30 text-white rounded-2xl p-3.5 shadow-xl flex items-center gap-3"
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300">
+                <div className="w-10 h-10 rounded-xl bg-[#c5a059]/20 border border-[#c5a059]/40 flex items-center justify-center text-[#e6ca85]">
                   <Trees size={20} />
                 </div>
                 <div>
-                  <span className="text-[10px] font-black text-amber-300 uppercase tracking-widest block">Clima de Montaña</span>
-                  <span className="text-xs font-bold text-white">18°C • Brisa Fresca 🍃</span>
+                  <span className="text-[10px] font-bold text-[#e6ca85] uppercase tracking-widest block">Clima de Montaña</span>
+                  <span className="text-xs font-light text-white/90">18°C • Brisa Fresca 🍃</span>
                 </div>
               </motion.div>
             </div>
 
             <div className="hidden lg:block absolute bottom-32 right-12 z-20 pointer-events-none">
               <motion.div 
-                animate={{ y: [0, 10, 0] }}
+                animate={{ y: [0, 8, 0] }}
                 transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
-                className="bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-2xl p-3.5 shadow-2xl flex items-center gap-3"
+                className="bg-[#163322]/60 backdrop-blur-xl border border-[#c5a059]/30 text-white rounded-2xl p-3.5 shadow-xl flex items-center gap-3"
               >
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300">
-                  <Star size={20} className="fill-amber-300" />
+                <div className="w-10 h-10 rounded-xl bg-[#c5a059]/20 border border-[#c5a059]/40 flex items-center justify-center text-[#e6ca85]">
+                  <Star size={20} className="fill-[#e6ca85]" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-black text-amber-300 uppercase tracking-widest block">Exclusividad</span>
-                  <span className="text-xs font-bold text-white">4.9 ★★★★★ (Huéspedes)</span>
+                  <span className="text-[10px] font-bold text-[#e6ca85] uppercase tracking-widest block">Exclusividad</span>
+                  <span className="text-xs font-light text-white/90">4.9 ★★★★★ (Huéspedes)</span>
                 </div>
               </motion.div>
             </div>
 
             {/* CENTRAL HERO CONTENT */}
-            <div className="relative z-20 text-center px-4 max-w-4xl mx-auto pt-16 pb-12 space-y-6 flex flex-col items-center">
+            <div className="relative z-20 text-center px-4 max-w-3xl mx-auto pt-14 pb-16 space-y-6 flex flex-col items-center">
               {/* LOCATION BADGE */}
               <motion.div
-                initial={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, y: -15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-amber-300 text-xs font-black uppercase tracking-widest shadow-xl"
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#163322]/70 backdrop-blur-md border border-[#c5a059]/40 text-[#f4e8c1] text-xs font-medium uppercase tracking-[0.2em] shadow-lg"
               >
-                <MapPin size={14} className="text-emerald-400 animate-bounce" />
+                <MapPin size={14} className="text-[#c5a059] animate-bounce" />
                 <span>Bayacanes, La Vega, República Dominicana</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#c5a059] animate-pulse"></span>
               </motion.div>
 
-              {/* LOGO WITH GLOW EFFECT */}
+              {/* LOGO WITH DELICATE GLOW EFFECT */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
+                initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl -z-10 animate-pulse"></div>
+                <div className="absolute inset-0 bg-[#c5a059]/20 rounded-full blur-2xl -z-10 animate-pulse"></div>
                 <img 
                   src={logo} 
                   alt="Villas Mamajuana" 
-                  className="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.5)]" 
+                  className="w-24 h-24 md:w-28 md:h-28 object-contain drop-shadow-md p-1 bg-white/90 rounded-2xl border border-[#c5a059]/40" 
                 />
               </motion.div>
 
               {/* MAIN TYPOGRAPHY HEADLINE */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className="space-y-3"
               >
-                <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight uppercase font-display">
+                <h1 className="text-3xl sm:text-5xl md:text-6xl font-light text-white tracking-tight leading-tight font-display">
                   Bienvenido a <br />
-                  <span className="bg-gradient-to-r from-emerald-300 via-amber-200 to-emerald-400 bg-clip-text text-transparent drop-shadow-lg italic font-serif">
+                  <span className="font-serif italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-[#f4e8c1] via-[#c5a059] to-[#f4e8c1] drop-shadow-sm">
                     Villas Mamajuana
                   </span>
                 </h1>
                 
-                <p className="text-sm md:text-lg text-emerald-100/90 font-medium max-w-2xl mx-auto leading-relaxed drop-shadow-sm font-body">
-                  Tu santuario privado en Bayacanes, La Vega. Vive una experiencia inolvidable de lujo, paz y contacto puro con la naturaleza.
+                <p className="text-sm md:text-base text-[#f4f1ea]/90 font-light max-w-xl mx-auto leading-relaxed font-body">
+                  Tu santuario privado en Bayacanes, La Vega. Vive una experiencia inolvidable de tranquilidad, confort y contacto directo con la naturaleza.
                 </p>
               </motion.div>
 
               {/* TOURISM QUICK FEATURE TAGS */}
               <motion.div 
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="flex flex-wrap justify-center gap-2 pt-2"
+                className="flex flex-wrap justify-center gap-2 pt-1"
               >
-                <span className="px-3.5 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                <span className="px-3.5 py-1.5 rounded-full bg-[#163322]/60 backdrop-blur-md border border-[#c5a059]/30 text-[#f4e8c1] text-xs font-light tracking-wide flex items-center gap-1.5 shadow-sm">
                   🏊‍♂️ Piscina Privada
                 </span>
-                <span className="px-3.5 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                <span className="px-3.5 py-1.5 rounded-full bg-[#163322]/60 backdrop-blur-md border border-[#c5a059]/30 text-[#f4e8c1] text-xs font-light tracking-wide flex items-center gap-1.5 shadow-sm">
                   🏔️ Vistas Panorámicas
                 </span>
-                <span className="px-3.5 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm">
-                  🔥 Area BBQ & Chimenea
+                <span className="px-3.5 py-1.5 rounded-full bg-[#163322]/60 backdrop-blur-md border border-[#c5a059]/30 text-[#f4e8c1] text-xs font-light tracking-wide flex items-center gap-1.5 shadow-sm">
+                  🔥 Área BBQ & Fogata
                 </span>
-                <span className="px-3.5 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                <span className="px-3.5 py-1.5 rounded-full bg-[#163322]/60 backdrop-blur-md border border-[#c5a059]/30 text-[#f4e8c1] text-xs font-light tracking-wide flex items-center gap-1.5 shadow-sm">
                   📶 WiFi & Confort 5★
                 </span>
               </motion.div>
             </div>
           </div>
 
-          {/* INTERACTIVE FLOATING QUICK SEARCH WIDGET (BUSCADOR INTERACTIVO EN PORTADA) */}
-          <div className="px-4 -mt-16 md:-mt-20 relative z-30 max-w-5xl mx-auto">
+          {/* INTERACTIVE FLOATING QUICK SEARCH WIDGET */}
+          <div className="px-4 -mt-14 md:-mt-16 relative z-30 max-w-4xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.6)] text-white space-y-4"
+              className="bg-white/95 backdrop-blur-xl border border-[#c5a059]/30 rounded-3xl p-5 md:p-6 shadow-xl text-[#163322] space-y-4"
             >
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2 text-emerald-400 font-black text-xs uppercase tracking-widest">
-                  <Compass size={18} className="animate-spin-slow" />
+              <div className="flex items-center justify-between border-b border-[#c5a059]/20 pb-3">
+                <div className="flex items-center gap-2 text-[#163322] font-semibold text-xs uppercase tracking-widest font-display">
+                  <Compass size={18} className="text-[#c5a059]" />
                   <span>Encuentra tu Estancia Perfecta</span>
                 </div>
-                <span className="text-[11px] font-bold text-amber-300 bg-amber-500/10 border border-amber-400/20 px-3 py-1 rounded-full">
-                  ⚡ Reserva Directa sin Comisiones
+                <span className="text-[11px] font-medium text-[#163322] bg-[#c5a059]/15 border border-[#c5a059]/30 px-3 py-1 rounded-full">
+                  Reserva Directa sin Comisiones
                 </span>
               </div>
 
               <form onSubmit={handleSearchDisponibilidad} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {/* SELECT VILLA */}
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                    <Building2 size={12} className="text-emerald-400" /> Villa Preferida
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-[#163322]/70 flex items-center gap-1">
+                    <Building2 size={12} className="text-[#c5a059]" /> Villa Preferida
                   </label>
                   <select
                     value={selectedVilla}
                     onChange={(e) => setSelectedVilla(e.target.value)}
-                    className="w-full bg-slate-800/90 border border-white/15 rounded-xl px-3.5 py-3 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="w-full bg-[#faf8f5] border border-[#c5a059]/30 rounded-xl px-3.5 py-2.5 text-xs font-medium text-[#163322] focus:outline-none focus:ring-2 focus:ring-[#c5a059]"
                   >
                     <option value="todas">Todas las Villas</option>
                     {(dbVillas && dbVillas.length > 0 ? dbVillas : [
@@ -319,27 +319,27 @@ const HomePage = () => {
 
                 {/* CHECK-IN */}
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                    <CalendarIcon size={12} className="text-emerald-400" /> Fecha Check-In
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-[#163322]/70 flex items-center gap-1">
+                    <CalendarIcon size={12} className="text-[#c5a059]" /> Fecha Check-In
                   </label>
                   <input
                     type="date"
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
-                    className="w-full bg-slate-800/90 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="w-full bg-[#faf8f5] border border-[#c5a059]/30 rounded-xl px-3.5 py-2 text-xs font-medium text-[#163322] focus:outline-none focus:ring-2 focus:ring-[#c5a059]"
                   />
                 </div>
 
                 {/* CHECK-OUT */}
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                    <CalendarIcon size={12} className="text-emerald-400" /> Fecha Check-Out
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-[#163322]/70 flex items-center gap-1">
+                    <CalendarIcon size={12} className="text-[#c5a059]" /> Fecha Check-Out
                   </label>
                   <input
                     type="date"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
-                    className="w-full bg-slate-800/90 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="w-full bg-[#faf8f5] border border-[#c5a059]/30 rounded-xl px-3.5 py-2 text-xs font-medium text-[#163322] focus:outline-none focus:ring-2 focus:ring-[#c5a059]"
                   />
                 </div>
 
@@ -347,9 +347,9 @@ const HomePage = () => {
                 <div className="flex items-end">
                   <button
                     type="submit"
-                    className="w-full h-[42px] bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95"
+                    className="w-full h-[38px] bg-[#163322] hover:bg-[#254d35] text-white rounded-xl font-medium text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 border border-[#c5a059]/40"
                   >
-                    <Search size={16} />
+                    <Search size={15} className="text-[#c5a059]" />
                     <span>Buscar Disponibilidad</span>
                   </button>
                 </div>
@@ -357,49 +357,48 @@ const HomePage = () => {
             </motion.div>
           </div>
 
-          {/* MAIN INTERACTIVE CALL-TO-ACTION BUTTONS */}
+          {/* MAIN ACTION BUTTONS */}
           <div className="px-4 mt-8 relative z-20 max-w-xl mx-auto flex flex-col sm:flex-row gap-3.5">
             <Link 
               to="/reservar" 
-              className="flex-1 relative group overflow-hidden bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-slate-950 rounded-2xl py-4 px-6 font-black text-sm text-center shadow-[0_10px_30px_rgba(245,158,11,0.3)] transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+              className="flex-1 relative group overflow-hidden bg-[#c5a059] hover:bg-[#b58f48] text-white rounded-2xl py-3.5 px-6 font-semibold text-xs tracking-wider uppercase text-center shadow-md transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
             >
-              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-              <Sparkles size={18} className="text-slate-900 animate-pulse" />
+              <Sparkles size={16} className="text-amber-100" />
               <span>RESERVAR AHORA</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
             </Link>
 
             <Link 
               to="/villas" 
-              className="flex-1 bg-white/10 hover:bg-white/15 border border-white/20 text-white rounded-2xl py-4 px-6 font-bold text-sm text-center backdrop-blur-md transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 shadow-lg"
+              className="flex-1 bg-white hover:bg-[#faf8f5] border border-[#c5a059]/40 text-[#163322] rounded-2xl py-3.5 px-6 font-semibold text-xs tracking-wider uppercase text-center transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 shadow-sm"
             >
-              <Building2 size={18} className="text-emerald-400" />
+              <Building2 size={16} className="text-[#c5a059]" />
               <span>Explorar Villas</span>
             </Link>
 
             <Link 
               to="/disponibilidad" 
-              className="sm:w-auto bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 rounded-2xl py-4 px-5 font-bold text-sm text-center transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+              className="sm:w-auto bg-white hover:bg-[#faf8f5] border border-[#c5a059]/40 text-[#163322] rounded-2xl py-3.5 px-4 font-semibold text-xs text-center transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 shadow-sm"
               title="Ver Calendario"
             >
-              <CalendarIcon size={18} className="text-amber-400" />
+              <CalendarIcon size={16} className="text-[#c5a059]" />
               <span className="sm:hidden">Calendario</span>
             </Link>
           </div>
 
           {/* PROMOTIONS CAROUSEL / BANNER */}
-          <div className="max-w-5xl mx-auto px-4 mt-10">
+          <div className="max-w-4xl mx-auto px-4 mt-10">
             <PromotionsBanner />
           </div>
 
           {/* TURISTICO / MOUNTAIN HIGHLIGHT CARDS GRID */}
-          <div className="px-4 mt-12 max-w-5xl mx-auto space-y-6">
+          <div className="px-4 mt-14 max-w-4xl mx-auto space-y-6">
             <div className="text-center space-y-2">
-              <span className="text-xs font-black text-amber-400 uppercase tracking-widest bg-amber-400/10 border border-amber-400/20 px-3.5 py-1 rounded-full inline-block">
+              <span className="text-[11px] font-semibold text-[#b58f48] uppercase tracking-[0.25em] bg-[#c5a059]/10 border border-[#c5a059]/30 px-3.5 py-1 rounded-full inline-block">
                 Por Qué Elegir Bayacanes, La Vega
               </span>
-              <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight uppercase font-display">
-                Una Experiencia Turística Inolvidable
+              <h2 className="text-2xl md:text-3xl font-light text-[#163322] tracking-tight uppercase font-display">
+                Una Experiencia Única y Delicada
               </h2>
             </div>
 
@@ -409,25 +408,25 @@ const HomePage = () => {
                 return (
                   <motion.div
                     key={item.label}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: idx * 0.1 }}
-                    className="group bg-slate-900/80 border border-white/10 hover:border-emerald-500/50 rounded-2xl p-5 shadow-xl transition-all hover:-translate-y-1 hover:bg-slate-800/90 flex flex-col justify-between"
+                    className="group bg-white border border-[#c5a059]/20 hover:border-[#c5a059] rounded-2xl p-5 shadow-soft transition-all hover:-translate-y-1 flex flex-col justify-between"
                   >
                     <div className="space-y-3">
-                      <div className="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
-                        <IconComponent size={24} />
+                      <div className="w-11 h-11 rounded-xl bg-[#163322]/10 border border-[#c5a059]/30 flex items-center justify-center text-[#163322] group-hover:scale-105 transition-transform">
+                        <IconComponent size={22} className="text-[#163322]" />
                       </div>
-                      <h3 className="font-black text-slate-100 text-sm tracking-wide">
+                      <h3 className="font-semibold text-[#163322] text-sm tracking-wide font-display">
                         {item.label}
                       </h3>
-                      <p className="text-xs text-slate-400 font-medium leading-relaxed">
+                      <p className="text-xs text-[#163322]/70 font-light leading-relaxed">
                         {item.desc}
                       </p>
                     </div>
-                    <div className="pt-4 border-t border-white/5 mt-4 flex items-center justify-between text-[11px] font-bold text-emerald-400 group-hover:text-emerald-300">
-                      <span>Saber más</span>
+                    <div className="pt-3 border-t border-[#c5a059]/15 mt-4 flex items-center justify-between text-[11px] font-medium text-[#c5a059]">
+                      <span>Descubrir</span>
                       <ChevronDown size={14} className="-rotate-90 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </motion.div>
@@ -437,18 +436,18 @@ const HomePage = () => {
           </div>
 
           {/* VILLA PREVIEW TEASER GRID */}
-          <div className="px-4 mt-16 max-w-5xl mx-auto space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-white/10 pb-4">
+          <div className="px-4 mt-16 max-w-4xl mx-auto space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 border-b border-[#c5a059]/20 pb-4">
               <div>
-                <span className="text-xs font-black text-emerald-400 uppercase tracking-widest">Nuestras Instalaciones</span>
-                <h2 className="text-2xl font-black text-white uppercase font-display">Villas Exclusivas en Alquiler</h2>
+                <span className="text-[11px] font-semibold text-[#b58f48] uppercase tracking-[0.2em]">Nuestras Instalaciones</span>
+                <h2 className="text-2xl font-light text-[#163322] uppercase font-display">Villas Exclusivas en Alquiler</h2>
               </div>
-              <Link to="/villas" className="text-xs font-bold text-amber-300 hover:text-amber-200 flex items-center gap-1 transition-colors">
+              <Link to="/villas" className="text-xs font-semibold text-[#c5a059] hover:text-[#b58f48] flex items-center gap-1 transition-colors">
                 Ver todas las villas <ArrowRight size={14} />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
               {(dbVillas && dbVillas.length > 0 ? dbVillas : [
                 {
                   id: 'villa-1',
@@ -473,25 +472,25 @@ const HomePage = () => {
                 const displayCapacity = `Hasta ${v.capacity} Personas`;
 
                 return (
-                  <div key={v.id || i} className="bg-slate-900 rounded-2xl overflow-hidden border border-white/10 shadow-xl group hover:border-amber-400/50 transition-all">
+                  <div key={v.id || i} className="bg-white rounded-2xl overflow-hidden border border-[#c5a059]/30 shadow-soft group hover:border-[#c5a059] transition-all">
                     <div className="relative h-56 overflow-hidden">
                       <img 
                         src={displayImg} 
                         alt={displayTitle} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                       />
-                      <div className="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-amber-300 border border-amber-400/30">
+                      <div className="absolute top-3 right-3 bg-[#163322]/90 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-semibold text-[#f4e8c1] border border-[#c5a059]/40 shadow-sm">
                         {displayPrice}
                       </div>
                     </div>
-                    <div className="p-5 space-y-3">
-                      <h3 className="font-bold text-lg text-white">{displayTitle}</h3>
-                      <p className="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
-                        <CheckCircle2 size={14} className="text-emerald-400" /> {displayCapacity}
+                    <div className="p-5 space-y-3 bg-white">
+                      <h3 className="font-semibold text-lg text-[#163322] font-display">{displayTitle}</h3>
+                      <p className="text-xs text-[#163322]/70 flex items-center gap-1.5 font-light">
+                        <CheckCircle2 size={14} className="text-[#c5a059]" /> {displayCapacity}
                       </p>
                       <Link
                         to="/villas"
-                        className="block w-full text-center py-3 bg-white/10 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-md"
+                        className="block w-full text-center py-2.5 bg-[#163322] hover:bg-[#254d35] text-white rounded-xl text-xs font-semibold tracking-wider uppercase transition-all shadow-sm"
                       >
                         Ver Detalles & Reservar
                       </Link>
@@ -503,12 +502,12 @@ const HomePage = () => {
           </div>
 
           {/* FOOTER */}
-          <footer className="w-full text-center py-8 mt-16 border-t border-white/10 space-y-2">
+          <footer className="w-full text-center py-8 mt-16 border-t border-[#c5a059]/20 space-y-2 bg-[#112418]">
             <div className="flex items-center justify-center gap-3">
-              <img src={logo} alt="Logo" className="w-8 h-8 object-contain" />
-              <span className="font-black text-sm tracking-wider uppercase text-white">Villas Mamajuana</span>
+              <img src={logo} alt="Logo" className="w-8 h-8 object-contain p-0.5 bg-white rounded-lg" />
+              <span className="font-light text-sm tracking-[0.2em] uppercase text-[#f4e8c1] font-display">Villas Mamajuana</span>
             </div>
-            <p className="text-xs text-white/50 font-body">
+            <p className="text-xs text-[#f4e8c1]/60 font-light font-body">
               &copy; {new Date().getFullYear()} Villas Mamajuana • Bayacanes, La Vega, República Dominicana. Todos los derechos reservados.
             </p>
           </footer>
