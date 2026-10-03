@@ -68,15 +68,34 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
       const canvas = await html2canvas(invoiceRef.current, {
         scale: 2,
         useCORS: true,
+        allowTaint: true,
         logging: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        onclone: (clonedDoc) => {
+          const watermark = clonedDoc.querySelector('[data-watermark="true"]');
+          if (watermark) {
+            (watermark as HTMLElement).style.display = 'none';
+          }
+          const logos = clonedDoc.querySelectorAll('img');
+          logos.forEach((img) => {
+            if (img.alt?.includes('Logo') || img.className?.includes('w-16')) {
+              img.style.width = '64px';
+              img.style.height = '64px';
+              img.style.maxWidth = '64px';
+              img.style.maxHeight = '64px';
+              img.style.objectFit = 'contain';
+            }
+          });
+        }
       });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgProps = pdf.getImageProperties(imgData);
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      const calculatedHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      const renderHeight = Math.min(calculatedHeight, pdfHeight);
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, renderHeight);
       const shortId = invoice.reservationId.substring(0, 8).toUpperCase();
       const fileName = `Factura-Corporativa-${shortId}-${invoice.clientName.replace(/\s+/g, '_')}.pdf`;
       return { blob: pdf.output('blob'), fileName };
@@ -160,11 +179,14 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
         className="relative bg-white text-slate-800 shadow-2xl border border-slate-200 min-h-[1050px] p-8 md:p-14 flex flex-col justify-between print:shadow-none print:border-none print:m-0 print:p-8 overflow-hidden"
       >
         {/* WATERMARK BACKGROUND LOGO */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+        <div data-watermark="true" className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
           <img 
             src={logo} 
             alt="Watermark Logo" 
-            className="w-[480px] h-[480px] object-contain opacity-[0.05] grayscale filter blur-[0.5px] select-none" 
+            width={380}
+            height={380}
+            style={{ width: '380px', height: '380px', maxWidth: '380px', maxHeight: '380px', opacity: 0.04, objectFit: 'contain' }}
+            className="w-[380px] h-[380px] object-contain opacity-5 grayscale select-none" 
           />
         </div>
 
@@ -186,7 +208,10 @@ const ReservationInvoice = ({ invoice, onDownloadPDF, onShareWhatsApp }: {
                 <img 
                   src={logo} 
                   alt="Villas Mamajuana Logo" 
-                  className="w-16 h-16 object-contain drop-shadow-sm" 
+                  width={64}
+                  height={64}
+                  style={{ width: '64px', height: '64px', maxWidth: '64px', maxHeight: '64px', objectFit: 'contain' }}
+                  className="w-16 h-16 object-contain drop-shadow-sm shrink-0" 
                 />
                 <div>
                   <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase">
