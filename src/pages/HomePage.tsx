@@ -271,17 +271,17 @@ const HomePage = () => {
               transition={{ duration: 0.8, delay: 0.5 }}
               className="bg-white border border-[#c5a059]/30 rounded-2xl p-5 md:p-6 shadow-xl text-[#163322]"
             >
-              <form onSubmit={handleSearchDisponibilidad} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+              <form onSubmit={handleSearchDisponibilidad} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
                 
                 {/* SELECT VILLA */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
                   <label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#163322]/70 flex items-center gap-1.5">
                     <Building2 size={13} className="text-[#c5a059]" /> Villa
                   </label>
                   <select
                     value={selectedVilla}
                     onChange={(e) => setSelectedVilla(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#c5a059]/20 rounded-xl px-3.5 py-3 text-xs font-medium text-[#163322] focus:outline-none focus:border-[#c5a059]"
+                    className="w-full h-[46px] bg-[#faf8f5] border border-[#c5a059]/20 rounded-xl px-3.5 text-xs font-medium text-[#163322] focus:outline-none focus:border-[#c5a059]"
                   >
                     <option value="todas">Todas las Villas</option>
                     {(dbVillas && dbVillas.length > 0 ? dbVillas : [
@@ -294,7 +294,7 @@ const HomePage = () => {
                 </div>
 
                 {/* CHECK-IN */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 sm:col-span-1 lg:col-span-2">
                   <label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#163322]/70 flex items-center gap-1.5">
                     <CalendarIcon size={13} className="text-[#c5a059]" /> Check-In
                   </label>
@@ -302,12 +302,12 @@ const HomePage = () => {
                     type="date"
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#c5a059]/20 rounded-xl px-3.5 py-2.5 text-xs font-medium text-[#163322] focus:outline-none focus:border-[#c5a059]"
+                    className="w-full h-[46px] bg-[#faf8f5] border border-[#c5a059]/20 rounded-xl px-3 text-xs font-medium text-[#163322] focus:outline-none focus:border-[#c5a059]"
                   />
                 </div>
 
                 {/* CHECK-OUT */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 sm:col-span-1 lg:col-span-2">
                   <label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#163322]/70 flex items-center gap-1.5">
                     <CalendarIcon size={13} className="text-[#c5a059]" /> Check-Out
                   </label>
@@ -315,28 +315,28 @@ const HomePage = () => {
                     type="date"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#c5a059]/20 rounded-xl px-3.5 py-2.5 text-xs font-medium text-[#163322] focus:outline-none focus:border-[#c5a059]"
+                    className="w-full h-[46px] bg-[#faf8f5] border border-[#c5a059]/20 rounded-xl px-3 text-xs font-medium text-[#163322] focus:outline-none focus:border-[#c5a059]"
                   />
                 </div>
 
                 {/* SEARCH BUTTON */}
-                <div>
+                <div className="sm:col-span-2 lg:col-span-5">
                   <button
                     type="submit"
-                    className={`w-full h-[42px] px-3.5 rounded-xl font-semibold text-[11px] xl:text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2 transition-all ${
+                    className={`w-full h-[46px] px-4 rounded-xl font-bold text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2.5 transition-all overflow-hidden ${
                       checkIn && !availability.isAvailable
                         ? 'bg-rose-700 hover:bg-rose-800 text-white'
-                        : 'bg-[#163322] hover:bg-[#234b33] text-white hover:scale-[1.01] active:scale-95'
+                        : 'bg-[#163322] hover:bg-[#234b33] text-white hover:shadow-lg hover:scale-[1.01] active:scale-95'
                     }`}
                   >
                     {checkIn && !availability.isAvailable ? (
                       <>
-                        <CalendarX size={15} className="text-rose-200 shrink-0" />
+                        <CalendarX size={16} className="text-rose-200 shrink-0" />
                         <span className="whitespace-nowrap">Sin Disponibilidad</span>
                       </>
                     ) : (
                       <>
-                        <Search size={15} className="text-[#c5a059] shrink-0" />
+                        <Search size={16} className="text-[#c5a059] shrink-0" />
                         <span className="whitespace-nowrap">Consultar Disponibilidad</span>
                       </>
                     )}
