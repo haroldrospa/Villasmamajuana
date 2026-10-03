@@ -4,15 +4,17 @@ import PageTransition from '@/components/PageTransition';
 import ClientLayout from '@/components/ClientLayout';
 import { useVilla } from '@/hooks/useVillas';
 import { usePromotions } from '@/hooks/usePromotions';
-import { MapPin, Users, Play, ExternalLink, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MapPin, Users, Play, ExternalLink, Tag, ChevronLeft, ChevronRight, Image as ImageIcon, Maximize2, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import DriveImage from '@/components/DriveImage';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const VillaDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { data: villa, isLoading: isLoadingVilla } = useVilla(id || '');
   const { data: promotions, isLoading: isLoadingPromos } = usePromotions();
   const [currentImage, setCurrentImage] = useState(0);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const isLoading = isLoadingVilla || isLoadingPromos;
@@ -215,6 +217,51 @@ const VillaDetailPage = () => {
               ))}
             </div>
 
+            {/* DEDICATED PHOTO GALLERY SECTION */}
+            {(() => {
+              const allPhotos = [villa.image, ...(villa.gallery || [])].filter(Boolean);
+              if (allPhotos.length === 0) return null;
+              return (
+                <div className="mt-8 border-t border-border/60 pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="font-display font-extrabold text-base sm:text-lg text-foreground uppercase tracking-tight flex items-center gap-2">
+                        <ImageIcon className="text-primary" size={18} />
+                        Galería de Fotos
+                      </h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Explora las fotos y áreas de {villa.name}
+                      </p>
+                    </div>
+                    <span className="text-[11px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                      {allPhotos.length} Fotos
+                    </span>
+                  </div>
+
+                  {/* Photo Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {allPhotos.map((imgUrl, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => setLightboxIndex(index)}
+                        className="group relative aspect-square rounded-2xl overflow-hidden border border-border bg-muted shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.02] focus:outline-none"
+                      >
+                        <DriveImage
+                          src={imgUrl}
+                          alt={`${villa.name} foto ${index + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                          <Maximize2 className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-md" size={22} />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Video */}
             {villa.videoUrl && (
               <div className="mt-6">
@@ -268,6 +315,77 @@ const VillaDetailPage = () => {
               Reservar {villa.name}
             </Link>
           </div>
+
+          {/* LIGHTBOX MODAL FOR FULLSCREEN PHOTO VIEWING */}
+          <AnimatePresence>
+            {lightboxIndex !== null && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-between p-4 sm:p-6"
+              >
+                {/* Top Bar */}
+                <div className="w-full flex items-center justify-between text-white z-10 max-w-5xl mx-auto">
+                  <span className="text-xs font-display font-semibold uppercase tracking-widest text-white/80">
+                    Foto {lightboxIndex + 1} de {[villa.image, ...(villa.gallery || [])].filter(Boolean).length} — {villa.name}
+                  </span>
+                  <button
+                    onClick={() => setLightboxIndex(null)}
+                    className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/10"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Main Image Container */}
+                <div className="relative w-full max-w-5xl flex-1 flex items-center justify-center my-4 overflow-hidden">
+                  <DriveImage
+                    src={[villa.image, ...(villa.gallery || [])].filter(Boolean)[lightboxIndex]}
+                    alt={`Galería ${lightboxIndex + 1}`}
+                    className="max-h-[75vh] max-w-full object-contain rounded-2xl shadow-2xl"
+                  />
+
+                  {/* Previous Arrow */}
+                  {[villa.image, ...(villa.gallery || [])].filter(Boolean).length > 1 && (
+                    <button
+                      onClick={() => setLightboxIndex((prev) => (prev! === 0 ? [villa.image, ...(villa.gallery || [])].filter(Boolean).length - 1 : prev! - 1))}
+                      className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white border border-white/20 transition-all backdrop-blur-md"
+                    >
+                      <ChevronLeft size={24} />
+                    </button>
+                  )}
+
+                  {/* Next Arrow */}
+                  {[villa.image, ...(villa.gallery || [])].filter(Boolean).length > 1 && (
+                    <button
+                      onClick={() => setLightboxIndex((prev) => (prev! === [villa.image, ...(villa.gallery || [])].filter(Boolean).length - 1 ? 0 : prev! + 1))}
+                      className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white border border-white/20 transition-all backdrop-blur-md"
+                    >
+                      <ChevronRight size={24} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Bottom Thumbnail Carousel */}
+                {[villa.image, ...(villa.gallery || [])].filter(Boolean).length > 1 && (
+                  <div className="flex gap-2.5 overflow-x-auto py-2 max-w-2xl w-full justify-center scrollbar-none">
+                    {[villa.image, ...(villa.gallery || [])].filter(Boolean).map((img, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setLightboxIndex(i)}
+                        className={`w-14 h-14 rounded-xl overflow-hidden shrink-0 border-2 transition-all ${
+                          i === lightboxIndex ? 'border-[#c5a059] scale-105 opacity-100 shadow-lg' : 'border-transparent opacity-50 hover:opacity-80'
+                        }`}
+                      >
+                        <DriveImage src={img} alt={`thumb ${i}`} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </PageTransition>
     </ClientLayout>
