@@ -186,6 +186,9 @@ const AdminReservations = () => {
       let finalTotal = subtotal;
       let discountLabel = "";
 
+      const days = form.checkOut ? Math.max(1, differenceInDays(parseISO(form.checkOut), parseISO(form.checkIn))) : 0;
+      const is3DaysOrMore = form.stayType === '24h' && days >= 3;
+
       if (form.discountType === 'percent' && form.discountValue) {
         const disc = subtotal * (Number(form.discountValue) / 100);
         finalTotal -= disc;
@@ -193,6 +196,10 @@ const AdminReservations = () => {
       } else if (form.discountType === 'amount' && form.discountValue) {
         finalTotal -= Number(form.discountValue);
         discountLabel = ` - RD$${Number(form.discountValue).toLocaleString()} (fijo)`;
+      } else if (is3DaysOrMore) {
+        const disc = subtotal * 0.05;
+        finalTotal -= disc;
+        discountLabel = ` - 5% Descuento Automático 3+ Días (RD$${disc.toLocaleString()})`;
       }
 
       setForm(prev => ({ ...prev, totalAmount: Math.max(0, finalTotal).toString() }));

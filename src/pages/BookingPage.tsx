@@ -80,6 +80,11 @@ const BookingPage = () => {
        subtotal = nights * selectedVilla.price;
     }
 
+    // Automatic 5% Long Stay Discount for stays of 3 days or more (nights >= 3)
+    const isLongStay = form.stayType === '24h' && nights >= 3;
+    const longStayDiscount = isLongStay ? Math.round(subtotal * 0.05) : 0;
+    const subtotalAfterLongStay = subtotal - longStayDiscount;
+
     // Check active promotions
     const today = new Date().toISOString().split('T')[0];
     const villaPromos = (promotions || []).filter(
@@ -96,18 +101,29 @@ const BookingPage = () => {
       ? villaPromos.reduce((best, p) => p.discount_percent > best.discount_percent ? p : best)
       : null;
 
-    const promoDiscount = bestPromo ? Math.round(subtotal * bestPromo.discount_percent / 100) : 0;
-    const afterPromo = subtotal - promoDiscount;
+    const promoDiscount = bestPromo ? Math.round(subtotalAfterLongStay * bestPromo.discount_percent / 100) : 0;
+    const afterPromo = subtotalAfterLongStay - promoDiscount;
 
     // Apply coupon on top
     const couponDiscount = appliedCoupon ? Math.round(afterPromo * appliedCoupon.discountPercent / 100) : 0;
     const total = afterPromo - couponDiscount;
 
+    // Combine promo names for database & display
+    let combinedPromoName = bestPromo?.title || null;
+    if (isLongStay) {
+      combinedPromoName = bestPromo 
+        ? `${bestPromo.title} + Descuento 5% Estancia (3+ días)` 
+        : 'Descuento 5% Estancia Prolongada (3+ días)';
+    }
+
     return {
       nights,
       subtotal,
-      promoName: bestPromo?.title || null,
-      promoDiscount,
+      isLongStay,
+      longStayDiscount,
+      bestPromoTitle: bestPromo?.title || null,
+      promoName: combinedPromoName,
+      promoDiscount: promoDiscount + longStayDiscount,
       couponDiscount,
       total,
       deposit: Math.round(total * 0.5),
@@ -341,8 +357,22 @@ const BookingPage = () => {
 
             {/* Pricing breakdown */}
             {pricing && (
-              <div className="bg-card border border-border rounded-lg p-4 mt-2 gold-line shadow-sm">
-                <h3 className="font-display font-bold text-sm text-foreground mb-3">Resumen de {form.stayType === '10h' ? 'Pasa Día' : 'Estadía'}</h3>
+              <div className="bg-card border border-border rounded-lg p-4 mt-2 gold-line shadow-sm space-y-3">
+                <h3 className="font-display font-bold text-sm text-foreground">Resumen de {form.stayType === '10h' ? 'Pasa Día' : 'Estadía'}</h3>
+                
+                {/* Long stay automatic discount banner badge */}
+                {pricing.isLongStay && (
+                  <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 flex items-start gap-2.5 text-emerald-400 text-xs font-bold animate-in fade-in">
+                    <span className="text-base">🎉</span>
+                    <div>
+                      <p className="font-black text-emerald-400">¡Descuento Automático del 5% Aplicado!</p>
+                      <p className="text-[11px] text-muted-foreground font-medium">
+                        Por reservar 3 o más días ({pricing.nights} noches).
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-col gap-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
@@ -351,19 +381,29 @@ const BookingPage = () => {
                     <span className="font-display font-bold text-foreground">RD${pricing.subtotal.toLocaleString()}</span>
                   </div>
 
-                  {pricing.promoDiscount > 0 && (
-                    <div className="flex justify-between text-accent-foreground">
-                      <span className="text-xs flex items-center gap-1">
-                        <Tag size={12} className="text-accent" />
-                        {pricing.promoName}
+                  {pricing.longStayDiscount > 0 && (
+                    <div className="flex justify-between text-emerald-400 font-semibold text-xs bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg">
+                      <span className="flex items-center gap-1.5 font-bold">
+                        <Tag size={12} className="text-emerald-400" />
+                        Descuento 5% (Estancia 3+ Días)
                       </span>
-                      <span className="font-display font-bold">-RD${pricing.promoDiscount.toLocaleString()}</span>
+                      <span className="font-display font-bold text-emerald-400">-RD${pricing.longStayDiscount.toLocaleString()}</span>
+                    </div>
+                  )}
+
+                  {pricing.bestPromoTitle && (
+                    <div className="flex justify-between text-accent-foreground text-xs">
+                      <span className="flex items-center gap-1">
+                        <Tag size={12} className="text-accent" />
+                        {pricing.bestPromoTitle}
+                      </span>
+                      <span className="font-display font-bold">-RD${(pricing.promoDiscount - pricing.longStayDiscount).toLocaleString()}</span>
                     </div>
                   )}
 
                   {pricing.couponDiscount > 0 && (
-                    <div className="flex justify-between text-primary">
-                      <span className="text-xs flex items-center gap-1">
+                    <div className="flex justify-between text-primary text-xs">
+                      <span className="flex items-center gap-1">
                         <Tag size={12} />
                         Cupón {appliedCoupon?.code}
                       </span>
