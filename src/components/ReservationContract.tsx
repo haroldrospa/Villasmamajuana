@@ -309,13 +309,52 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
     window.print();
   };
 
-  const handleShareWhatsApp = () => {
+  const handleShareWhatsApp = async () => {
+    setIsGenerating(true);
+    toast.info('Generando PDF del contrato para WhatsApp...');
+
+    const res = await getPDFBlob();
+    if (!res) {
+      toast.error('No se pudo generar el PDF del contrato');
+      setIsGenerating(false);
+      return;
+    }
+
+    // Try Web Share API (Works natively on Mobile devices / supported browsers)
+    try {
+      const pdfFile = new File([res.blob], res.fileName, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        await navigator.share({
+          title: `Contrato - ${villaName}`,
+          text: `Hola ${clientName}, adjuntamos tu Contrato de Alquiler de ${villaName} en Villas Mamajuana para tu estadía del ${checkIn} (${checkInTime}) al ${checkOut} (${checkOutTime}).\n\nPor favor revísalo y firma digitalmente.`,
+          files: [pdfFile]
+        });
+        toast.success('Contrato compartido exitosamente');
+        setIsGenerating(false);
+        return;
+      }
+    } catch (e) {
+      console.log('Nativo Share omitido o cancelado, ejecutando descarga + apertura de WhatsApp');
+    }
+
+    // Fallback Desktop / Standard Web Browser: Download PDF automatically & Open WhatsApp with message text
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(res.blob);
+    link.download = res.fileName;
+    link.click();
+
     const text = encodeURIComponent(
       `Hola ${clientName}, adjuntamos tu Contrato de Alquiler de ${villaName} en Villas Mamajuana para tu estadía del ${checkIn} (${checkInTime}) al ${checkOut} (${checkOutTime}).\n\nPor favor revísalo y firma digitalmente.`
     );
     const cleanPhone = clientPhone.replace(/\D/g, '');
     const phoneWithCode = cleanPhone.length === 10 ? `1${cleanPhone}` : cleanPhone;
+    
     window.open(`https://wa.me/${phoneWithCode}?text=${text}`, '_blank');
+
+    toast.success('El PDF del contrato se ha descargado. En el chat de WhatsApp haz clic en el icono 📎 (Adjuntar) > Documento para enviarlo.', {
+      duration: 7000
+    });
+    setIsGenerating(false);
   };
 
   return (
