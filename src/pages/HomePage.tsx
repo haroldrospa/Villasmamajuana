@@ -110,7 +110,7 @@ const HomePage = () => {
         <div className="min-h-screen pb-12 font-sans bg-[#faf8f5] text-[#163322] overflow-x-hidden">
 
           {/* TOP AUTH & UTILITY BAR */}
-          <div className="absolute top-4 right-4 z-40 flex items-center gap-2">
+          <div className="absolute top-6 right-6 z-40 flex items-center gap-3">
             <LanguageToggle />
             {!isLoading && (
               user ? (
@@ -118,17 +118,17 @@ const HomePage = () => {
                   {isAdmin && (
                     <Link
                       to="/admin"
-                      className="flex items-center gap-1.5 bg-[#c5a059] text-white backdrop-blur-md rounded-full px-3.5 py-1.5 text-xs font-bold shadow-md hover:bg-[#b58f48] transition-all hover:scale-105"
+                      className="flex items-center gap-1.5 bg-[#c5a059] text-white rounded-full px-4 py-2 text-xs font-semibold shadow-md hover:bg-[#b58f48] transition-all"
                     >
                       <Shield size={14} /> Admin
                     </Link>
                   )}
-                  <span className="text-xs font-medium text-white/90 bg-[#163322]/40 backdrop-blur-md border border-[#c5a059]/30 rounded-full px-3.5 py-1.5 shadow-sm">
+                  <span className="text-xs font-medium text-white/90 bg-black/30 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 shadow-sm">
                     Hola, {profile?.full_name?.split(' ')[0] || 'Usuario'}
                   </span>
                   <button
                     onClick={() => signOut()}
-                    className="bg-[#163322]/40 backdrop-blur-md border border-[#c5a059]/30 text-white rounded-full p-2 hover:bg-rose-500/80 transition-all hover:scale-105"
+                    className="bg-black/30 backdrop-blur-md border border-white/20 text-white rounded-full p-2 hover:bg-rose-600/80 transition-all"
                     title="Cerrar sesión"
                   >
                     <LogOut size={15} />
@@ -138,14 +138,14 @@ const HomePage = () => {
                 <>
                   <Link
                     to="/auth"
-                    className="flex items-center gap-1.5 bg-[#163322]/90 backdrop-blur-md text-white rounded-full px-4 py-2 text-xs font-medium shadow-md hover:bg-[#163322] transition-all hover:scale-105 border border-[#c5a059]/40"
+                    className="flex items-center gap-1.5 bg-black/30 backdrop-blur-md text-white rounded-full px-4 py-2 text-xs font-medium border border-white/25 hover:bg-white/10 transition-all"
                   >
                     <LogIn size={14} /> Ingresar
                   </Link>
                   <Link
                     to="/auth"
                     state={{ register: true }}
-                    className="flex items-center gap-1.5 bg-[#c5a059] backdrop-blur-md text-white rounded-full px-4 py-2 text-xs font-bold shadow-md hover:bg-[#b58f48] transition-all hover:scale-105"
+                    className="flex items-center gap-1.5 bg-[#c5a059] text-white rounded-full px-4 py-2 text-xs font-semibold shadow-md hover:bg-[#b58f48] transition-all"
                   >
                     <UserPlus size={14} /> Registrarse
                   </Link>
@@ -154,86 +154,51 @@ const HomePage = () => {
             )}
           </div>
 
-          {/* HERO COVER SECTION */}
-          <div className="relative min-h-[82vh] md:min-h-[88vh] flex flex-col justify-center items-center overflow-hidden bg-[#112418]">
-            {/* DYNAMIC BACKGROUND IMAGE CAROUSEL WITH KEN-BURNS ANIMATION */}
+          {/* HERO COVER SECTION - BOUTIQUE LUXURY RESORT STYLE */}
+          <div className="relative min-h-[82vh] md:min-h-[88vh] flex flex-col justify-center items-center overflow-hidden bg-[#0d1a12]">
+            {/* DYNAMIC BACKGROUND IMAGE CAROUSEL */}
             <AnimatePresence mode="wait">
               <motion.img
                 key={currentBgImage}
                 src={currentBgImage}
                 alt="Villas Mamajuana Bayacanes, La Vega"
-                initial={{ opacity: 0, scale: 1.12 }}
-                animate={{ opacity: 1, scale: 1.04 }}
+                initial={{ opacity: 0, scale: 1.08 }}
+                animate={{ opacity: 1, scale: 1.02 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.8, ease: "easeOut" }}
-                className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-45"
+                className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-65"
               />
             </AnimatePresence>
 
-            {/* ELEGANT FOREST GRADIENT OVERLAYS */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#112418] via-[#163322]/70 to-[#0d1d13]/80 pointer-events-none z-10" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(17,36,24,0.75)_100%)] pointer-events-none z-10" />
-
-            {/* FLOATING AMBIENT DECORATIVE BADGES */}
-            <div className="hidden lg:block absolute top-28 left-12 z-20 pointer-events-none">
-              <motion.div 
-                animate={{ y: [0, -8, 0] }}
-                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                className="bg-[#163322]/60 backdrop-blur-xl border border-[#c5a059]/30 text-white rounded-2xl p-3.5 shadow-xl flex items-center gap-3"
-              >
-                <div className="w-10 h-10 rounded-xl bg-[#c5a059]/20 border border-[#c5a059]/40 flex items-center justify-center text-[#e6ca85]">
-                  <Trees size={20} />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#e6ca85] uppercase tracking-widest block">Clima de Montaña</span>
-                  <span className="text-xs font-light text-white/90">18°C • Brisa Fresca 🍃</span>
-                </div>
-              </motion.div>
-            </div>
-
-            <div className="hidden lg:block absolute bottom-32 right-12 z-20 pointer-events-none">
-              <motion.div 
-                animate={{ y: [0, 8, 0] }}
-                transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
-                className="bg-[#163322]/60 backdrop-blur-xl border border-[#c5a059]/30 text-white rounded-2xl p-3.5 shadow-xl flex items-center gap-3"
-              >
-                <div className="w-10 h-10 rounded-xl bg-[#c5a059]/20 border border-[#c5a059]/40 flex items-center justify-center text-[#e6ca85]">
-                  <Star size={20} className="fill-[#e6ca85]" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#e6ca85] uppercase tracking-widest block">Exclusividad</span>
-                  <span className="text-xs font-light text-white/90">4.9 ★★★★★ (Huéspedes)</span>
-                </div>
-              </motion.div>
-            </div>
+            {/* HIGH-END GRADIENT VIGNETTE */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-[#faf8f5] pointer-events-none z-10" />
 
             {/* CENTRAL HERO CONTENT */}
-            <div className="relative z-20 text-center px-4 max-w-3xl mx-auto pt-14 pb-16 space-y-6 flex flex-col items-center">
-              {/* LOCATION BADGE */}
+            <div className="relative z-20 text-center px-4 max-w-4xl mx-auto pt-16 pb-24 space-y-6 flex flex-col items-center">
+              
+              {/* LOGO - CLEAN TRANSPARENT BLEND */}
               <motion.div
-                initial={{ opacity: 0, y: -15 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#163322]/70 backdrop-blur-md border border-[#c5a059]/40 text-[#f4e8c1] text-xs font-medium uppercase tracking-[0.2em] shadow-lg"
-              >
-                <MapPin size={14} className="text-[#c5a059] animate-bounce" />
-                <span>Bayacanes, La Vega, República Dominicana</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#c5a059] animate-pulse"></span>
-              </motion.div>
-
-              {/* LOGO WITH DELICATE GLOW EFFECT */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
+                transition={{ duration: 0.8 }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-[#c5a059]/20 rounded-full blur-2xl -z-10 animate-pulse"></div>
                 <img 
                   src={logo} 
                   alt="Villas Mamajuana" 
-                  className="w-24 h-24 md:w-28 md:h-28 object-contain drop-shadow-md p-1 bg-white/90 rounded-2xl border border-[#c5a059]/40" 
+                  className="h-20 md:h-24 w-auto object-contain filter drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]" 
                 />
+              </motion.div>
+
+              {/* LOCATION BADGE */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-black/40 backdrop-blur-md border border-[#c5a059]/40 text-[#f4e8c1] text-[11px] font-medium uppercase tracking-[0.25em]"
+              >
+                <MapPin size={13} className="text-[#c5a059]" />
+                <span>Bayacanes, La Vega • República Dominicana</span>
               </motion.div>
 
               {/* MAIN TYPOGRAPHY HEADLINE */}
@@ -241,71 +206,62 @@ const HomePage = () => {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
-                className="space-y-3"
+                className="space-y-4"
               >
-                <h1 className="text-3xl sm:text-5xl md:text-6xl font-light text-white tracking-tight leading-tight font-display">
-                  Bienvenido a <br />
-                  <span className="font-serif italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-[#f4e8c1] via-[#c5a059] to-[#f4e8c1] drop-shadow-sm">
-                    Villas Mamajuana
-                  </span>
+                <h1 className="text-4xl sm:text-6xl md:text-7xl font-light text-white tracking-tight leading-none font-display">
+                  Santuario de Montaña
                 </h1>
                 
                 <p className="text-sm md:text-base text-[#f4f1ea]/90 font-light max-w-xl mx-auto leading-relaxed font-body">
-                  Tu santuario privado en Bayacanes, La Vega. Vive una experiencia inolvidable de tranquilidad, confort y contacto directo con la naturaleza.
+                  Una colección privada de villas rodeadas de naturaleza virgen, clima fresco y paz absoluta.
                 </p>
               </motion.div>
 
-              {/* TOURISM QUICK FEATURE TAGS */}
+              {/* REFINED HOSPITALITY AMENITY BAR */}
               <motion.div 
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="flex flex-wrap justify-center gap-2 pt-1"
+                className="flex flex-wrap justify-center items-center gap-6 text-[#f4e8c1]/90 text-xs font-light tracking-widest uppercase border-t border-white/15 pt-5 max-w-2xl"
               >
-                <span className="px-3.5 py-1.5 rounded-full bg-[#163322]/60 backdrop-blur-md border border-[#c5a059]/30 text-[#f4e8c1] text-xs font-light tracking-wide flex items-center gap-1.5 shadow-sm">
-                  🏊‍♂️ Piscina Privada
+                <span className="flex items-center gap-2">
+                  <Waves size={14} className="text-[#c5a059]" /> Piscina Privada
                 </span>
-                <span className="px-3.5 py-1.5 rounded-full bg-[#163322]/60 backdrop-blur-md border border-[#c5a059]/30 text-[#f4e8c1] text-xs font-light tracking-wide flex items-center gap-1.5 shadow-sm">
-                  🏔️ Vistas Panorámicas
+                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-[#c5a059]/50"></span>
+                <span className="flex items-center gap-2">
+                  <Trees size={14} className="text-[#c5a059]" /> Vistas Panorámicas
                 </span>
-                <span className="px-3.5 py-1.5 rounded-full bg-[#163322]/60 backdrop-blur-md border border-[#c5a059]/30 text-[#f4e8c1] text-xs font-light tracking-wide flex items-center gap-1.5 shadow-sm">
-                  🔥 Área BBQ & Fogata
+                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-[#c5a059]/50"></span>
+                <span className="flex items-center gap-2">
+                  <Flame size={14} className="text-[#c5a059]" /> Área BBQ & Fogata
                 </span>
-                <span className="px-3.5 py-1.5 rounded-full bg-[#163322]/60 backdrop-blur-md border border-[#c5a059]/30 text-[#f4e8c1] text-xs font-light tracking-wide flex items-center gap-1.5 shadow-sm">
-                  📶 WiFi & Confort 5★
+                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-[#c5a059]/50"></span>
+                <span className="flex items-center gap-2">
+                  <Coffee size={14} className="text-[#c5a059]" /> Confort 5 Estrellas
                 </span>
               </motion.div>
             </div>
           </div>
 
-          {/* INTERACTIVE FLOATING QUICK SEARCH WIDGET */}
+          {/* FLOATING QUICK SEARCH BAR - MINIMALIST LUXURY STYLE */}
           <div className="px-4 -mt-14 md:-mt-16 relative z-30 max-w-4xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, y: 25 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="bg-white/95 backdrop-blur-xl border border-[#c5a059]/30 rounded-3xl p-5 md:p-6 shadow-xl text-[#163322] space-y-4"
+              className="bg-white border border-[#c5a059]/30 rounded-2xl p-5 md:p-6 shadow-xl text-[#163322]"
             >
-              <div className="flex items-center justify-between border-b border-[#c5a059]/20 pb-3">
-                <div className="flex items-center gap-2 text-[#163322] font-semibold text-xs uppercase tracking-widest font-display">
-                  <Compass size={18} className="text-[#c5a059]" />
-                  <span>Encuentra tu Estancia Perfecta</span>
-                </div>
-                <span className="text-[11px] font-medium text-[#163322] bg-[#c5a059]/15 border border-[#c5a059]/30 px-3 py-1 rounded-full">
-                  Reserva Directa sin Comisiones
-                </span>
-              </div>
-
-              <form onSubmit={handleSearchDisponibilidad} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <form onSubmit={handleSearchDisponibilidad} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                
                 {/* SELECT VILLA */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold uppercase tracking-wider text-[#163322]/70 flex items-center gap-1">
-                    <Building2 size={12} className="text-[#c5a059]" /> Villa Preferida
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#163322]/70 flex items-center gap-1.5">
+                    <Building2 size={13} className="text-[#c5a059]" /> Villa
                   </label>
                   <select
                     value={selectedVilla}
                     onChange={(e) => setSelectedVilla(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#c5a059]/30 rounded-xl px-3.5 py-2.5 text-xs font-medium text-[#163322] focus:outline-none focus:ring-2 focus:ring-[#c5a059]"
+                    className="w-full bg-[#faf8f5] border border-[#c5a059]/20 rounded-xl px-3.5 py-3 text-xs font-medium text-[#163322] focus:outline-none focus:border-[#c5a059]"
                   >
                     <option value="todas">Todas las Villas</option>
                     {(dbVillas && dbVillas.length > 0 ? dbVillas : [
@@ -318,39 +274,39 @@ const HomePage = () => {
                 </div>
 
                 {/* CHECK-IN */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold uppercase tracking-wider text-[#163322]/70 flex items-center gap-1">
-                    <CalendarIcon size={12} className="text-[#c5a059]" /> Fecha Check-In
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#163322]/70 flex items-center gap-1.5">
+                    <CalendarIcon size={13} className="text-[#c5a059]" /> Check-In
                   </label>
                   <input
                     type="date"
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#c5a059]/30 rounded-xl px-3.5 py-2 text-xs font-medium text-[#163322] focus:outline-none focus:ring-2 focus:ring-[#c5a059]"
+                    className="w-full bg-[#faf8f5] border border-[#c5a059]/20 rounded-xl px-3.5 py-2.5 text-xs font-medium text-[#163322] focus:outline-none focus:border-[#c5a059]"
                   />
                 </div>
 
                 {/* CHECK-OUT */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold uppercase tracking-wider text-[#163322]/70 flex items-center gap-1">
-                    <CalendarIcon size={12} className="text-[#c5a059]" /> Fecha Check-Out
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#163322]/70 flex items-center gap-1.5">
+                    <CalendarIcon size={13} className="text-[#c5a059]" /> Check-Out
                   </label>
                   <input
                     type="date"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#c5a059]/30 rounded-xl px-3.5 py-2 text-xs font-medium text-[#163322] focus:outline-none focus:ring-2 focus:ring-[#c5a059]"
+                    className="w-full bg-[#faf8f5] border border-[#c5a059]/20 rounded-xl px-3.5 py-2.5 text-xs font-medium text-[#163322] focus:outline-none focus:border-[#c5a059]"
                   />
                 </div>
 
                 {/* SEARCH BUTTON */}
-                <div className="flex items-end">
+                <div>
                   <button
                     type="submit"
-                    className="w-full h-[38px] bg-[#163322] hover:bg-[#254d35] text-white rounded-xl font-medium text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 border border-[#c5a059]/40"
+                    className="w-full h-[42px] bg-[#163322] hover:bg-[#234b33] text-white rounded-xl font-medium text-xs uppercase tracking-[0.15em] shadow-md flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-95"
                   >
                     <Search size={15} className="text-[#c5a059]" />
-                    <span>Buscar Disponibilidad</span>
+                    <span>Consultar Disponibilidad</span>
                   </button>
                 </div>
               </form>
@@ -358,31 +314,21 @@ const HomePage = () => {
           </div>
 
           {/* MAIN ACTION BUTTONS */}
-          <div className="px-4 mt-8 relative z-20 max-w-xl mx-auto flex flex-col sm:flex-row gap-3.5">
+          <div className="px-4 mt-8 relative z-20 max-w-md mx-auto flex flex-col sm:flex-row gap-3">
             <Link 
               to="/reservar" 
-              className="flex-1 relative group overflow-hidden bg-[#c5a059] hover:bg-[#b58f48] text-white rounded-2xl py-3.5 px-6 font-semibold text-xs tracking-wider uppercase text-center shadow-md transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+              className="flex-1 bg-[#c5a059] hover:bg-[#b58f48] text-white rounded-xl py-3.5 px-6 font-semibold text-xs tracking-[0.15em] uppercase text-center shadow-md transition-all flex items-center justify-center gap-2"
             >
-              <Sparkles size={16} className="text-amber-100" />
-              <span>RESERVAR AHORA</span>
-              <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+              <Sparkles size={15} />
+              <span>Reservar Ahora</span>
             </Link>
 
             <Link 
               to="/villas" 
-              className="flex-1 bg-white hover:bg-[#faf8f5] border border-[#c5a059]/40 text-[#163322] rounded-2xl py-3.5 px-6 font-semibold text-xs tracking-wider uppercase text-center transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 shadow-sm"
+              className="flex-1 bg-white hover:bg-[#faf8f5] border border-[#c5a059]/40 text-[#163322] rounded-xl py-3.5 px-6 font-semibold text-xs tracking-[0.15em] uppercase text-center transition-all flex items-center justify-center gap-2 shadow-sm"
             >
-              <Building2 size={16} className="text-[#c5a059]" />
-              <span>Explorar Villas</span>
-            </Link>
-
-            <Link 
-              to="/disponibilidad" 
-              className="sm:w-auto bg-white hover:bg-[#faf8f5] border border-[#c5a059]/40 text-[#163322] rounded-2xl py-3.5 px-4 font-semibold text-xs text-center transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 shadow-sm"
-              title="Ver Calendario"
-            >
-              <CalendarIcon size={16} className="text-[#c5a059]" />
-              <span className="sm:hidden">Calendario</span>
+              <Building2 size={15} className="text-[#c5a059]" />
+              <span>Ver Villas</span>
             </Link>
           </div>
 
