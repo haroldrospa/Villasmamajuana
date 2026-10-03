@@ -393,17 +393,15 @@ const HomePage = () => {
           <div className="px-4 mt-8 relative z-20 max-w-md mx-auto flex flex-col sm:flex-row gap-3">
             <Link 
               to="/reservar" 
-              className="flex-1 bg-[#c5a059] hover:bg-[#b58f48] text-white rounded-xl py-3.5 px-6 font-semibold text-xs tracking-[0.15em] uppercase text-center shadow-md transition-all flex items-center justify-center gap-2"
+              className="flex-1 bg-[#c5a059] hover:bg-[#b58f48] text-white rounded-xl py-3.5 px-6 font-bold text-xs tracking-[0.15em] uppercase text-center shadow-md transition-all flex items-center justify-center"
             >
-              <Sparkles size={15} />
               <span>Reservar Ahora</span>
             </Link>
 
             <Link 
               to="/villas" 
-              className="flex-1 bg-white hover:bg-[#faf8f5] border border-[#c5a059]/40 text-[#163322] rounded-xl py-3.5 px-6 font-semibold text-xs tracking-[0.15em] uppercase text-center transition-all flex items-center justify-center gap-2 shadow-sm"
+              className="flex-1 bg-white hover:bg-[#faf8f5] border border-[#c5a059]/40 text-[#163322] rounded-xl py-3.5 px-6 font-bold text-xs tracking-[0.15em] uppercase text-center transition-all flex items-center justify-center shadow-sm"
             >
-              <Building2 size={15} className="text-[#c5a059]" />
               <span>Ver Villas</span>
             </Link>
           </div>
