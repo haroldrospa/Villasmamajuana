@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import logo from '@/assets/logo-villa.png';
-import { Download, Printer, Send, FileText, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Download, Printer, Send, FileText, CheckCircle2, ShieldAlert, PenTool, RotateCcw, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -40,14 +40,170 @@ const INVENTORY_ITEMS = [
   { area: 'Otros (lavadora, wifi, llaves/controles)', cant: '-' },
 ];
 
+const STATUS_OPTIONS = [
+  '✔ Excelente',
+  '✔ Buen estado',
+  '⚠️ Con detalles',
+  '✖ Faltante',
+  '— N/A'
+];
+
+// Interactive Signature Canvas Component
+const DigitalSignaturePad = ({
+  label,
+  signatureData,
+  onSave,
+  onClear
+}: {
+  label: string;
+  signatureData: string | null;
+  onSave: (dataUrl: string) => void;
+  onClear: () => void;
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [hasDrawn, setHasDrawn] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.strokeStyle = '#163322';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  }, []);
+
+  const getCoordinates = (e: any) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+  };
+
+  const startDrawing = (e: any) => {
+    setIsDrawing(true);
+    setHasDrawn(true);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const coords = getCoordinates(e);
+    ctx.beginPath();
+    ctx.moveTo(coords.x, coords.y);
+  };
+
+  const draw = (e: any) => {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const coords = getCoordinates(e);
+    ctx.lineTo(coords.x, coords.y);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    if (isDrawing) {
+      setIsDrawing(false);
+      const canvas = canvasRef.current;
+      if (canvas && hasDrawn) {
+        onSave(canvas.toDataURL());
+      }
+    }
+  };
+
+  const handleClear = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    setHasDrawn(false);
+    onClear();
+  };
+
+  return (
+    <div className="flex flex-col items-center w-full">
+      {signatureData ? (
+        <div className="relative w-full h-24 border-b-2 border-slate-800 flex items-center justify-center bg-slate-50/50 rounded-lg group">
+          <img src={signatureData} alt={`Firma ${label}`} className="max-h-20 max-w-full object-contain" />
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute top-1 right-1 px-2 py-0.5 bg-rose-600 text-white rounded-md text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity print:hidden shadow-sm"
+          >
+            Refirmar
+          </button>
+        </div>
+      ) : (
+        <div className="w-full flex flex-col items-center">
+          <div className="relative w-full h-24 bg-slate-50 border-2 border-dashed border-slate-300 hover:border-slate-500 rounded-xl overflow-hidden touch-none cursor-crosshair transition-colors">
+            <canvas
+              ref={canvasRef}
+              width={350}
+              height={100}
+              className="w-full h-full"
+              onMouseDown={startDrawing}
+              onMouseMove={draw}
+              onMouseUp={stopDrawing}
+              onMouseLeave={stopDrawing}
+              onTouchStart={startDrawing}
+              onTouchMove={draw}
+              onTouchEnd={stopDrawing}
+            />
+            {!hasDrawn && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-400 text-xs font-semibold gap-1.5">
+                <PenTool size={14} className="text-[#c5a059]" />
+                <span>Presiona o dibuja tu firma digital aquí</span>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-between w-full mt-1 px-1 text-[10px] text-slate-500 print:hidden">
+            <span>Arrastra el dedo o ratón para firmar</span>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-rose-600 font-bold hover:underline flex items-center gap-1"
+            >
+              <RotateCcw size={10} /> Borrar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareWhatsApp }: ContractProps) => {
   const contractRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [settings, setSettings] = useState<any>(null);
 
-  // Editable extra fields for contract signing
+  // Editable extra fields
   const [guestId, setGuestId] = useState('');
   const [guestCount, setGuestCount] = useState(reservation?.capacity || '6');
+
+  // Digital Signature States
+  const [arrendadorSignature, setArrendadorSignature] = useState<string | null>(null);
+  const [guestSignature, setGuestSignature] = useState<string | null>(null);
+
+  // Interactive Inventory Checkbox Status Map (index -> { entrada, salida })
+  const [inventoryStatuses, setInventoryStatuses] = useState<Record<number, { entrada: string; salida: string }>>(() => {
+    const initial: Record<number, { entrada: string; salida: string }> = {};
+    INVENTORY_ITEMS.forEach((_, idx) => {
+      initial[idx] = { entrada: '✔ Excelente', salida: '✔ Excelente' };
+    });
+    return initial;
+  });
 
   useEffect(() => {
     fetchSettings();
@@ -70,6 +226,28 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
   const totalAmount = reservation?.total_amount || invoiceData?.totalAmount || 0;
   const paymentMethod = reservation?.payment_method || invoiceData?.paymentMethod || 'Efectivo / Transferencia';
   const createdDate = reservation?.created_at ? new Date(reservation.created_at).toLocaleDateString('es-DO') : new Date().toLocaleDateString('es-DO');
+
+  const updateInventoryStatus = (index: number, field: 'entrada' | 'salida', value: string) => {
+    setInventoryStatuses(prev => ({
+      ...prev,
+      [index]: {
+        ...prev[index],
+        [field]: value
+      }
+    }));
+  };
+
+  const bulkSetStatus = (field: 'entrada' | 'salida', value: string) => {
+    const updated: Record<number, { entrada: string; salida: string }> = {};
+    INVENTORY_ITEMS.forEach((_, idx) => {
+      updated[idx] = {
+        ...inventoryStatuses[idx],
+        [field]: value
+      };
+    });
+    setInventoryStatuses(updated);
+    toast.success(`Todo marcado como "${value}" en ${field.toUpperCase()}`);
+  };
 
   const getPDFBlob = async () => {
     if (!contractRef.current) return null;
@@ -117,7 +295,7 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
       link.href = URL.createObjectURL(res.blob);
       link.download = res.fileName;
       link.click();
-      toast.success('Contrato de alquiler PDF descargado');
+      toast.success('Contrato de alquiler firmado y descargado en PDF');
     } else {
       toast.error('Error al generar el PDF del contrato');
     }
@@ -130,7 +308,7 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
 
   const handleShareWhatsApp = () => {
     const text = encodeURIComponent(
-      `Hola ${clientName}, adjuntamos tu Contrato de Alquiler de ${villaName} en Villas Mamajuana para tu estadía del ${checkIn} al ${checkOut}.\n\nPor favor revísalo y conservalo.`
+      `Hola ${clientName}, adjuntamos tu Contrato de Alquiler de ${villaName} en Villas Mamajuana para tu estadía del ${checkIn} al ${checkOut}.\n\nPor favor revísalo y firma digitalmente.`
     );
     const cleanPhone = clientPhone.replace(/\D/g, '');
     const phoneWithCode = cleanPhone.length === 10 ? `1${cleanPhone}` : cleanPhone;
@@ -146,7 +324,7 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
           <FileText className="text-[#c5a059]" size={20} />
           <div>
             <h3 className="font-bold text-sm text-slate-800">Contrato de Alquiler Oficial</h3>
-            <p className="text-xs text-slate-500">Generado automáticamente para {clientName}</p>
+            <p className="text-xs text-slate-500">Con Firma Digital e Inventario Interactivo para {clientName}</p>
           </div>
         </div>
 
@@ -287,12 +465,34 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
           </p>
         </div>
 
-        {/* SECTION 4: INVENTARIO */}
+        {/* SECTION 4: INVENTARIO CON COTEJOS SELECCIONABLES */}
         <div className="mb-6">
-          <h2 className="text-sm font-extrabold uppercase tracking-wider text-[#163322] border-b border-slate-200 pb-1 mb-3 flex items-center justify-between">
-            <span>4. Inventario</span>
-            <span className="text-[10px] font-semibold text-slate-500 lowercase">(revisar y firmar en el check-in y check-out)</span>
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-1 mb-3 gap-2">
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-[#163322]">
+              4. Inventario <span className="text-[10px] text-slate-500 font-medium lowercase">(marcar cotejos al check-in y check-out)</span>
+            </h2>
+
+            {/* Quick Fill Toolbar (Hidden in print) */}
+            <div className="flex gap-2 print:hidden">
+              <button
+                type="button"
+                onClick={() => bulkSetStatus('entrada', '✔ Excelente')}
+                className="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all"
+              >
+                <CheckSquare size={12} />
+                <span>Todo Excelente Entrada</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => bulkSetStatus('salida', '✔ Excelente')}
+                className="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all"
+              >
+                <CheckSquare size={12} />
+                <span>Todo Excelente Salida</span>
+              </button>
+            </div>
+          </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-[11px] border-collapse border border-slate-300">
@@ -300,23 +500,62 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
                 <tr className="bg-[#163322] text-white">
                   <th className="p-2 border border-slate-300 font-bold">Área / Artículo</th>
                   <th className="p-2 border border-slate-300 font-bold text-center w-16">Cant.</th>
-                  <th className="p-2 border border-slate-300 font-bold text-center w-28">Estado ENTRADA</th>
-                  <th className="p-2 border border-slate-300 font-bold text-center w-28">Estado SALIDA</th>
+                  <th className="p-2 border border-slate-300 font-bold text-center w-36">Estado ENTRADA</th>
+                  <th className="p-2 border border-slate-300 font-bold text-center w-36">Estado SALIDA</th>
                 </tr>
               </thead>
               <tbody>
-                {INVENTORY_ITEMS.map((item, idx) => (
-                  <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                    <td className="p-1.5 border border-slate-300 font-medium text-slate-800">{item.area}</td>
-                    <td className="p-1.5 border border-slate-300 text-center font-bold text-slate-700">{item.cant}</td>
-                    <td className="p-1.5 border border-slate-300 text-center">
-                      <span className="inline-block w-full h-4 border-b border-slate-300"></span>
-                    </td>
-                    <td className="p-1.5 border border-slate-300 text-center">
-                      <span className="inline-block w-full h-4 border-b border-slate-300"></span>
-                    </td>
-                  </tr>
-                ))}
+                {INVENTORY_ITEMS.map((item, idx) => {
+                  const status = inventoryStatuses[idx] || { entrada: '✔ Excelente', salida: '✔ Excelente' };
+                  return (
+                    <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                      <td className="p-1.5 border border-slate-300 font-medium text-slate-800">{item.area}</td>
+                      <td className="p-1.5 border border-slate-300 text-center font-bold text-slate-700">{item.cant}</td>
+                      
+                      {/* Estado ENTRADA Cell with Cotejo Selector */}
+                      <td className="p-1 border border-slate-300 text-center">
+                        <select
+                          value={status.entrada}
+                          onChange={(e) => updateInventoryStatus(idx, 'entrada', e.target.value)}
+                          className={`w-full bg-transparent text-center font-bold text-[10px] outline-none cursor-pointer py-1 ${
+                            status.entrada.includes('✔')
+                              ? 'text-emerald-700'
+                              : status.entrada.includes('⚠️')
+                              ? 'text-amber-700 font-black'
+                              : status.entrada.includes('✖')
+                              ? 'text-rose-700 font-black'
+                              : 'text-slate-500'
+                          }`}
+                        >
+                          {STATUS_OPTIONS.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </td>
+
+                      {/* Estado SALIDA Cell with Cotejo Selector */}
+                      <td className="p-1 border border-slate-300 text-center">
+                        <select
+                          value={status.salida}
+                          onChange={(e) => updateInventoryStatus(idx, 'salida', e.target.value)}
+                          className={`w-full bg-transparent text-center font-bold text-[10px] outline-none cursor-pointer py-1 ${
+                            status.salida.includes('✔')
+                              ? 'text-emerald-700'
+                              : status.salida.includes('⚠️')
+                              ? 'text-amber-700 font-black'
+                              : status.salida.includes('✖')
+                              ? 'text-rose-700 font-black'
+                              : 'text-slate-500'
+                          }`}
+                        >
+                          {STATUS_OPTIONS.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -351,35 +590,46 @@ const ReservationContract = ({ reservation, invoiceData, onDownloadPDF, onShareW
           </p>
         </div>
 
-        {/* SECTION 7: FIRMAS */}
+        {/* SECTION 7: FIRMAS DIGITALES INTERACTIVAS */}
         <div className="mt-8 pt-4 border-t-2 border-slate-300">
-          <h2 className="text-sm font-extrabold uppercase tracking-wider text-[#163322] mb-2">
-            7. Firmas
+          <h2 className="text-sm font-extrabold uppercase tracking-wider text-[#163322] mb-2 flex items-center justify-between">
+            <span>7. Firmas Digitales</span>
+            <span className="text-[10px] text-slate-500 font-medium lowercase print:hidden">(dibuja tu firma táctil o con ratón abajo)</span>
           </h2>
-          <p className="text-xs text-slate-600 mb-6">
-            Ambas partes aceptan lo aquí establecido, incluyendo el inventario.
+          <p className="text-xs text-slate-600 mb-4">
+            Ambas partes aceptan lo aquí establecido, incluyendo el inventario verificado.
           </p>
 
-          <p className="text-xs font-bold text-slate-800 mb-10">
+          <p className="text-xs font-bold text-slate-800 mb-6">
             Lugar y fecha: <span className="border-b border-slate-400 px-4 font-semibold">Bayacanes, La Vega, República Dominicana — {createdDate}</span>
           </p>
 
-          <div className="grid grid-cols-2 gap-12 pt-8">
-            <div className="text-center">
-              <div className="border-b-2 border-slate-800 mb-2 h-12 flex items-end justify-center pb-1">
-                <span className="font-serif italic text-slate-500 text-xs">Villas Mamajuana</span>
-              </div>
-              <p className="font-bold text-xs text-slate-900 uppercase">Villas Mamajuana</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4">
+            
+            {/* FIRMA ARRENDADOR (VILLAS MAMAJUANA) */}
+            <div className="flex flex-col items-center">
+              <DigitalSignaturePad
+                label="Villas Mamajuana"
+                signatureData={arrendadorSignature}
+                onSave={setArrendadorSignature}
+                onClear={() => setArrendadorSignature(null)}
+              />
+              <p className="font-bold text-xs text-slate-900 uppercase mt-2">Villas Mamajuana</p>
               <p className="text-[10px] text-slate-500 uppercase tracking-wider">Arrendador</p>
             </div>
 
-            <div className="text-center">
-              <div className="border-b-2 border-slate-800 mb-2 h-12 flex items-end justify-center pb-1">
-                <span className="font-serif italic text-slate-400 text-xs">(Firma Huésped)</span>
-              </div>
-              <p className="font-bold text-xs text-slate-900 uppercase">{clientName}</p>
+            {/* FIRMA HUÉSPED (CLIENTE) */}
+            <div className="flex flex-col items-center">
+              <DigitalSignaturePad
+                label={clientName}
+                signatureData={guestSignature}
+                onSave={setGuestSignature}
+                onClear={() => setGuestSignature(null)}
+              />
+              <p className="font-bold text-xs text-slate-900 uppercase mt-2">{clientName}</p>
               <p className="text-[10px] text-slate-500 uppercase tracking-wider">Huésped (Arrendatario)</p>
             </div>
+
           </div>
         </div>
 
