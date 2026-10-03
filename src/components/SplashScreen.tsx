@@ -83,14 +83,18 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        <motion.img
-          src={logo}
-          alt="Villas Mamajuana"
-          className="w-44 h-44 md:w-56 md:h-56 object-contain drop-shadow-lg"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <motion.div
+          className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden bg-white p-2.5 shadow-2xl border-4 border-[#c5a059] flex items-center justify-center"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.5 }}
-        />
+        >
+          <img
+            src={logo}
+            alt="Villas Mamajuana"
+            className="w-full h-full object-cover rounded-full select-none"
+          />
+        </motion.div>
 
         {/* Gold line */}
         <motion.div

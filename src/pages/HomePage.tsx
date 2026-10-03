@@ -175,18 +175,20 @@ const HomePage = () => {
             {/* CENTRAL HERO CONTENT */}
             <div className="relative z-20 text-center px-4 max-w-4xl mx-auto pt-16 pb-24 space-y-6 flex flex-col items-center">
               
-              {/* LOGO - CLEAN TRANSPARENT BLEND */}
+              {/* LOGO - ELEGANT ROUND CIRCULAR EMBLEM BADGE */}
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8 }}
                 className="relative"
               >
-                <img 
-                  src={logo} 
-                  alt="Villas Mamajuana" 
-                  className="h-20 md:h-24 w-auto object-contain filter drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]" 
-                />
+                <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden bg-white p-2 shadow-2xl border-2 border-[#c5a059] flex items-center justify-center">
+                  <img 
+                    src={logo} 
+                    alt="Villas Mamajuana" 
+                    className="w-full h-full object-cover rounded-full select-none" 
+                  />
+                </div>
               </motion.div>
 
               {/* LOCATION BADGE */}
@@ -445,7 +447,7 @@ const HomePage = () => {
           {/* FOOTER */}
           <footer className="w-full text-center py-8 mt-16 border-t border-[#c5a059]/20 space-y-2 bg-[#112418]">
             <div className="flex items-center justify-center gap-3">
-              <img src={logo} alt="Logo" className="w-8 h-8 object-contain p-0.5 bg-white rounded-lg" />
+              <img src={logo} alt="Logo" className="w-9 h-9 object-cover p-0.5 bg-white rounded-full border border-[#c5a059]/40 shadow-sm" />
               <span className="font-light text-sm tracking-[0.2em] uppercase text-[#f4e8c1] font-display">Villas Mamajuana</span>
             </div>
             <p className="text-xs text-[#f4e8c1]/60 font-light font-body">
