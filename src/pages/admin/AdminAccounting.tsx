@@ -72,8 +72,8 @@ const AdminAccounting = () => {
   const [activeTab, setActiveTab] = useState<'mensual' | 'semanal'>('mensual');
   const [viewingMonthModal, setViewingMonthModal] = useState<number | null>(null);
   
-  // Weekly Report State
-  const [selectedWeekOffset, setSelectedWeekOffset] = useState<number>(0);
+  // Weekly Report State (Default to last week: -1)
+  const [selectedWeekOffset, setSelectedWeekOffset] = useState<number>(-1);
   const [selectedWeeklyVilla, setSelectedWeeklyVilla] = useState<string>('all');
   const [copiedText, setCopiedText] = useState(false);
 
@@ -575,16 +575,39 @@ const AdminAccounting = () => {
                     ))}
                   </select>
 
+                  {/* Quick Week Toggle Pills */}
+                  <div className="flex items-center gap-1 bg-muted p-1 rounded-xl border border-border">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedWeekOffset(-1)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        selectedWeekOffset === -1 ? 'bg-amber-500 text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      Semana que pasó
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedWeekOffset(0)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        selectedWeekOffset === 0 ? 'bg-amber-500 text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      Semana actual
+                    </button>
+                  </div>
+
                   {/* Week Selector */}
                   <select
                     value={selectedWeekOffset}
                     onChange={e => setSelectedWeekOffset(Number(e.target.value))}
-                    className="bg-muted border border-border rounded-xl px-3 py-2 text-xs font-bold text-foreground outline-none"
+                    className="bg-muted border border-border rounded-xl px-3 py-2 text-xs font-bold text-foreground outline-none cursor-pointer"
                   >
-                    <option value={0}>Semana Actual ({getWeekRange(0).startStr})</option>
-                    <option value={-1}>Semana Anterior ({getWeekRange(-1).startStr})</option>
-                    <option value={-2}>Hace 2 Semanas ({getWeekRange(-2).startStr})</option>
-                    <option value={-3}>Hace 3 Semanas ({getWeekRange(-3).startStr})</option>
+                    <option value={-1}>Semana que pasó ({getWeekRange(-1).startStr} al {getWeekRange(-1).endStr})</option>
+                    <option value={0}>Semana Actual ({getWeekRange(0).startStr} al {getWeekRange(0).endStr})</option>
+                    <option value={-2}>Hace 2 Semanas ({getWeekRange(-2).startStr} al {getWeekRange(-2).endStr})</option>
+                    <option value={-3}>Hace 3 Semanas ({getWeekRange(-3).startStr} al {getWeekRange(-3).endStr})</option>
+                    <option value={-4}>Hace 4 Semanas ({getWeekRange(-4).startStr} al {getWeekRange(-4).endStr})</option>
                   </select>
 
                   <button
